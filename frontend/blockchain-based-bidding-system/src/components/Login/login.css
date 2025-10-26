@@ -1,0 +1,213 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+.login-container {
+  height: 100vh;
+  width: 100vw;
+  background-image: url("../../assets/login.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 5%;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.logo-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.logo {
+  height: 60px;
+  width: auto;
+}
+
+.logo-text {
+  font-family: "Poppins", sans-serif;
+  font-size: 24px;
+  color: white;
+  font-weight: bold;
+}
+.google-login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  color: #555;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  transform: scale(1);
+}
+
+.google-login-btn:hover {
+  background-color: transparent;
+  color: white;
+  border-color: #41e1e3;
+  transform: scale(1.05);
+}
+
+.google-login-btn .google-icon {
+  height: 20px;
+  width: 20px;
+  transition: transform 0.3s ease;
+}
+
+.google-login-btn:hover .google-icon {
+  transform: rotate(360deg);
+}
+
+.signup-link a {
+  color: #41e1e3;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px 15px;
+}
+
+.input-icon {
+  height: 20px;
+  width: 20px;
+  margin-right: 10px;
+}
+
+.login-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: white;
+  font-size: 16px;
+}
+
+.login-input::placeholder {
+  color: white;
+}
+
+.google-login-btn:hover {
+  background-color: transparent
+}
+
+.google-icon {
+  height: 20px;
+  width: 20px;
+}
+
+.signup-link {
+  text-align: center;
+  margin-top: 55px;
+  font-size: 14px;
+  color: white;
+font-family: "Poppins", sans-serif;
+}
+
+.signup-link a {
+  color: #41e1e3;
+  font-family: "Poppins", sans-serif;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
+}
+
+
+ 
+.login-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.login-main-text {
+  font-family: "Poppins", sans-serif;
+  color: #41e1e3;
+  font-size: 66px;
+  font-weight: bold;
+}
+
+.login-sub-text {
+  font-family: "Poppins", sans-serif;
+  color: #41e1e3;
+  font-size: 20px;
+  margin-top: 5px;
+}
+
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 500px;
+}
+
+.login-input {
+  padding: 12px 15px;
+  border-radius: 8px;
+
+  font-size: 16px;
+  outline: none;
+  width: 100%;
+  background-color: transparent;
+  color: white;
+}
+
+.login-input::placeholder {
+  color: white;
+}
+
+.login-input:focus {
+  border-color: #41e1e3;
+  box-shadow: 0 0 5px #41e1e3;
+}
+
+.login-btn {
+  padding: 12px 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: #41e1e3;
+  color: black;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  width: 100px;
+}
+
+.login-btn:hover {
+  background-color: #36b9ba;
+}
