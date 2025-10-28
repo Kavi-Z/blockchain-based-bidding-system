@@ -14,7 +14,7 @@ html, body {
   height: 100vh;
   width: 100vw;
   background-image: url("../../assets/login.png");
-  background-size: cover;
+  background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
   display: flex;
@@ -155,16 +155,17 @@ font-family: "Poppins", sans-serif;
 }
 
 .login-main-text {
-  font-family: "Poppins", sans-serif;
+  font-family: "MyFont1", sans-serif;
   color: #41e1e3;
   font-size: 66px;
-  font-weight: bold;
+  font-weight: 100;
 }
 
 .login-sub-text {
-  font-family: "Poppins", sans-serif;
+  font-family: "MyFont1", sans-serif;
   color: #41e1e3;
   font-size: 20px;
+  font-weight: 100;
   margin-top: 5px;
 }
 
@@ -203,6 +204,7 @@ font-family: "Poppins", sans-serif;
   background-color: #41e1e3;
   color: black;
   font-size: 18px;
+  font-family: sans-serif, "MyFont1";
   cursor: pointer;
   transition: background 0.3s ease;
   width: 100px;

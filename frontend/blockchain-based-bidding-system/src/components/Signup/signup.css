@@ -13,7 +13,7 @@ html, body {
 .signup-container {
   height: 100vh;
   width: 100vw;
-  background-size: cover;
+  background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
   display: flex;
@@ -54,16 +54,16 @@ html, body {
 }
 
 .signup-main-text {
-  font-family: "Poppins", sans-serif;
+  font-family: "MyFont1", sans-serif;
   color: #41e1e3;
   font-size: 36px;
-  font-weight: bold;
+  font-weight: 100;
   margin-top: 75px;
   padding-top: 0px;
 }
 
 .signup-sub-text {
-  font-family: "Poppins", sans-serif;
+  font-family: "MyFont1", sans-serif;
   color: #41e1e3;
   font-size: 20px;
   margin-top: 2px;
@@ -72,6 +72,7 @@ html, body {
 
 .signup-form {
   display: flex;
+  font-family: 'MyFont1', sans-serif;
   flex-direction: column;
   gap: 15px;
   width: 500px;
@@ -82,6 +83,7 @@ html, body {
   padding: 12px 15px;
   border-radius: 8px;
   border: 1px solid #ccc;
+  font-family: sans-serif, "MyFont1";
   font-size: 16px;
   outline: none;
   background-color: transparent;
@@ -104,7 +106,7 @@ html, body {
   background-color: #41e1e3;
   color: black;
   font-size: 18px;
-  font-family: sans-serif, "Poppins";
+  font-family: sans-serif, "MyFont1";
   font-weight: bold;
   cursor: pointer;
   transition: background 0.3s ease;
@@ -145,13 +147,6 @@ html, body {
 
 .google-signup-btn:hover .google-icon {
   transform: rotate(360deg);
-}
-
-
-
-.google-icon {
-  height: 20px;
-  width: 20px;
 }
 
 .login-link {
