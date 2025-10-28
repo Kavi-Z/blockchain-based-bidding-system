@@ -12,7 +12,7 @@ const Signup = () => {
   return (
     <div
       className="signup-container"
-      style={{ backgroundImage: `url(${signupBg})`}}
+      style={{ backgroundImage: `url(${signupBg})`, height: "100vh" }}
     >
       <div className="logo-container">
         <img src={logo} alt="Logo" className="logo" />
@@ -28,16 +28,13 @@ const Signup = () => {
         <form className="signup-form">
           <div className="input-group">
             <img src={userIcon} alt="User" className="input-icon" />
-            <input type="text" placeholder="Full Name" className="signup-input" />
+            <input type="text" placeholder="Username" className="signup-input" />
           </div>
           <div className="input-group">
             <img src={emailIcon} alt="Email" className="input-icon" />
             <input type="email" placeholder="Email" className="signup-input" />
           </div>
-          <div className="input-group">
-            <img src={userIcon} alt="Username" className="input-icon" />
-            <input type="text" placeholder="Username" className="signup-input" />
-          </div>
+         
           <div className="input-group">
             <img src={lockIcon} alt="Password" className="input-icon" />
             <input type="password" placeholder="Password" className="signup-input" />
