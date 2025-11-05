@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { ethers } from 'ethers';
 import './navbar1.css';
 import logo from "../../assets/cryptops.png";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [walletAddress, setWalletAddress] = useState('');
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -17,10 +19,27 @@ const Navbar = () => {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
-
-  const handleConnectWallet = () => {
-    alert('Connecting wallet...');
+ 
+  const handleConnectWallet = async () => {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        setWalletAddress(accounts[0]);
+      } catch (err) {
+        console.error("User rejected connection:", err);
+      }
+    } else {
+      alert('MetaMask not detected. Please install it from https://metamask.io/');
+    }
   };
+ 
+  useEffect(() => {
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', (accounts) => {
+        setWalletAddress(accounts[0] || '');
+      });
+    }
+  }, []);
 
   return (
     <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
@@ -46,7 +65,9 @@ const Navbar = () => {
         </ul>
 
         <button className='connect-wallet-btn' onClick={handleConnectWallet}>
-          Connect Wallet
+          {walletAddress
+            ? `${walletAddress.substring(0, 6)}...${walletAddress.slice(-4)}`
+            : 'Connect Wallet'}
         </button>
       </div>
     </nav>
