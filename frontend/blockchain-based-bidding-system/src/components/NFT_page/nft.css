@@ -1,0 +1,531 @@
+/* ==================== NFTGallery.css ==================== */
+
+/* Reset and Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* App Container */
+.app-container {
+  min-height: 100vh;
+  background-color: #111827;
+  color: white;
+  padding: 2rem;
+}
+
+/* ==================== Header Styles ==================== */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-circle {
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: #22d3ee;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text {
+  color: #111827;
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+.logo-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.nav-container {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  font-size: 1rem;
+}
+
+.nav-link:hover {
+  color: #22d3ee;
+}
+
+.nav-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #22d3ee;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.nav-icon:hover {
+  color: #06b6d4;
+}
+
+.wallet-btn {
+  padding: 0.5rem 1.5rem;
+  background-color: transparent;
+  border: 2px solid #22d3ee;
+  color: #22d3ee;
+  border-radius: 9999px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.wallet-btn:hover {
+  background-color: #22d3ee;
+  color: #111827;
+}
+
+/* ==================== Page Title ==================== */
+.page-title {
+  font-family: 'MyFont1', Georgia, 'Times New Roman', serif;
+  font-size: 4rem;
+  font-weight: 700;
+  margin-bottom: 3rem;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ==================== NFT Grid (Gallery View) ==================== */
+.nft-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  max-width: 75rem;
+  margin: 0 auto;           /* center grid on page */
+  justify-items: center;    /* center items in each grid cell */
+}
+
+.nft-card {
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  display: flex;
+  justify-content: center; /* keep card content centered */
+}
+
+.nft-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* remove inner padding so images touch wrapper (no border/gap) */
+.nft-image-wrapper {
+  border-radius: 1.5rem;
+  padding: 0;               /* removed padding to eliminate border-like gap */
+  aspect-ratio: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: transparent;
+  box-shadow: none;
+}
+
+.nft-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;        /* fill the card */
+  border-radius: 1.5rem;    /* match wrapper */
+  display: block;
+  border: none;
+}
+
+/* ==================== Background Color Classes ==================== */
+.nft-bg-green {
+  background: linear-gradient(to bottom right, #84cc16, #22c55e);
+}
+
+.nft-bg-pink {
+  background: linear-gradient(to bottom right, #f9a8d4, #f472b6);
+}
+
+.nft-bg-orange {
+  background: linear-gradient(to bottom right, #fb923c, #eab308);
+}
+
+.nft-bg-teal {
+  background: linear-gradient(to bottom right, #2dd4bf, #0891b2);
+}
+
+.nft-bg-red {
+  background: linear-gradient(to bottom right, #f87171, #ec4899);
+}
+
+.nft-bg-purple {
+  background: linear-gradient(to bottom right, #581c87, #ca8a04);
+}
+
+/* ==================== Back Button ==================== */
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #22d3ee;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+  padding: 0.5rem 0;
+  margin: 0; /* remove margin-bottom so vertical spacing is controlled by .detail-top */
+}
+
+.back-btn:hover {
+  color: #06b6d4;
+}
+
+/* ensure detail back button sits below fixed navbar and is clickable */
+.detail-top {
+  margin-top: 90px; /* adjust to match navbar height */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* ==================== Detail View Grid ==================== */
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3rem;
+  max-width: 90rem;
+}
+
+.detail-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-title {
+  font-family: 'MyFont1', Georgia, 'Times New Roman', serif; /* changed to custom font */
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  color: white;
+  text-transform: none;
+}
+
+.detail-image-wrapper {
+  border-radius: 1.5rem;
+  padding: 0;                 /* remove inner padding so image touches wrapper */
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;           /* ensure no gap around image */
+  background: transparent;    /* remove any background that looked like a border */
+}
+
+.detail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;     /* match wrapper radius so no inner border */
+  display: block;
+  border: none;
+}
+
+/* ==================== Detail Right Side ==================== */
+.detail-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.owner-text {
+  text-align: right;
+  color: #9ca3af;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+/* ==================== Stats Card ==================== */
+.stats-card {
+  background-color: #1f2937;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-label {
+  color: #9ca3af;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.stat-value {
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+/* ==================== Buy Section ==================== */
+.buy-section {
+  border-top: 1px solid #374151;
+  padding-top: 1.5rem;
+}
+
+.buy-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.buy-label {
+  font-family: 'MyFont1', Georgia, 'Times New Roman', serif; /* use custom font */
+  color: #9ca3af;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+}
+
+.buy-price-container {
+  text-align: right;
+}
+
+.buy-price {
+  font-family: 'MyFont1', Georgia, 'Times New Roman', serif; /* use custom font */
+  font-size: 2rem; /* larger */
+  font-weight: 900;
+  color: white;
+}
+
+.buy-discount {
+  color: #22d3ee;
+  font-size: 0.875rem;
+}
+
+.timer-text {
+  text-align: right;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.buy-btn {
+  font-family: 'MyFont1', Georgia, 'Times New Roman', serif;
+  width: 100%;
+  padding: 1rem;
+  background-color: #22d3ee;
+  color: #111827;
+  font-weight: bold;
+  border: none;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.buy-btn:hover {
+  background-color: #06b6d4;
+}
+
+/* ==================== Related Section ==================== */
+.related-section {
+  margin-top: 2rem;
+}
+
+.related-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.related-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+}
+
+.related-arrow {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 29, 34, 0.9); /* dark rounded square */
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+  transition: background 0.18s ease, transform 0.12s ease;
+  padding: 0;
+}
+
+.related-arrow:hover {
+  transform: translateY(-2px);
+  background: rgba(8, 44, 48, 0.95);
+}
+
+.related-arrow-icon {
+  color: #22d3ee;
+  width: 20px;
+  height: 20px;
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.related-card {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.related-card:hover {
+  transform: scale(1.05);
+}
+
+/* related cards: remove padding gap */
+.related-image-wrapper {
+  border-radius: 1rem;
+  padding: 0;                 /* remove inner padding */
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: transparent;
+}
+
+.related-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;     /* match wrapper radius */
+  display: block;
+  border: none;
+}
+
+/* ==================== Responsive Design ==================== */
+@media (max-width: 1024px) {
+  .nft-grid {
+    grid-template-columns: repeat(2, 1fr);
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .related-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .page-title,
+  .detail-title {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    padding: 1rem;
+  }
+
+  .nav-container {
+    gap: 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .wallet-btn {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .page-title,
+  .detail-title {
+    font-size: 2.5rem;
+  }
+  
+  .nft-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .related-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .stats-grid {
+    gap: 0.75rem;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+  }
+
+  .stat-value {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title,
+  .detail-title {
+    font-size: 2rem;
+  }
+
+  .nav-link {
+    font-size: 0.8rem;
+  }
+
+  .buy-price {
+    font-size: 1.5rem;
+  }
+
+  .related-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+}
