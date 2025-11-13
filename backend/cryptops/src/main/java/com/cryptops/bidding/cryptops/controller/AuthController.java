@@ -1,7 +1,7 @@
-package com.cryptops.bidding.controller;
+package com.cryptops.bidding.cryptops.controller;
 
-import com.cryptops.bidding.model.User;
-import com.cryptops.bidding.service.AuthService;
+import com.cryptops.bidding.cryptops.model.User;
+import com.cryptops.bidding.cryptops.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
