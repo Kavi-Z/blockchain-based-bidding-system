@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './Landing.css';
-import Navbar from '../navbar1/navbar1';
+import Navbar2 from  '../navbar2/navbar2';
 import img1 from '../../assets/img1.jpg';
 import img2 from '../../assets/img2.jpg';
 import img3 from '../../assets/img3.png';
@@ -31,7 +31,7 @@ const Landing = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
-    // submision logic
+    
     alert('Message sent successfully!');
     setFormData({ name: '', email: '', message: '' });
   };
@@ -61,7 +61,7 @@ const Landing = () => {
 
   return (
     <div id="home" className="landing-container">
-      <Navbar />
+      <Navbar2 />
       <p className='Head-landing'>Blockchain Infrastructure</p>
       <p className='sub-landing'>for Secure Online Auctions</p>
       <p className='protocols'>Our Protocols</p>

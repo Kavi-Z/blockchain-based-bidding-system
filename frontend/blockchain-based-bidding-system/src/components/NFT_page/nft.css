@@ -103,19 +103,18 @@ body {
   background-color: #22d3ee;
   color: #111827;
 }
-
-/* ==================== Page Title ==================== */
+ 
 .page-title {
   font-family: 'MyFont1', Georgia, 'Times New Roman', serif;
   font-size: 4rem;
   font-weight: 700;
+  margin-top: 5rem;
   margin-bottom: 3rem;
   color: white;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
-
-/* ==================== NFT Grid (Gallery View) ==================== */
+ 
 .nft-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -466,6 +465,7 @@ body {
   .page-title,
   .detail-title {
     font-size: 3rem;
+    
   }
 }
 
@@ -486,7 +486,8 @@ body {
   
   .page-title,
   .detail-title {
-    font-size: 2.5rem;
+    font-size: 1.5rem;
+
   }
   
   .nft-grid {

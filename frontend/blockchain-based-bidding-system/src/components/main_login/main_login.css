@@ -1,0 +1,74 @@
+.main-login-page {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at top left, #0a0f1e, #000);
+  font-family: "Poppins", sans-serif;
+}
+
+.main-login-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 60px 50px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(65, 225, 227, 0.2);
+  backdrop-filter: blur(12px);
+  width: 400px;
+}
+
+.main-login-logo {
+  width: 90px;
+  height: 90px;
+  margin-bottom: 15px;
+}
+
+.main-login-title {
+  font-size: 2rem;
+  color: #41E1E3;
+  margin-bottom: 10px;
+}
+
+.main-login-subtitle {
+  font-size: 1.1rem;
+  color: #ccc;
+  margin-bottom: 40px;
+}
+
+.main-login-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.main-login-btn {
+  padding: 15px;
+  border: none;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.main-login-btn.seller {
+  background: linear-gradient(135deg, #41E1E3, #32AEB0);
+  color: white;
+}
+
+.main-login-btn.bidder {
+  background: transparent;
+  border: 2px solid #41E1E3;
+  color: #41E1E3;
+}
+
+.main-login-btn.seller:hover {
+  box-shadow: 0 8px 20px rgba(65, 225, 227, 0.5);
+  transform: translateY(-3px);
+}
+
+.main-login-btn.bidder:hover {
+  background: #41E1E3;
+  color: white;
+  transform: translateY(-3px);
+}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Bell, ArrowRight } from 'lucide-react'; // added ArrowRight
+
 import './nft.css';
 import '../../assets/fonts/fonts.css';
 import Navbar from '../navbar1/navbar1';
@@ -10,22 +10,21 @@ import img3 from '../../assets/img7.jpg';
 import img4 from '../../assets/img8.jpg';
 import img5 from '../../assets/img9.jpg';
 import backImg from '../../assets/img10.jpg';
-const img6 = backImg; // fallback image
+const img6 = backImg;  
 
 const NFTGallery = () => {
   const [selectedNFT, setSelectedNFT] = useState(null);
   const [timeLeft, setTimeLeft] = useState(25);
-
-  // centralised goBack handler — ensures detail -> gallery works and scrolls to top
+ 
   const goToGallery = () => {
     setSelectedNFT(null);
-    // scroll to top so gallery is visible (useful if detail view scrolled)
+     
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
-  // NFT Data - use imported images
+   
   const nfts = [
     { id: 1, name: "Monkey Mash", image: img1, bgClass: "nft-bg-green", owner: "0xbdf...5554", topOffer: "0.0161", floorPrice: "0.0175", lastSale: "0.0179", buyPrice: "0.0175", discount: "66.25%" },
     { id: 2, name: "Pink Ape Club", image: img2, bgClass: "nft-bg-pink", owner: "0xabc...1234", topOffer: "0.0145", floorPrice: "0.0160", lastSale: "0.0155", buyPrice: "0.0160", discount: "55.50%" },
@@ -38,18 +37,18 @@ const NFTGallery = () => {
   const getRelatedNFTs = (currentId) => {
     return nfts.filter(nft => nft.id !== currentId).slice(0, 4);
   };
-
-  // Gallery View Component
+ 
   const GalleryView = () => (
+    
     <div className="app-container">
+      <div>
       <Navbar />
-
-      {/* Page Title: click goes to gallery (no-op when already there) */}
+      </div>
+    <div>
       <h1 className="page-title" onClick={goToGallery} role="button" tabIndex={0}>
-        MY ASSETS
+         My Assets
       </h1>
-
-      {/* NFT Grid */}
+ </div>
       <div className="nft-grid">
         {nfts.map((nft) => (
           <div
@@ -69,26 +68,23 @@ const NFTGallery = () => {
       <Footer />
     </div>
   );
-
-  // Detail View Component
+ 
   const DetailView = ({ nft }) => {
     const relatedNFTs = getRelatedNFTs(nft.id);
 
     return (
       <div className="app-container">
         <Navbar />
-
-        {/* ensure the back button uses the same handler and is visible/clickable */}
+ 
         <div className="detail-top">
           <button type="button" onClick={goToGallery} className="back-btn">
             <ArrowLeft className="back-icon" />
             Back to Gallery
           </button>
         </div>
-
-        {/* Detail Grid */}
+ 
         <div className="detail-grid">
-          {/* Left Side - NFT Image */}
+           
           <div className="detail-left">
             <h1 className="detail-title">{nft.name}</h1>
             <div className={`detail-image-wrapper ${nft.bgClass}`}>
@@ -99,14 +95,13 @@ const NFTGallery = () => {
               />
             </div>
           </div>
-
-          {/* Right Side - Details */}
+ 
           <div className="detail-right">
             <div className="owner-text">
               Owned by {nft.owner}
             </div>
 
-            {/* Stats Card */}
+             
             <div className="stats-card">
               <div className="stats-grid">
                 <div className="stat-item">
@@ -122,11 +117,10 @@ const NFTGallery = () => {
                   <div className="stat-value">{nft.lastSale} ETH</div>
                 </div>
               </div>
-
-              {/* Buy Section */}
+ 
               <div className="buy-section">
                 <div className="buy-header">
-                  <span className="buy-label">BUY FOR</span> {/* changed */}
+                  <span className="buy-label">BUY FOR</span>  
                   <div className="buy-price-container">
                     <div className="buy-price">{nft.buyPrice} ETH</div>
                     <div className="buy-discount">({nft.discount})</div>
@@ -136,12 +130,11 @@ const NFTGallery = () => {
                 <button className="buy-btn">Buy Now</button>
               </div>
             </div>
-
-            {/* Related NFTs Section */}
+ 
             <div className="related-section">
               <div className="related-header">
                 <h3 className="related-title">More from this collection</h3>
-                {/* replaced text arrow with lucide ArrowRight icon */}
+              
                 <button className="related-arrow" type="button" aria-label="Next in collection">
                   <ArrowRight className="related-arrow-icon" />
                 </button>

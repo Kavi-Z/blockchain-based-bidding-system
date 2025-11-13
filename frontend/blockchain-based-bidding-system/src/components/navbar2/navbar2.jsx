@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
-import './navbar1.css';
+import { useNavigate } from 'react-router-dom';
+import './navbar2.css';
 import logo from "../../assets/cryptops.png";
 
-const Navbar = () => {
+const Navbar2 = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [walletAddress, setWalletAddress] = useState('');
+  const navigate = useNavigate();
 
-  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Scroll to section
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -22,42 +20,16 @@ const Navbar = () => {
     }
   };
 
-  // Connect MetaMask wallet
-  const handleConnectWallet = async () => {
-    if (window.ethereum) {
-      try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
-        const signer = await provider.getSigner();
-        const address = await signer.getAddress();
-        setWalletAddress(address);
-      } catch (err) {
-        console.error("User rejected connection:", err);
-      }
-    } else {
-      alert('MetaMask not detected. Please install it from https://metamask.io/');
-    }
+  const handleLoginRedirect = () => {
+    navigate('/main-login');
   };
-
-  // Listen for account changes
-  useEffect(() => {
-    if (window.ethereum) {
-      const handleAccountsChanged = (accounts) => {
-        setWalletAddress(accounts[0] || '');
-      };
-      window.ethereum.on('accountsChanged', handleAccountsChanged);
-      return () => {
-        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
-      };
-    }
-  }, []);
 
   return (
     <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
       <div className='navbar-container'>
         <div className='navbar-logo'>
           <img src={logo} alt="CryptOps Logo" className='logo-img' />
-          <span className='logo-text'>CryptOps</span>
+          <span  className='logo-text'>CryptOps </span>
         </div>
 
         <ul className='navbar-menu'>
@@ -75,14 +47,12 @@ const Navbar = () => {
           </li>
         </ul>
 
-        <button className='connect-wallet-btn' onClick={handleConnectWallet}>
-          {walletAddress
-            ? `${walletAddress.substring(0, 6)}...${walletAddress.slice(-4)}`
-            : 'Connect Wallet'}
+        <button className='connect-wallet-btn' onClick={handleLoginRedirect}>
+          Login
         </button>
       </div>
     </nav>
   );
 };
 
-export default Navbar;
+export default Navbar2;

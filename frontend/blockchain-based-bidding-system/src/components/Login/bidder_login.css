@@ -40,7 +40,7 @@ html, body {
 }
 
 .logo-text {
-  font-family: "Poppins", sans-serif;
+  font-family: 'MyFont1', Georgia, 'Times New Roman', serif;
   font-size: 24px;
   color: white;
   font-weight: bold;
