@@ -1,7 +1,7 @@
-package com.cryptops.bidding.service;
+package com.cryptops.bidding.cryptops.service;
 
-import com.cryptops.bidding.model.User;
-import com.cryptops.bidding.repository.UserRepository;
+import com.cryptops.bidding.cryptops.model.User;
+import com.cryptops.bidding.cryptops.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

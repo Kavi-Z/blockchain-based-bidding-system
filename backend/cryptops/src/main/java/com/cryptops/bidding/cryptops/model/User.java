@@ -1,14 +1,18 @@
-package com.cryptops.bidding.model;
+package com.cryptops.bidding.cryptops.model;
 
-import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@data
-@Atno@Data
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 @Document(collection = "users")
 
 public class User {
