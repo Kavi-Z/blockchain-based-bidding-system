@@ -16,7 +16,8 @@ const Signup = () => {
     >
       <div className="logo-container">
         <img src={logo} alt="Logo" className="logo" />
-        <span className="logo-text">CryptOps</span>
+        <Link to="/" className="logo-text">CryptOps</Link>
+
       </div>
 
       <div className="signup-box">

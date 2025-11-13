@@ -5,7 +5,7 @@ import googleIcon from "../../assets/google.png";
 import userIcon from "../../assets/user.png";
 import lockIcon from "../../assets/lock.png";
 import { Link } from "react-router-dom";
-import "./Login.css";
+import "./bidder_login.css";
 
 const Login = () => {
   return (
@@ -13,17 +13,19 @@ const Login = () => {
       className="login-container"
       style={{ backgroundImage: `url(${loginBg})` }}
     >
+     
       <div className="logo-container">
         <img src={logo} alt="Logo" className="logo" />
-        <span className="logo-text">CryptOps</span>
+        <Link to="/" className="logo-text">CryptOps</Link>
       </div>
-
+ 
       <div className="login-box">
         <div className="login-title">
           <span className="login-main-text">Login</span>
           <span className="login-sub-text">as a Bidder</span>
         </div>
 
+        
         <form className="login-form">
           <div className="input-group">
             <img src={userIcon} alt="Username" className="input-icon" />
@@ -35,12 +37,12 @@ const Login = () => {
           </div>
           <button type="submit" className="login-btn">Login</button>
         </form>
-
+ 
         <button className="google-login-btn">
           <img src={googleIcon} alt="Google" className="google-icon" />
           Login with Google
         </button>
-
+ 
         <div className="signup-link">
           Don't have an account? <Link to="/signup">Sign Up</Link>
         </div>
