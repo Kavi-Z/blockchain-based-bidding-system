@@ -15,7 +15,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/nft" element={<NFTGallery />} />
         <Route path="/main-login" element={<Main_Login />} />
-        <Route path="/upload" element = {<Upload />} />
+        <Route path="/upload" element = {<Upload />} /> 
       </Routes>
     </Router>
   );
