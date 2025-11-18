@@ -1,0 +1,371 @@
+ 
+.upload-container {
+  height: 100vh;
+  width: 100vw;
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  font-family: "MyFont1", sans-serif;
+  overflow-y: auto;
+}
+ 
+
+.logo-img {
+  height: 40px;
+  width: auto;
+}
+
+.logo-text {
+  font-family: "MyFont1", sans-serif;
+  font-size: 24px;
+  color: #41e1e3;
+  font-weight: 600;
+}
+
+.connect-wallet-btn {
+  font-family: "MyFont1", sans-serif;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #41E1E3, #32AEB0);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.connect-wallet-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(65, 225, 227, 0.4);
+  background: linear-gradient(135deg, #4AEAEC, #3BBFC1);
+}
+ 
+.upload-content {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 120px 20px 40px;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.upload-box {
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 50px 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 500px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(65, 225, 227, 0.1);
+}
+ 
+.upload-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.upload-main-text {
+  font-family: "MyFont1", sans-serif;
+  color: #41e1e3;
+  font-size: 3.5rem;
+  font-weight: 100;
+  text-align: center;
+  background: linear-gradient(135deg, #41E1E3, #32AEB0, #247C7D);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+ 
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.form-group {
+  margin-bottom: 30px;
+}
+
+.form-label {
+  display: block;
+  color: #41e1e3;
+  font-size: 16px;
+  margin-bottom: 12px;
+  font-weight: 500;
+  font-family: "MyFont1", sans-serif;
+}
+
+.form-input {
+  width: 100%;
+  padding: 15px 20px;
+  border: 1px solid rgba(65, 225, 227, 0.3);
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.05);
+  color: white;
+  font-size: 16px;
+  outline: none;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  font-family: "MyFont1", sans-serif;
+}
+
+.form-input:focus {
+  border-color: #41e1e3;
+  box-shadow: 0 0 15px rgba(65, 225, 227, 0.3);
+  transform: translateY(-2px);
+}
+
+.form-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+  font-family: "MyFont1", sans-serif;
+}
+ 
+.upload-area {
+  border: 2px dashed #41e1e3;
+  border-radius: 15px;
+  padding: 40px 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  background-color: rgba(65, 225, 227, 0.05);
+  cursor: pointer;
+}
+
+.upload-area.dragging {
+  background-color: rgba(65, 225, 227, 0.15);
+  border-color: #36b9ba;
+  transform: scale(1.02);
+}
+
+.upload-area.has-file {
+  border-style: solid;
+  background-color: rgba(65, 225, 227, 0.1);
+}
+
+.upload-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+  opacity: 0.8;
+}
+
+.upload-text {
+  color: white;
+  font-size: 18px;
+  margin-bottom: 8px;
+  font-weight: 500;
+  font-family: "MyFont1", sans-serif;
+}
+
+.upload-subtext {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  margin-bottom: 20px;
+  font-family: "MyFont1", sans-serif;
+}
+
+.file-input-label {
+  display: inline-block;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #41E1E3, #32AEB0);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-family: "MyFont1", sans-serif;
+}
+
+.file-input-label:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(65, 225, 227, 0.4);
+  background: linear-gradient(135deg, #4AEAEC, #3BBFC1);
+}
+
+.file-input {
+  display: none;
+}
+
+/* File Selected State */
+.file-selected {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
+  padding: 10px;
+}
+
+.file-icon {
+  font-size: 32px;
+  margin-right: 15px;
+  opacity: 0.8;
+}
+
+.file-info {
+  flex: 1;
+  text-align: left;
+}
+
+.file-name {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  font-family: "MyFont1", sans-serif;
+}
+
+.file-size {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: "MyFont1", sans-serif;
+}
+
+.remove-file {
+  background: none;
+  border: none;
+  color: #ff6b6b;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 5px;
+  transition: color 0.3s ease;
+  line-height: 1;
+  font-family: "MyFont1", sans-serif;
+}
+
+.remove-file:hover {
+  color: #ff5252;
+  transform: scale(1.1);
+}
+ 
+.file-requirements {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  margin-top: 15px;
+  font-family: "MyFont1", sans-serif;
+}
+
+.file-requirements p {
+  margin: 5px 0;
+}
+ 
+.wallet-address {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border: 1px solid #41e1e3;
+  border-radius: 12px;
+  background-color: rgba(65, 225, 227, 0.05);
+}
+
+.wallet-text {
+  color: white;
+  font-family: "MyFont1", monospace;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.copy-btn {
+  background: linear-gradient(135deg, #41E1E3, #32AEB0);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  font-family: "MyFont1", sans-serif;
+}
+
+.copy-btn:hover {
+  background: linear-gradient(135deg, #4AEAEC, #3BBFC1);
+  transform: scale(1.05);
+}
+ 
+.create-auction-btn {
+  width: 100%;
+  padding: 18px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #41E1E3, #32AEB0);
+  color: white;
+  font-size: 18px;
+  font-family: "MyFont1", sans-serif;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 600;
+  margin-top: 20px;
+  box-shadow: 0 4px 15px rgba(65, 225, 227, 0.3);
+}
+
+.create-auction-btn:hover {
+  background: linear-gradient(135deg, #4AEAEC, #3BBFC1);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(65, 225, 227, 0.5);
+}
+
+.create-auction-btn:active {
+  transform: translateY(-1px);
+}
+
+/* DateTime Input Styling */
+input[type="datetime-local"] {
+  color-scheme: dark;
+  font-family: "MyFont1", sans-serif;
+}
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+ 
+@media (max-width: 768px) {
+  .navbar {
+    padding: 12px 20px;
+  }
+  
+  .navbar-menu {
+    gap: 20px;
+  }
+  
+  .upload-box {
+    padding: 30px 20px;
+    margin: 20px;
+  }
+  
+  .upload-main-text {
+    font-size: 2.5rem;
+  }
+  
+  .upload-content {
+    padding: 100px 10px 20px;
+  }
+  
+  .navbar-container {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-menu {
+    gap: 15px;
+  }
+  
+  .navbar-link {
+    font-size: 14px;
+  }
+  
+  .connect-wallet-btn {
+    padding: 10px 16px;
+    font-size: 12px;
+  }
+  
+  .upload-main-text {
+    font-size: 2rem;
+  }
+}
