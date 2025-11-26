@@ -10,6 +10,7 @@ import lockIcon from "../../assets/lock.png";
 import { Link } from "react-router-dom";
 import { registerUser } from "../../api/auth";
 import "./signup.css";
+import axios from "axios";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -20,6 +21,20 @@ const Signup = () => {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+
+  const handleLogin = async (email, password) =>{
+    try{
+       const res = await axios.post("http://localhost:8080/api/auth/login", {
+      email,
+      password,
+    });
+    console.log(res.data);
+
+  }
+  catch (err){
+    console.log(err.response.data); 
+  }
+};
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!username.trim()) {
