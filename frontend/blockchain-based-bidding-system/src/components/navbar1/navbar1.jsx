@@ -7,14 +7,13 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
 
-  // Handle scroll effect
+   
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Scroll to section
+ 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -22,24 +21,30 @@ const Navbar = () => {
     }
   };
 
-  // Connect MetaMask wallet
-  const handleConnectWallet = async () => {
-    if (window.ethereum) {
-      try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
-        const signer = await provider.getSigner();
-        const address = await signer.getAddress();
-        setWalletAddress(address);
-      } catch (err) {
-        console.error("User rejected connection:", err);
-      }
-    } else {
-      alert('MetaMask not detected. Please install it from https://metamask.io/');
-    }
-  };
+ // Connect MetaMask wallet
+const handleConnectWallet = async () => {
+  if (window.ethereum) {
+    try {
+      // Force popup even if already connected
+      await window.ethereum.request({
+        method: "wallet_requestPermissions",
+        params: [{ eth_accounts: {} }],
+      });
 
-  // Listen for account changes
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts"
+      });
+
+      setWalletAddress(accounts[0]);
+    } catch (err) {
+      console.error("MetaMask connection error:", err);
+    }
+  } else {
+    alert("MetaMask not detected. Please install MetaMask.");
+  }
+};
+        
+
   useEffect(() => {
     if (window.ethereum) {
       const handleAccountsChanged = (accounts) => {
@@ -60,7 +65,7 @@ const Navbar = () => {
           <span className='logo-text'>CryptOps</span>
         </div>
 
-        <ul className='navbar-menu'>
+        {/* <ul className='navbar-menu'>
           <li className='navbar-item'>
             <a onClick={() => scrollToSection('home')} className='navbar-link'>Home</a>
           </li>
@@ -73,7 +78,7 @@ const Navbar = () => {
           <li className='navbar-item'>
             <a onClick={() => scrollToSection('contact')} className='navbar-link'>Contact</a>
           </li>
-        </ul>
+        </ul> */}
 
         <button className='connect-wallet-btn' onClick={handleConnectWallet}>
           {walletAddress
