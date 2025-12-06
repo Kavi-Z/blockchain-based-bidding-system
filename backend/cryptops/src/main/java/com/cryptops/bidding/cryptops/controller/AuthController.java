@@ -26,7 +26,7 @@ public class AuthController {
 
     private Map<String, String> walletNonces = new HashMap<>();
 
-    // --- REGISTER ---
+    //REGISTER 
     @PostMapping("/register")
     public Map<String, Object> register(@RequestBody User user) {
         User savedUser = authService.register(user);
@@ -39,7 +39,7 @@ public class AuthController {
         return response;
     }
 
-    // --- LOGIN ---
+    //LOGIN 
     @PostMapping("/login")
     public Map<String, Object> login(@RequestBody User user) {
         User loggedInUser = authService.login(user.getEmail(), user.getPassword());
