@@ -1,49 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { ethers } from 'ethers';
+import { useNavigate } from 'react-router-dom';
 import './navbar1.css';
 import logo from "../../assets/cryptops.png";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [walletAddress, setWalletAddress] = useState('');
+  const navigate = useNavigate();
 
-   
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
- 
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+
+  const handleConnectWallet = async () => {
+    if (window.ethereum) {
+      try {
+        await window.ethereum.request({
+          method: "wallet_requestPermissions",
+          params: [{ eth_accounts: {} }],
+        });
+
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts"
+        });
+
+        setWalletAddress(accounts[0]);
+      } catch (err) {
+        console.error("MetaMask connection error:", err);
+      }
+    } else {
+      alert("MetaMask not detected. Please install MetaMask.");
     }
   };
-
- // Connect MetaMask wallet
-const handleConnectWallet = async () => {
-  if (window.ethereum) {
-    try {
-      // Force popup even if already connected
-      await window.ethereum.request({
-        method: "wallet_requestPermissions",
-        params: [{ eth_accounts: {} }],
-      });
-
-      const accounts = await window.ethereum.request({
-        method: "eth_requestAccounts"
-      });
-
-      setWalletAddress(accounts[0]);
-    } catch (err) {
-      console.error("MetaMask connection error:", err);
-    }
-  } else {
-    alert("MetaMask not detected. Please install MetaMask.");
-  }
-};
-        
 
   useEffect(() => {
     if (window.ethereum) {
@@ -51,9 +41,7 @@ const handleConnectWallet = async () => {
         setWalletAddress(accounts[0] || '');
       };
       window.ethereum.on('accountsChanged', handleAccountsChanged);
-      return () => {
-        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
-      };
+      return () => window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
     }
   }, []);
 
@@ -65,26 +53,24 @@ const handleConnectWallet = async () => {
           <span className='logo-text'>CryptOps</span>
         </div>
 
-        {/* <ul className='navbar-menu'>
-          <li className='navbar-item'>
-            <a onClick={() => scrollToSection('home')} className='navbar-link'>Home</a>
-          </li>
-          <li className='navbar-item'>
-            <a onClick={() => scrollToSection('about')} className='navbar-link'>About Us</a>
-          </li>
-          <li className='navbar-item'>
-            <a onClick={() => scrollToSection('faq')} className='navbar-link'>FAQ’s</a>
-          </li>
-          <li className='navbar-item'>
-            <a onClick={() => scrollToSection('contact')} className='navbar-link'>Contact</a>
-          </li>
-        </ul> */}
+        <div className="navbar-buttons">
+  <button 
+    className='connect-wallet-btn'
+    onClick={handleConnectWallet}>
+    {walletAddress
+      ? `${walletAddress.substring(0, 6)}...${walletAddress.slice(-4)}`
+      : 'Connect Wallet'}
+  </button>
 
-        <button className='connect-wallet-btn' onClick={handleConnectWallet}>
-          {walletAddress
-            ? `${walletAddress.substring(0, 6)}...${walletAddress.slice(-4)}`
-            : 'Connect Wallet'}
-        </button>
+    <button
+      className='connect-wallet-btn profile-btn'
+      onClick={() => navigate('/profile')}
+    >
+      Profile
+    </button>
+
+</div>
+
       </div>
     </nav>
   );

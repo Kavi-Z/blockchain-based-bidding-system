@@ -25,7 +25,7 @@ const NFTGallery = () => {
   ];
 
   const goToDetail = (nft) => {
-    // Navigate to detail page with NFT id
+    
     navigate(`/nft/${nft.id}`);
   };
 
