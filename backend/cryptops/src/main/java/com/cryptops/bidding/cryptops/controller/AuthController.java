@@ -1,20 +1,19 @@
 package com.cryptops.bidding.cryptops.controller;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.cryptops.bidding.cryptops.model.User;
 import com.cryptops.bidding.cryptops.service.AuthService;
-
-// import org.web3j.crypto.Keys;
-// import org.web3j.crypto.Sign;
-// import org.web3j.utils.Numeric;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -24,9 +23,7 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    private Map<String, String> walletNonces = new HashMap<>();
-
-    //REGISTER 
+    // REGISTER
     @PostMapping("/register")
     public Map<String, Object> register(@RequestBody User user) {
         User savedUser = authService.register(user);
@@ -39,14 +36,10 @@ public class AuthController {
         return response;
     }
 
-    //LOGIN 
+    // LOGIN
     @PostMapping("/login")
     public Map<String, Object> login(@RequestBody User user) {
         User loggedInUser = authService.login(user.getEmail(), user.getPassword());
-
-        if (loggedInUser == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
-        }
 
         Map<String, Object> response = new HashMap<>();
         response.put("id", loggedInUser.getId());
@@ -55,6 +48,40 @@ public class AuthController {
 
         return response;
     }
+
+    // UPDATE EMAIL
+    @PutMapping("/users/{id}/update-email")
+    public Map<String, Object> updateEmail(@PathVariable String id, @RequestBody Map<String, String> request) {
+        String newEmail = request.get("email");
+        User updatedUser = authService.updateEmail(id, newEmail);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", updatedUser.getId());
+        response.put("email", updatedUser.getEmail());
+        response.put("role", updatedUser.getRole());
+
+        return response;
+    }
+
+    // CHANGE PASSWORD
+    @PutMapping("/users/{id}/change-password")
+    public Map<String, String> changePassword(@PathVariable String id, @RequestBody Map<String, String> passwords) {
+        String oldPassword = passwords.get("oldPassword");
+        String newPassword = passwords.get("newPassword");
+
+        boolean success = authService.changePassword(id, oldPassword, newPassword);
+
+        Map<String, String> response = new HashMap<>();
+        if(success) {
+            response.put("message", "Password changed successfully");
+        } else {
+            response.put("message", "Old password is incorrect");
+        }
+
+        return response;
+    }
+
+
 
     // --- WALLET VERIFICATION ---
 

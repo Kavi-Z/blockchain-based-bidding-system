@@ -14,6 +14,40 @@ const Login = () => {
 
   const navigate = useNavigate();
 
+  const handleLogin = async (e) => {
+  e.preventDefault();
+
+  try {
+    const res = await axios.post("http://localhost:8080/api/auth/login", {
+      email,
+      password,
+    });
+
+    console.log("Login Response:", res.data);
+
+    const userId =
+      res.data.userId ||
+      res.data.id ||
+      res.data._id ||
+      (res.data.user && res.data.user._id) ||
+      (res.data.data && res.data.data._id);
+
+    console.log("Extracted userId:", userId);
+
+    if (!userId) {
+      console.log("❌ userId not found in response!");
+      return;
+    }
+
+    localStorage.setItem("userId", userId);
+
+    navigate("/profile");
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -33,6 +67,7 @@ const Login = () => {
  
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data));
+      localStorage.setItem("userId", data.id);
 
       navigate("/my-nft");  
     } catch (err) {
