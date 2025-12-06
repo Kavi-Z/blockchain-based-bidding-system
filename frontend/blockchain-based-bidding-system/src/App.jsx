@@ -7,6 +7,7 @@ import NFTGallery from "./components/NFT_page/nft";
 import Main_Login from "./components/main_login/main_login";
 import Upload from "./components/items-upload/upload";
 import NFTDetail from "./components/NFTDetails/NFTDetails";
+import Seller_dashboard from "./components/seller_dashboard/seller_dashboard"
 function App() {
   return (
     <Router>
@@ -18,6 +19,8 @@ function App() {
         <Route path="/main-login" element={<Main_Login />} />
         <Route path="/upload" element = {<Upload />} /> 
         <Route path="/nft/:id" element={<NFTDetail/>} />
+        <Route path="/Seller_dashboard" element={<Seller_dashboard/>} />
+       
 
       </Routes>
     </Router>

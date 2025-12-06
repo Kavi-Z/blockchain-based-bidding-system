@@ -1,0 +1,30 @@
+.top-header {
+  margin-top: 5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sub-title {
+  font-family: 'MyFont1';
+  font-size: 1.5rem;
+  margin-left: 3rem;
+  margin-bottom: 2rem;
+}
+
+.create-auction-btn {
+  padding: 0.7rem 1.5rem;
+  background-color: #22d3ee;
+  color: #111827;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.create-auction-btn:hover {
+  background-color: #06b6d4;
+}

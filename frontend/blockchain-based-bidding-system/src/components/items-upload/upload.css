@@ -49,9 +49,11 @@
   padding: 120px 20px 40px;
   min-height: 100vh;
   box-sizing: border-box;
+  
 }
 
 .upload-box {
+  
   background-color: rgba(0, 0, 0, 0.8);
   padding: 50px 40px;
   border-radius: 20px;
@@ -70,7 +72,8 @@
 }
 
 .upload-main-text {
-  font-family: "MyFont1", sans-serif;
+  /* font-family: "MyFont1", sans-serif; */
+  
   color: #41e1e3;
   font-size: 3.5rem;
   font-weight: 100;
@@ -98,7 +101,9 @@
   font-size: 16px;
   margin-bottom: 12px;
   font-weight: 500;
-  font-family: "MyFont1", sans-serif;
+  /* font-family: "MyFont1", sans-serif; */
+  font-family:'Courier New', Courier, monospace;
+  font-weight: 100;
 }
 
 .form-input {
@@ -112,7 +117,7 @@
   outline: none;
   transition: all 0.3s ease;
   box-sizing: border-box;
-  font-family: "MyFont1", sans-serif;
+  font-family:'Courier New', Courier, monospace;
 }
 
 .form-input:focus {
@@ -123,7 +128,7 @@
 
 .form-input::placeholder {
   color: rgba(255, 255, 255, 0.4);
-  font-family: "MyFont1", sans-serif;
+  font-family:'Courier New', Courier, monospace;
 }
  
 .upload-area {
@@ -158,14 +163,14 @@
   font-size: 18px;
   margin-bottom: 8px;
   font-weight: 500;
-  font-family: "MyFont1", sans-serif;
+  font-family:'Courier New', Courier, monospace;
 }
 
 .upload-subtext {
   color: rgba(255, 255, 255, 0.7);
   font-size: 14px;
   margin-bottom: 20px;
-  font-family: "MyFont1", sans-serif;
+  font-family:'Courier New', Courier, monospace;
 }
 
 .file-input-label {
@@ -177,7 +182,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-weight: 500;
-  font-family: "MyFont1", sans-serif;
+  font-family:'Courier New', Courier, monospace;
 }
 
 .file-input-label:hover {
@@ -214,13 +219,13 @@
   font-size: 16px;
   font-weight: 500;
   margin-bottom: 5px;
-  font-family: "MyFont1", sans-serif;
+  font-family:'Courier New', Courier, monospace;
 }
 
 .file-size {
   font-size: 14px;
   color: rgba(255, 255, 255, 0.7);
-  font-family: "MyFont1", sans-serif;
+  font-family:'Courier New', Courier, monospace;
 }
 
 .remove-file {
@@ -316,7 +321,7 @@
 /* DateTime Input Styling */
 input[type="datetime-local"] {
   color-scheme: dark;
-  font-family: "MyFont1", sans-serif;
+  font-family:'Courier New', Courier, monospace;
 }
 
 input[type="datetime-local"]::-webkit-calendar-picker-indicator {
