@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import signupBg from "../../assets/signup.png"; 
@@ -9,10 +8,10 @@ import emailIcon from "../../assets/email.png";
 import lockIcon from "../../assets/lock.png";
 import { Link } from "react-router-dom";
 import { registerUser } from "../../api/auth";
-import "./signup.css";
+import "./seller_signup.css";
 import axios from "axios";
 
-const Signup = () => {
+const SellerSignup = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState(""); 
   const [email, setEmail] = useState("");
@@ -21,20 +20,6 @@ const Signup = () => {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-
-  const handleLogin = async (email, password) =>{
-    try{
-       const res = await axios.post("http://localhost:8080/api/auth/login", {
-      email,
-      password,
-    });
-    console.log(res.data);
-
-  }
-  catch (err){
-    console.log(err.response.data); 
-  }
-};
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!username.trim()) {
@@ -51,9 +36,9 @@ const Signup = () => {
     }
     setIsLoading(true);
     try {
-      await registerUser({ username, email, password, role: "bidder" });
+      await registerUser({ username, email, password, role: "seller" });
       setMessage("Registration successful! Redirecting...");
-      setTimeout(() => navigate("/login"), 1500);
+      setTimeout(() => navigate("/seller-login"), 1500);
     } catch (err) {
       setMessage("Registration failed: " + (err.message || "Unknown error"));
     } finally {
@@ -63,65 +48,65 @@ const Signup = () => {
 
   return (
     <div
-      className="signup-container"
+      className="seller-signup-container"
       style={{ backgroundImage: `url(${signupBg})`, height: "100vh" }}
     >
-      <div className="logo-container">
-        <img src={logo} alt="Logo" className="logo" />
-        <Link to="/" className="logo-text">CryptOps</Link>
+      <div className="seller-logo-container">
+        <img src={logo} alt="Logo" className="seller-logo" />
+        <Link to="/" className="seller-logo-text">CryptOps</Link>
       </div>
 
-      <div className="signup-box">
-        <div className="signup-title">
-          <span className="signup-main-text">Sign Up As a bidder</span>
+      <div className="seller-signup-box">
+        <div className="seller-signup-title">
+          <span className="seller-signup-main-text">Sign Up As a Seller</span>
         </div>
 
-        <form className="signup-form" onSubmit={handleSubmit}>
-          <div className="input-group">
-            <img src={userIcon} alt="User" className="input-icon" />
+        <form className="seller-signup-form" onSubmit={handleSubmit}>
+          <div className="seller-input-group">
+            <img src={userIcon} alt="User" className="seller-input-icon" />
             <input
               type="text"
               placeholder="Username"
-              className="signup-input"
+              className="seller-signup-input"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
             />
           </div>
-          <div className="input-group">
-            <img src={emailIcon} alt="Email" className="input-icon" />
+          <div className="seller-input-group">
+            <img src={emailIcon} alt="Email" className="seller-input-icon" />
             <input
               type="email"
               placeholder="Email"
-              className="signup-input"
+              className="seller-signup-input"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
-          <div className="input-group">
-            <img src={lockIcon} alt="Password" className="input-icon" />
+          <div className="seller-input-group">
+            <img src={lockIcon} alt="Password" className="seller-input-icon" />
             <input
               type="password"
               placeholder="Password"
-              className="signup-input"
+              className="seller-signup-input"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
-          <div className="input-group">
-            <img src={lockIcon} alt="Confirm" className="input-icon" />
+          <div className="seller-input-group">
+            <img src={lockIcon} alt="Confirm" className="seller-input-icon" />
             <input
               type="password"
               placeholder="Confirm Password"
-              className="signup-input"
+              className="seller-signup-input"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
           </div>
-          <button type="submit" className="signup-btn" disabled={isLoading}>
+          <button type="submit" className="seller-signup-btn" disabled={isLoading}>
             {isLoading ? "Signing up..." : "Sign Up"}
           </button>
         </form>
@@ -136,17 +121,17 @@ const Signup = () => {
           </p>
         )}
 
-        <button className="google-signup-btn">
-          <img src={googleIcon} alt="Google" className="google-icon" />
+        <button className="seller-google-signup-btn">
+          <img src={googleIcon} alt="Google" className="seller-google-icon" />
           Sign Up with Google
         </button>
 
-        <div className="login-link">
-          Already have an account? <Link to="/bidder_login">Login</Link>
+        <div className="seller-login-link">
+          Already have an account? <Link to="/seller-login">Login</Link>
         </div>
       </div>
     </div>
   );
 };
 
-export default Signup;
+export default SellerSignup;
