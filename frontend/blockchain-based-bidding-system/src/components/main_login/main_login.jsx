@@ -7,10 +7,10 @@ const Main_Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = (role) => {
-    if (role === "seller") {
+    if (role === "bidder") {
       navigate("/bidder_login");
     } else {
-      navigate("/bidder-dashboard");
+      navigate("/seller-login");
     }
   };
 
