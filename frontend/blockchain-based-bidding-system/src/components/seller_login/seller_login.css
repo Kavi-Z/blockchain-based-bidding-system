@@ -1,0 +1,216 @@
+/* seller_login.css */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+.seller-login-container {
+  height: 100vh;
+  width: 100vw;
+  background-image: url("../../assets/login.png");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 5%;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.logo-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.logo {
+  height: 60px;
+  width: auto;
+}
+
+.logo-text {
+  font-family: 'MyFont1', Georgia, 'Times New Roman', serif;
+  font-size: 24px;
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.seller-login-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.seller-google-login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  color: #555;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  transform: scale(1);
+  width: 100%;
+}
+
+.seller-google-login-btn:hover {
+  background-color: transparent;
+  color: white;
+  border-color: #41e1e3;
+  transform: scale(1.05);
+}
+
+.seller-google-login-btn .seller-google-icon {
+  height: 20px;
+  width: 20px;
+  transition: transform 0.3s ease;
+}
+
+.seller-google-login-btn:hover .seller-google-icon {
+  transform: rotate(360deg);
+}
+
+.seller-signup-link {
+  text-align: center;
+  margin-top: 55px;
+  font-size: 14px;
+  color: white;
+  font-family: "Poppins", sans-serif;
+}
+
+.seller-signup-link a {
+  color: #41e1e3;
+  font-family: "Poppins", sans-serif;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.seller-signup-link a:hover {
+  text-decoration: underline;
+}
+
+.seller-input-group {
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px 15px;
+}
+
+.seller-input-icon {
+  height: 20px;
+  width: 20px;
+  margin-right: 10px;
+}
+
+.seller-login-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: white;
+  font-size: 16px;
+}
+
+.seller-login-input::placeholder {
+  color: white;
+}
+
+.seller-google-icon {
+  height: 20px;
+  width: 20px;
+}
+
+.seller-login-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.seller-login-main-text {
+  font-family: "MyFont1", sans-serif;
+  color: #41e1e3;
+  font-size: 66px;
+  font-weight: 100;
+}
+
+.seller-login-sub-text {
+  font-family: "MyFont1", sans-serif;
+  color: #41e1e3;
+  font-size: 20px;
+  font-weight: 100;
+  margin-top: 5px;
+}
+
+.seller-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 500px;
+}
+
+.seller-login-input {
+  padding: 12px 15px;
+  border-radius: 8px;
+  font-size: 16px;
+  outline: none;
+  width: 100%;
+  background-color: transparent;
+  color: white;
+}
+
+.seller-login-input::placeholder {
+  color: white;
+}
+
+.seller-login-input:focus {
+  border-color: #41e1e3;
+  box-shadow: 0 0 5px #41e1e3;
+}
+
+.seller-login-btn {
+  padding: 12px 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: #41e1e3;
+  color: black;
+  font-size: 18px;
+  font-family: sans-serif, "MyFont1";
+  cursor: pointer;
+  transition: background 0.3s ease;
+  width: 100px;
+}
+
+.seller-login-btn:hover {
+  background-color: #36b9ba;
+}
+
+.error-text {
+  color: #ff5252;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 15px;
+  font-family: "Poppins", sans-serif;
+}
