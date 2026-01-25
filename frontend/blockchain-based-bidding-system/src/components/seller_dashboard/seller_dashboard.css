@@ -1,30 +1,92 @@
-.top-header {
-  margin-top: 5rem;
-  margin-bottom: 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* SellerDashboard.css */
+
+/* Container */
+.dashboard-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.sub-title {
-  font-family: 'MyFont1';
+/* Headings */
+.dashboard-container h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.dashboard-container h2 {
   font-size: 1.5rem;
-  margin-left: 3rem;
-  margin-bottom: 2rem;
+  margin-top: 25px;
+  margin-bottom: 15px;
+  color: #555;
 }
 
-.create-auction-btn {
-  padding: 0.7rem 1.5rem;
-  background-color: #22d3ee;
-  color: #111827;
-  border: none;
-  border-radius: 0.75rem;
+/* Inputs */
+.dashboard-container input {
+  width: calc(50% - 10px);
+  padding: 10px 12px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
   font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s ease;
+  transition: border 0.3s;
 }
 
-.create-auction-btn:hover {
-  background-color: #06b6d4;
+.dashboard-container input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+/* Buttons */
+.dashboard-container button {
+  padding: 10px 20px;
+  margin: 10px 5px 20px 0;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  background-color: #007bff;
+  color: white;
+}
+
+.dashboard-container button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.dashboard-container button:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+/* Auction status section */
+.auction-status {
+  background-color: #fff;
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+.auction-status p {
+  font-size: 1rem;
+  margin: 6px 0;
+  color: #444;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .dashboard-container input {
+    width: 100%;
+  }
+  .dashboard-container button {
+    width: 100%;
+    margin: 10px 0;
+  }
 }

@@ -1,45 +1,68 @@
 import React, { useState, useEffect } from "react";
+import { ethers } from "ethers";
 import loginBg from "../../assets/login.png";
-import logo from "../../assets/cryptops.png";
-import { Link } from "react-router-dom";
 import "./upload.css";
+
+
 
 const Upload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [walletAddress, setWalletAddress] = useState("");
+
   const [formData, setFormData] = useState({
     itemName: "",
     startingBid: "",
     bidIncrement: "",
     startTime: "",
-    endTime: ""
+    endTime: "",
   });
 
+  // Detect scroll for UI animation
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const handleScroll = () => {};
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // -----------------------------
+  // WALLET CONNECTION
+  // -----------------------------
+  const connectWallet = async () => {
+    if (!window.ethereum) {
+      alert("MetaMask not detected!");
+      return;
+    }
+
+    try {
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      setWalletAddress(accounts[0]);
+    } catch (error) {
+      console.log("Wallet error:", error);
+    }
+  };
+
+  // -----------------------------
+  // FILE UPLOAD HANDLERS
+  // -----------------------------
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
-    if (file) {
-      // Check file type
-      const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
-      if (!validTypes.includes(file.type)) {
-        alert('Please select a JPEG or PNG file');
-        return;
-      }
-      
-      // Check file size (5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert('File size must be less than 5MB');
-        return;
-      }
-      
-      setSelectedFile(file);
+    if (!file) return;
+
+    const validTypes = ["image/jpeg", "image/jpg", "image/png"];
+    if (!validTypes.includes(file.type)) {
+      alert("Please select a JPEG or PNG file");
+      return;
     }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File size must be under 5MB");
+      return;
+    }
+
+    setSelectedFile(file);
   };
 
   const handleDragOver = (event) => {
@@ -56,39 +79,73 @@ const Upload = () => {
     event.preventDefault();
     setIsDragging(false);
     const file = event.dataTransfer.files[0];
-    if (file) {
-      handleFileSelect({ target: { files: [file] } });
-    }
+    if (file) handleFileSelect({ target: { files: [file] } });
   };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCreateAuction = (event) => {
+  // -----------------------------
+  // CREATE AUCTION (SMART CONTRACT)
+  // -----------------------------
+  const handleCreateAuction = async (event) => {
     event.preventDefault();
-    if (selectedFile && formData.itemName && formData.startingBid && formData.bidIncrement && formData.startTime && formData.endTime) {
-      // Handle auction creation logic here
-      console.log("Creating auction with:", { ...formData, file: selectedFile });
+
+    if (!walletAddress) {
+      alert("Connect your wallet first");
+      return;
+    }
+
+    if (
+      !selectedFile ||
+      !formData.itemName ||
+      !formData.startingBid ||
+      !formData.bidIncrement ||
+      !formData.startTime ||
+      !formData.endTime
+    ) {
+      alert("Fill all fields and select an image!");
+      return;
+    }
+
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        CONTRACT_ABI,
+        signer
+      );
+
+      const start = Math.floor(new Date(formData.startTime).getTime() / 1000);
+      const end = Math.floor(new Date(formData.endTime).getTime() / 1000);
+
+      const tx = await contract.createAuction(
+        formData.itemName,
+        ethers.parseEther(formData.startingBid.toString()),
+        ethers.parseEther(formData.bidIncrement.toString()),
+        start,
+        end
+      );
+
+      await tx.wait();
       alert("Auction created successfully!");
-    } else {
-      alert("Please fill all fields and select an item image!");
-    }
-  };
 
-  const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      // reset
+      setFormData({
+        itemName: "",
+        startingBid: "",
+        bidIncrement: "",
+        startTime: "",
+        endTime: "",
+      });
+      setSelectedFile(null);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to create auction!");
     }
-  };
-
-  const handleConnectWallet = () => {
-    alert('Connecting wallet...');
   };
 
   return (
@@ -96,7 +153,6 @@ const Upload = () => {
       className="upload-container"
       style={{ backgroundImage: `url(${loginBg})` }}
     >
- 
       <div className="upload-content">
         <div className="upload-box">
           <div className="upload-title">
@@ -104,11 +160,13 @@ const Upload = () => {
           </div>
 
           <form className="upload-form" onSubmit={handleCreateAuction}>
-      
+            {/* File Upload */}
             <div className="form-group">
               <label className="form-label">Item Image</label>
-              <div 
-                className={`upload-area ${isDragging ? 'dragging' : ''} ${selectedFile ? 'has-file' : ''}`}
+              <div
+                className={`upload-area ${
+                  isDragging ? "dragging" : ""
+                } ${selectedFile ? "has-file" : ""}`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
@@ -118,9 +176,11 @@ const Upload = () => {
                     <div className="file-icon">📄</div>
                     <div className="file-info">
                       <p className="file-name">{selectedFile.name}</p>
-                      <p className="file-size">{(selectedFile.size / (1024 * 1024)).toFixed(2)} MB</p>
+                      <p className="file-size">
+                        {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
+                      </p>
                     </div>
-                    <button 
+                    <button
                       type="button"
                       className="remove-file"
                       onClick={() => setSelectedFile(null)}
@@ -145,10 +205,6 @@ const Upload = () => {
                   </>
                 )}
               </div>
-              <div className="file-requirements">
-                <p>Supported Format: jpeg/png</p>
-                <p>Maximum Size: 5MB</p>
-              </div>
             </div>
 
             {/* Item Name */}
@@ -161,21 +217,19 @@ const Upload = () => {
                 className="form-input"
                 value={formData.itemName}
                 onChange={handleInputChange}
-                required
               />
             </div>
 
             {/* Starting Bid */}
             <div className="form-group">
-              <label className="form-label">Starting Bid</label>
+              <label className="form-label">Starting Bid (ETH)</label>
               <input
                 type="number"
                 name="startingBid"
-                placeholder="Enter starting bid amount"
+                placeholder="Enter starting bid"
                 className="form-input"
                 value={formData.startingBid}
                 onChange={handleInputChange}
-                required
                 min="0"
                 step="0.01"
               />
@@ -183,21 +237,20 @@ const Upload = () => {
 
             {/* Bid Increment */}
             <div className="form-group">
-              <label className="form-label">Bid Increment</label>
+              <label className="form-label">Bid Increment (ETH)</label>
               <input
                 type="number"
                 name="bidIncrement"
-                placeholder="Enter bid increment amount"
+                placeholder="Enter bid increment"
                 className="form-input"
                 value={formData.bidIncrement}
                 onChange={handleInputChange}
-                required
                 min="0"
                 step="0.01"
               />
             </div>
 
-            {/* Duration - Start Time */}
+            {/* Start & End Time */}
             <div className="form-group">
               <label className="form-label">Start Time</label>
               <input
@@ -206,11 +259,9 @@ const Upload = () => {
                 className="form-input"
                 value={formData.startTime}
                 onChange={handleInputChange}
-                required
               />
             </div>
 
-            {/* Duration - End Time */}
             <div className="form-group">
               <label className="form-label">End Time</label>
               <input
@@ -219,20 +270,29 @@ const Upload = () => {
                 className="form-input"
                 value={formData.endTime}
                 onChange={handleInputChange}
-                required
               />
             </div>
-
-            {/* Wallet Address */}
+ 
             <div className="form-group">
-              <label className="form-label">Wallet Address</label>
+              <label className="form-label">Wallet</label>
               <div className="wallet-address">
-                <span className="wallet-text">Waltz:Oxav...5554</span>
-                <button type="button" className="copy-btn">Copy</button>
+                {walletAddress ? (
+                  <span className="wallet-text">
+                    {walletAddress.substring(0, 6)}...
+                    {walletAddress.substring(walletAddress.length - 4)}
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    className="copy-btn"
+                    onClick={connectWallet}
+                  >
+                    Connect Wallet
+                  </button>
+                )}
               </div>
             </div>
-
-            {/* Create Auction Button */}
+ 
             <div className="form-group">
               <button type="submit" className="create-auction-btn">
                 Create Auction

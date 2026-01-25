@@ -1,70 +1,158 @@
-import React from 'react';
-import './seller_dashboard.css';
-import '../../assets/fonts/fonts.css';
-import Navbar from '../navbar1/navbar1';
-import Footer from '../footer/footer';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import Web3 from "web3";
+import SecureAuction from "./SecureAuction.json";
 
-import img1 from '../../assets/img1.jpg';
-import img2 from '../../assets/img6.jpg';
-import img3 from '../../assets/img7.jpg';
-import img4 from '../../assets/img8.jpg';
-import img5 from '../../assets/img9.jpg';
-import img6 from '../../assets/img10.jpg';
+export default function SellerDashboard() {
+  const [web3, setWeb3] = useState(null);
+  const [accounts, setAccounts] = useState([]);
+  const [contract, setContract] = useState(null);
 
-const NFTGallery = () => {
-  const navigate = useNavigate();
+  const [biddingTime, setBiddingTime] = useState("");
+  const [minIncrement, setMinIncrement] = useState("");
+  const [extensionTime, setExtensionTime] = useState("");
+  const [maxBid, setMaxBid] = useState("");
 
-  const nfts = [
-    { id: 1, name: "Monkey Mash", image: img1, bgClass: "nft-bg-green" },
-    { id: 2, name: "Pink Ape Club", image: img2, bgClass: "nft-bg-pink" },
-    { id: 3, name: "Cool Chimp", image: img3, bgClass: "nft-bg-orange" },
-    { id: 4, name: "Teal Bear", image: img4, bgClass: "nft-bg-teal" },
-    { id: 5, name: "Cyber Punk", image: img5, bgClass: "nft-bg-red" },
-    { id: 6, name: "Lakers Bear", image: img6, bgClass: "nft-bg-purple" }
-  ];
+  const [highestBid, setHighestBid] = useState("0");
+  const [highestBidder, setHighestBidder] = useState("None");
+  const [auctionEnded, setAuctionEnded] = useState(false);
+  const [auctionStarted, setAuctionStarted] = useState(false);
+  const [endTime, setEndTime] = useState(null);
 
-  const goToDetail = (nft) => {
-    navigate(`/nft/${nft.id}`);
-  };
+  const CONTRACT_ADDRESS = "0x81efbcf260A84402cAF089f9cDDB77Ea888A8181";
+
+  useEffect(() => {
+    const init = async () => {
+      if (!window.ethereum) return alert("Please install MetaMask!");
+      const web3Instance = new Web3(window.ethereum);
+      window.web3 = web3Instance;   
+      window.Web3 = Web3;
+      await window.ethereum.request({ method: "eth_requestAccounts" });
+      const userAccounts = await web3Instance.eth.getAccounts();
+      const contractInstance = new web3Instance.eth.Contract(
+        SecureAuction.abi,
+        CONTRACT_ADDRESS
+      );
+
+      setWeb3(web3Instance);
+      setAccounts(userAccounts);
+      setContract(contractInstance);
  
-  const createAuction = () => {
-    navigate('/upload');
+      const auctionStartedOnChain = await contractInstance.methods.auctionStarted().call();
+      setAuctionStarted(auctionStartedOnChain);
+
+      const endedOnChain = await contractInstance.methods.ended().call();
+      setAuctionEnded(endedOnChain);
+
+      const highestBidOnChain = await contractInstance.methods.highestBid().call();
+      setHighestBid(web3Instance.utils.fromWei(highestBidOnChain, "ether"));
+
+      const highestBidderOnChain = await contractInstance.methods.highestBidder().call();
+      setHighestBidder(highestBidderOnChain || "None");
+
+      const endTimeOnChain = await contractInstance.methods.endTime().call();
+      setEndTime(Number(endTimeOnChain));
+
+      // Real-time updates
+      contractInstance.events.HighestBidIncreased({}, (err, event) => {
+        if (!err) {
+          setHighestBid(web3Instance.utils.fromWei(event.returnValues.amount, "ether"));
+          setHighestBidder(event.returnValues.bidder);
+        }
+      });
+      contractInstance.events.AuctionEnded({}, (err) => {
+        if (!err) setAuctionEnded(true);
+      });
+    };
+    init();
+  }, []);
+
+  const startAuctionOnChain = async () => {
+    if (!contract) return;
+    if (!biddingTime) return alert("Enter bidding time");
+
+    try {
+const bidTime = biddingTime ? Number(biddingTime) : 300;
+const extension = extensionTime ? Number(extensionTime) : 60;
+const increment = minIncrement ? web3.utils.toWei(minIncrement, "ether") : web3.utils.toWei("0.01", "ether");
+const max = maxBid ? web3.utils.toWei(maxBid, "ether") : web3.utils.toWei("1", "ether");
+
+      await contract.methods
+        .startAuction(bidTime, increment, extension, max)
+        .send({
+          from: accounts[0],
+          gas: 3000000,
+          gasPrice: await web3.eth.getGasPrice() 
+        });
+
+      const endTimeOnChain = await contract.methods.endTime().call();
+      setEndTime(Number(endTimeOnChain));
+
+      setAuctionStarted(true);
+      setAuctionEnded(false);
+      alert("Auction started on blockchain!");
+    } catch (err) {
+      console.error(err);
+      if (err.code === 4001) alert("Transaction rejected by user.");
+      else alert("Error starting auction. Check console.");
+    }
+  };
+
+  const endAuctionOnChain = async () => {
+    if (!contract) return;
+    try {
+      await contract.methods.endAuction().send({
+  from: accounts[0],
+  gas: 3000000,
+  gasPrice: await web3.eth.getGasPrice()  
+});
+      setAuctionEnded(true);
+      alert("Auction ended on blockchain!");
+    } catch (err) {
+      console.error(err);
+      alert("Error ending auction.");
+    }
   };
 
   return (
-    <div className="app-container">
-      <Navbar />
-      <div className="top-header">
-        <h1 className="page-title">Seller Dashboard</h1>
+    <div style={{ padding: "20px" }}>
+      <h1>Seller Dashboard</h1>
 
-        
-        <button className="create-auction-btn" onClick={createAuction}>
-          + Create Auction
-        </button>
-      </div>
+      <h2>Start Auction</h2>
+      <input
+        placeholder="Bidding Time (seconds)"
+        value={biddingTime}
+        onChange={(e) => setBiddingTime(e.target.value)}
+      />
+      <input
+        placeholder="Min Increment (ETH)"
+        value={minIncrement}
+        onChange={(e) => setMinIncrement(e.target.value)}
+      />
+      <input
+        placeholder="Extension Time (seconds)"
+        value={extensionTime}
+        onChange={(e) => setExtensionTime(e.target.value)}
+      />
+      <input
+        placeholder="Max Bid (ETH)"
+        value={maxBid}
+        onChange={(e) => setMaxBid(e.target.value)}
+      />
+      <button onClick={startAuctionOnChain} disabled={auctionStarted && !auctionEnded}>
+        Start Auction
+      </button>
 
-      <h2 className="sub-title">Ongoing Auctions</h2>
+      <h2>Auction Status</h2>
+      <p>Highest Bid: {highestBid} ETH</p>
+      <p>Highest Bidder: {highestBidder}</p>
+      <p>Auction Ended: {auctionEnded ? "Yes" : "No"}</p>
+      <p>
+        Auction End Time: {endTime ? new Date(endTime * 1000).toLocaleString() : "Not started"}
+      </p>
 
-      <div className="nft-grid">
-        {nfts.map((nft) => (
-          <div
-            key={nft.id}
-            onClick={() => goToDetail(nft)}
-            className="nft-card"
-            role="button"
-            tabIndex={0}
-          >
-            <div className={`nft-image-wrapper ${nft.bgClass}`}>
-              <img src={nft.image} alt={nft.name} className="nft-image" />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <Footer />
+      <button onClick={endAuctionOnChain} disabled={!auctionStarted || auctionEnded}>
+        End Auction
+      </button>
     </div>
   );
-};
-
-export default NFTGallery;
+}
