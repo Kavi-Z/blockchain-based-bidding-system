@@ -1,0 +1,14 @@
+Q: What is blockchain?
+A: Blockchain is a decentralized and secure digital ledger that records transactions in a transparent and tamper-proof way.
+
+Q: How does bidding work in this system?
+A: Users place bids through the platform. Each bid is recorded on the blockchain using smart contracts to ensure fairness.
+
+Q: Can someone cheat by changing bids?
+A: No. Once a bid is recorded on the blockchain, it cannot be modified or deleted.
+
+Q: What happens when an auction ends?
+A: The smart contract automatically determines the highest bidder and finalizes the transaction.
+
+Q: Why use blockchain for auctions?
+A: Blockchain ensures transparency, security, and trust without relying on a central authority.

@@ -1,0 +1,15 @@
+Blockchain is a distributed ledger technology that allows data to be stored across a network of computers.
+It is immutable, transparent, and decentralized, which ensures trust and security without relying on a central authority.
+
+Key features:
+- Blocks: Each block contains a list of transactions and a hash linking it to the previous block.
+- Consensus: Nodes in the network agree on the validity of transactions.
+- Smart Contracts: Self-executing contracts that automate processes.
+- Security: Cryptography ensures data integrity and prevents tampering.
+
+Applications:
+- Cryptocurrencies (Bitcoin, Ethereum)
+- Supply chain tracking
+- Voting systems
+- Decentralized finance (DeFi)
+- Digital identity
