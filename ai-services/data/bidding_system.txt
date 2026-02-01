@@ -1,0 +1,9 @@
+The Blockchain-Based Bidding System is a decentralized platform where users can participate in secure and transparent auctions.
+
+There are two main types of users: sellers and bidders. Sellers upload items or NFTs for auction, while bidders place bids on those items. Every bid is recorded on the blockchain through smart contracts.
+
+The system prevents bid manipulation because once a bid is placed, it cannot be changed or deleted. All participants can trust that the auction process is fair.
+
+When the auction time ends, the smart contract automatically determines the highest bidder and finalizes the transaction. This removes the need for a middleman and reduces the risk of fraud.
+
+The chatbot in this system helps users understand how the platform works, how bidding happens, and how blockchain ensures security and fairness.

@@ -1,0 +1,9 @@
+Smart contracts are self-executing programs stored on a blockchain. They automatically perform actions when specific conditions are met.
+
+In the blockchain-based bidding system, smart contracts manage the auction process. They record bids, keep track of the highest bid, and ensure that the auction rules are followed.
+
+Once the auction deadline is reached, the smart contract automatically selects the highest bidder as the winner. It then securely transfers ownership of the digital asset and processes the payment.
+
+Because smart contracts run on the blockchain, they cannot be changed after deployment. This guarantees that the auction rules cannot be manipulated by anyone, including the platform owners.
+
+Smart contracts remove the need for trust between users because the code itself enforces fairness and transparency.
