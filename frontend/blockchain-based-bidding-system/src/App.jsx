@@ -7,11 +7,13 @@ import NFTGallery from "./components/NFT_page/nft";
 import Main_Login from "./components/main_login/main_login";
 import Upload from "./components/items-upload/upload";
 import NFTDetail from "./components/NFTDetails/NFTDetails";
-import Seller_dashboard from "./components/seller_dashboard/seller_dashboard"
+import Seller_dashboard from "./components/seller_dashboard/seller_dashboard";
 import Update_profile from "./components/ProfilePage/ProfilePage";
 import AuctionPage from "./components/auction_page/auction_page";
 import SellerLogin from './components/seller_login/seller_login';
 import SellerSignup from './components/seller_signup/seller_signup';
+import Chatbot from "./components/chatbot/chatbot";
+
 function App() {
   return (
     <Router>
@@ -21,15 +23,17 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/my-nft" element={<NFTGallery />} />
         <Route path="/main-login" element={<Main_Login />} />
-        <Route path="/upload" element = {<Upload />} /> 
-        <Route path="/nft/:id" element={<NFTDetail/>} />
-        <Route path="/Seller_dashboard" element={<Seller_dashboard/>} />
-        <Route path="/profile" element={<Update_profile/>} />
-        <Route path="/auctions" element={<AuctionPage/>} />
+        <Route path="/upload" element={<Upload />} /> 
+        <Route path="/nft/:id" element={<NFTDetail />} />
+        <Route path="/Seller_dashboard" element={<Seller_dashboard />} />
+        <Route path="/profile" element={<Update_profile />} />
+        <Route path="/auctions" element={<AuctionPage />} />
         <Route path="/seller-login" element={<SellerLogin />} />
         <Route path="/seller-signup" element={<SellerSignup />} />
-
       </Routes>
+
+      {/* Chatbot appears on all pages */}
+      <Chatbot />
     </Router>
   );
 }
