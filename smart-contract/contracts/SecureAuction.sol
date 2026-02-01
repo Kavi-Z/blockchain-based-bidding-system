@@ -6,7 +6,7 @@ contract SecureAuction {
     uint public startTime;
     uint public endTime;
     bool public ended;
-    bool public auctionStarted;  
+    bool public auctionStarted;
 
     address public highestBidder;
     uint public highestBid;
@@ -40,21 +40,10 @@ contract SecureAuction {
         locked = false;
     }
 
-    constructor(
-        uint _biddingTime,
-        uint _minIncrement,
-        uint _extensionTime,
-        uint _maxBid
-    ) {
+    constructor() {
         seller = payable(msg.sender);
-        startTime = block.timestamp;
-        endTime = block.timestamp + _biddingTime;
-        minIncrement = _minIncrement;
-        extensionTime = _extensionTime;
-        maxBid = _maxBid;
         auctionStarted = false;
         ended = false;
-
     }
 
     function startAuction(
@@ -64,19 +53,25 @@ contract SecureAuction {
         uint _maxBid
     ) public onlySeller {
         require(!auctionStarted, "Auction already started");
+        require(_biddingTime > 0, "Invalid bidding time");
+        require(_minIncrement > 0, "Invalid min increment");
 
         startTime = block.timestamp;
         endTime = block.timestamp + _biddingTime;
         minIncrement = _minIncrement;
         extensionTime = _extensionTime;
         maxBid = _maxBid;
+
         auctionStarted = true;
         ended = false;
+        highestBid = 0;
+        highestBidder = address(0);
     }
 
     function bid() external payable {
         require(auctionStarted, "Auction not started");
         require(block.timestamp < endTime, "Auction ended");
+        require(msg.sender != seller, "Seller cannot bid");
 
         uint required = highestBid + minIncrement;
         require(msg.value >= required, "Bid below min increment");
@@ -117,32 +112,38 @@ contract SecureAuction {
         return true;
     }
 
-function endAuction() external onlySeller noReentrant {
-    require(block.timestamp >= endTime, "Auction not yet ended");
-    require(!ended, "Already ended");
-    ended = true;
-    auctionStarted = false;  
-    emit AuctionEnded(highestBidder, highestBid);
+    function endAuction() external onlySeller noReentrant {
+        require(auctionStarted, "Auction not started");
+        require(block.timestamp >= endTime, "Auction not yet ended");
+        require(!ended, "Already ended");
 
-    uint amount = highestBid;
-    highestBid = 0;
-    if (amount > 0) {
-        (bool success, ) = seller.call{value: amount}("");
-        if (!success) {
-            pendingReturns[seller] += amount;
-            if (!hasPendingRecorded[seller]) {
-                hasPendingRecorded[seller] = true;
-                pendingParties.push(seller);
+        ended = true;
+        auctionStarted = false;
+
+        emit AuctionEnded(highestBidder, highestBid);
+
+        uint amount = highestBid;
+        highestBid = 0;
+        if (amount > 0) {
+            (bool success, ) = seller.call{value: amount}("");
+            if (!success) {
+                pendingReturns[seller] += amount;
+                if (!hasPendingRecorded[seller]) {
+                    hasPendingRecorded[seller] = true;
+                    pendingParties.push(seller);
+                }
             }
         }
     }
-}
-
 
     function cancelAuction() external onlySeller noReentrant {
         require(!ended, "Already ended");
+
         ended = true;
+        auctionStarted = false;
+
         emit AuctionCancelled();
+
         if (highestBid != 0) {
             pendingReturns[highestBidder] += highestBid;
             if (!hasPendingRecorded[highestBidder]) {
