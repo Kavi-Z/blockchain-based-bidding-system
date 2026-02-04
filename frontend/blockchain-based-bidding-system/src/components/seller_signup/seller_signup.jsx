@@ -1,13 +1,11 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import signupBg from "../../assets/signup.png"; 
 import logo from "../../assets/cryptops.png";
 import googleIcon from "../../assets/google.png"; 
 import userIcon from "../../assets/user.png";
 import emailIcon from "../../assets/email.png";
 import lockIcon from "../../assets/lock.png";
-import { Link } from "react-router-dom";
-import { registerUser } from "../../api/auth";
 import "./seller_signup.css";
 import axios from "axios";
 
@@ -22,6 +20,9 @@ const SellerSignup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
+
+    // Validation
     if (!username.trim()) {
       setMessage("Username is required");
       return;
@@ -34,13 +35,34 @@ const SellerSignup = () => {
       setMessage("Password must be at least 6 characters");
       return;
     }
+
     setIsLoading(true);
+
     try {
-      await registerUser({ username, email, password, role: "seller" });
-      setMessage("Registration successful! Redirecting...");
-      setTimeout(() => navigate("/seller-login"), 1500);
+      const res = await axios.post(
+        "http://localhost:8080/api/auth/register/seller",
+        { username, email, password },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      console.log("Seller Signup Response:", res.data);
+      
+      // Save to localStorage
+      localStorage.setItem("userId", res.data.id);
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.role);
+      localStorage.setItem("email", res.data.email);
+
+      setMessage("✅ Registration successful! Redirecting...");
+      
+      setTimeout(() => {
+        navigate("/seller-login");
+      }, 1500);
+
     } catch (err) {
-      setMessage("Registration failed: " + (err.message || "Unknown error"));
+      console.error("Seller Signup Error:", err);
+      const serverError = err.response?.data?.error || err.response?.data?.message;
+      setMessage("❌ Registration failed: " + (serverError || err.message));
     } finally {
       setIsLoading(false);
     }
@@ -73,6 +95,7 @@ const SellerSignup = () => {
               required
             />
           </div>
+
           <div className="seller-input-group">
             <img src={emailIcon} alt="Email" className="seller-input-icon" />
             <input
@@ -84,6 +107,7 @@ const SellerSignup = () => {
               required
             />
           </div>
+
           <div className="seller-input-group">
             <img src={lockIcon} alt="Password" className="seller-input-icon" />
             <input
@@ -95,6 +119,7 @@ const SellerSignup = () => {
               required
             />
           </div>
+
           <div className="seller-input-group">
             <img src={lockIcon} alt="Confirm" className="seller-input-icon" />
             <input
@@ -106,7 +131,12 @@ const SellerSignup = () => {
               required
             />
           </div>
-          <button type="submit" className="seller-signup-btn" disabled={isLoading}>
+
+          <button 
+            type="submit" 
+            className="seller-signup-btn" 
+            disabled={isLoading}
+          >
             {isLoading ? "Signing up..." : "Sign Up"}
           </button>
         </form>
@@ -115,7 +145,8 @@ const SellerSignup = () => {
           <p style={{
             color: message.includes("successful") ? "green" : "red",
             marginTop: "10px",
-            textAlign: "center"
+            textAlign: "center",
+            fontSize: "14px"
           }}>
             {message}
           </p>

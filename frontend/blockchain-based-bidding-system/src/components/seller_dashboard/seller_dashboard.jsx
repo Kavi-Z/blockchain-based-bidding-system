@@ -1,479 +1,463 @@
 import React, { useState, useEffect } from "react";
 import Web3 from "web3";
 import SecureAuction from "./SecureAuction.json";
+import loginBg from "../../assets/login.png";
+import "../items-upload/upload.css";
 
-export default function SellerDashboard() {
+const Upload = () => {
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [walletAddress, setWalletAddress] = useState("");
   const [web3, setWeb3] = useState(null);
-  const [accounts, setAccounts] = useState([]);
   const [contract, setContract] = useState(null);
-  const [networkId, setNetworkId] = useState(null);
-  const [contractExists, setContractExists] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
-  const [biddingTime, setBiddingTime] = useState("");
-  const [minIncrement, setMinIncrement] = useState("");
-  const [extensionTime, setExtensionTime] = useState("");
-  const [maxBid, setMaxBid] = useState("");
+  const [formData, setFormData] = useState({
+    itemName: "",
+    biddingTime: "",
+    minIncrement: "",
+    extensionTime: "",
+    maxBid: "",
+  });
 
-  const [highestBid, setHighestBid] = useState("0");
-  const [highestBidder, setHighestBidder] = useState("None");
-  const [auctionEnded, setAuctionEnded] = useState(false);
-  const [auctionStarted, setAuctionStarted] = useState(false);
-  const [endTime, setEndTime] = useState(null);
-  const [seller, setSeller] = useState("");
-  const [error, setError] = useState("");
-
-  // IMPORTANT: Replace this with your actual deployed contract address
-  const CONTRACT_ADDRESS = "0x931CEaac29d98976FBF165b919A572101E93E6E1";
+  const CONTRACT_ADDRESS = "0xc3662276B3594bD8d70778b093caC2F31E6D497E";
 
   useEffect(() => {
-    const init = async () => {
-      if (!window.ethereum) {
-        setError("Please install MetaMask!");
-        return;
-      }
-
-      try {
+    const handleScroll = () => {};
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+ 
+  useEffect(() => {
+    const initWeb3 = async () => {
+      if (window.ethereum && walletAddress) {
         const web3Instance = new Web3(window.ethereum);
-        
-        // Request account access
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        const userAccounts = await web3Instance.eth.getAccounts();
-        
-        // Check network
-        const network = await web3Instance.eth.net.getId();
-        const chainId = await web3Instance.eth.getChainId();
-        console.log("Connected to network ID:", network, "Chain ID:", chainId);
-        setNetworkId(network);
+        setWeb3(web3Instance);
 
-        // CRITICAL: Verify contract exists
-        const code = await web3Instance.eth.getCode(CONTRACT_ADDRESS);
-        console.log("Contract code length:", code.length);
-        
-        if (code === "0x" || code.length <= 2) {
-          setError(
-            `❌ No contract found at ${CONTRACT_ADDRESS} on network ${network}. ` +
-            "Please verify: 1) Correct network selected in MetaMask, " +
-            "2) Contract is deployed, 3) Correct contract address"
-          );
-          setContractExists(false);
-          return;
-        }
-
-        console.log("✅ Contract exists at address");
-        setContractExists(true);
-
-        // Create contract instance
         const contractInstance = new web3Instance.eth.Contract(
           SecureAuction.abi,
           CONTRACT_ADDRESS
         );
-
-        setWeb3(web3Instance);
-        setAccounts(userAccounts);
         setContract(contractInstance);
-
-        // Load initial state with comprehensive error handling
-        await loadAuctionState(contractInstance, web3Instance);
-
-        // Setup event listeners
-        setupEventListeners(contractInstance, web3Instance);
-
-      } catch (error) {
-        console.error("Initialization error:", error);
-        setError(`Initialization failed: ${error.message}`);
       }
     };
 
-    init();
-  }, []);
+    initWeb3();
+  }, [walletAddress]);
 
-  const loadAuctionState = async (contractInstance, web3Instance) => {
+  // Connect Wallet
+  const connectWallet = async () => {
+    if (!window.ethereum) {
+      alert("MetaMask not detected!");
+      return;
+    }
+
     try {
-      // Step 1: Get seller address (this should ALWAYS work if contract is deployed)
-      let sellerAddress = "";
-      try {
-        sellerAddress = await contractInstance.methods.seller().call();
-        setSeller(sellerAddress);
-        console.log("Seller:", sellerAddress);
-      } catch (e) {
-        console.error("❌ CRITICAL: Cannot read seller() - ABI mismatch likely!");
-        console.error("Error details:", e);
-        setError("ABI mismatch detected! The SecureAuction.json ABI doesn't match the deployed contract.");
-        return;
-      }
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      setWalletAddress(accounts[0]);
+    } catch (error) {
+      console.log("Wallet error:", error);
+    }
+  };
 
-      // Step 2: Get auction status flags
-      let started = false;
-      let ended = false;
+  // File Upload Handlers
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
 
-      try {
-        started = await contractInstance.methods.auctionStarted().call();
-        console.log("Auction started:", started);
-      } catch (e) {
-        console.error("Error reading auctionStarted:", e.message);
-        // Don't return, continue with defaults
-      }
+    const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
+    if (!validTypes.includes(file.type)) {
+      alert("Please select a valid image file (JPEG, PNG, GIF, WEBP)");
+      return;
+    }
 
-      try {
-        ended = await contractInstance.methods.ended().call();
-        console.log("Auction ended:", ended);
-      } catch (e) {
-        console.error("Error reading ended:", e.message);
-      }
+    if (file.size > 10 * 1024 * 1024) {
+      alert("File size must be under 10MB");
+      return;
+    }
 
-      setAuctionStarted(started);
-      setAuctionEnded(ended);
+    setSelectedFile(file);
 
-      // Step 3: Only read bid data if auction has been started
-      if (started || ended) {
-        try {
-          const bid = await contractInstance.methods.highestBid().call();
-          const bidder = await contractInstance.methods.highestBidder().call();
-          const end = await contractInstance.methods.endTime().call();
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
 
-          setHighestBid(
-            bid && bid !== "0" 
-              ? web3Instance.utils.fromWei(bid.toString(), "ether") 
-              : "0"
-          );
-          
-          setHighestBidder(
-            bidder && bidder !== "0x0000000000000000000000000000000000000000"
-              ? bidder
-              : "None"
-          );
-          
-          setEndTime(end ? Number(end) : 0);
+  const handleDragOver = (event) => {
+    event.preventDefault();
+    setIsDragging(true);
+  };
 
-          console.log("Loaded auction data:", { bid, bidder, end });
-        } catch (e) {
-          console.error("Error loading auction data:", e.message);
-          // Set safe defaults
-          setHighestBid("0");
-          setHighestBidder("None");
-          setEndTime(0);
-        }
+  const handleDragLeave = (event) => {
+    event.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setIsDragging(false);
+    const file = event.dataTransfer.files[0];
+    if (file) handleFileSelect({ target: { files: [file] } });
+  };
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Upload NFT image to Spring Boot backend
+  const uploadNFTImage = async () => {
+    if (!selectedFile) return null;
+
+    const formDataObj = new FormData();
+    formDataObj.append('file', selectedFile);
+    formDataObj.append('walletAddress', walletAddress);
+
+    try {
+      const response = await fetch('http://localhost:8080/api/nft/upload', {
+        method: 'POST',
+        body: formDataObj
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.imageUrl; // Returns the URL where image is stored
       } else {
-        // Auction not started - set defaults
-        setHighestBid("0");
-        setHighestBidder("None");
-        setEndTime(0);
-        console.log("Auction not started yet - using default values");
+        throw new Error('Failed to upload image');
       }
-
     } catch (error) {
-      console.error("Error loading auction state:", error);
-      setError(`Failed to load auction state: ${error.message}`);
+      console.error("Error uploading image:", error);
+      throw error;
     }
   };
 
-  const setupEventListeners = (contractInstance, web3Instance) => {
-    try {
-      contractInstance.events.HighestBidIncreased({})
-        .on('data', (event) => {
-          if (event?.returnValues) {
-            setHighestBid(
-              web3Instance.utils.fromWei(event.returnValues.amount, "ether")
-            );
-            setHighestBidder(event.returnValues.bidder);
-            console.log("Bid increased event:", event.returnValues);
-          }
-        })
-        .on('error', (error) => {
-          console.error("Event error:", error);
-        });
+  // Create Auction (Blockchain + Backend)
+  const handleCreateAuction = async (event) => {
+    event.preventDefault();
 
-      contractInstance.events.AuctionEnded({})
-        .on('data', (event) => {
-          setAuctionEnded(true);
-          setAuctionStarted(false);
-          console.log("Auction ended event:", event);
-        })
-        .on('error', (error) => {
-          console.error("Event error:", error);
-        });
-
-    } catch (error) {
-      console.error("Error setting up events:", error);
-    }
-  };
-
-  const startAuctionOnChain = async () => {
-    if (!contract) {
-      alert("Contract not loaded");
+    if (!walletAddress) {
+      alert("Connect your wallet first");
       return;
     }
 
-    if (!biddingTime || !minIncrement || !extensionTime) {
-      alert("Please fill in all required fields (Bidding Time, Min Increment, Extension Time)");
+    if (
+      !selectedFile ||
+      !formData.itemName ||
+      !formData.biddingTime ||
+      !formData.minIncrement ||
+      !formData.extensionTime
+    ) {
+      alert("Fill all required fields and select an NFT image!");
       return;
     }
 
+    if (!web3 || !contract) {
+      alert("Web3 not initialized!");
+      return;
+    }
+
+    setUploading(true);
+
     try {
-      // ✅ FIX: Convert to strings to avoid BigInt mixing error
-      const bidTime = biddingTime.toString();
-      const extension = extensionTime.toString();
+      // Step 1: Upload NFT image to backend
+      console.log("Uploading NFT image...");
+      const imageUrl = await uploadNFTImage();
+      console.log("Image uploaded:", imageUrl);
+
+      // Step 2: Start auction on blockchain
+      console.log("Starting auction on blockchain...");
       
-      // Validate values
-      if (parseFloat(bidTime) <= 0 || parseFloat(extension) < 0) {
-        alert("Invalid time values");
-        return;
-      }
-
-      const increment = web3.utils.toWei(minIncrement.toString(), "ether");
-      const max = maxBid && parseFloat(maxBid) > 0 
-        ? web3.utils.toWei(maxBid.toString(), "ether") 
+      const bidTime = formData.biddingTime.toString();
+      const extension = formData.extensionTime.toString();
+      const increment = web3.utils.toWei(formData.minIncrement.toString(), "ether");
+      const max = formData.maxBid && parseFloat(formData.maxBid) > 0 
+        ? web3.utils.toWei(formData.maxBid.toString(), "ether") 
         : "0";
 
-      console.log("Starting auction with:", { bidTime, increment, extension, max });
-
       // Estimate gas first
-      const gasEstimate = await contract.methods
-        .startAuction(bidTime, increment, extension, max)
-        .estimateGas({ from: accounts[0] });
-
-      console.log("Estimated gas:", gasEstimate);
+      let gasEstimate;
+      try {
+        gasEstimate = await contract.methods
+          .startAuction(bidTime, increment, extension, max)
+          .estimateGas({ from: walletAddress });
+      } catch (estimateError) {
+        console.error("Gas estimation failed:", estimateError);
+        alert("Transaction will fail. Check console for details.");
+        setUploading(false);
+        return;
+      }
 
       const receipt = await contract.methods
         .startAuction(bidTime, increment, extension, max)
         .send({
-          from: accounts[0],
-          gas: Math.floor(Number(gasEstimate) * 1.2), // Add 20% buffer, convert BigInt to Number
+          from: walletAddress,
+          gas: Math.floor(Number(gasEstimate) * 1.2),
         });
 
-      console.log("Transaction receipt:", receipt);
+      console.log("Blockchain transaction successful:", receipt);
 
-      // Reload state
-      await loadAuctionState(contract, web3);
+      // Step 3: Save auction data to backend
+      console.log("Saving auction to database...");
+      const auctionData = {
+        itemName: formData.itemName,
+        imageUrl: imageUrl,
+        ownerAddress: walletAddress,
+        biddingTime: parseInt(formData.biddingTime),
+        minIncrement: formData.minIncrement,
+        extensionTime: parseInt(formData.extensionTime),
+        maxBid: formData.maxBid || null,
+        contractAddress: CONTRACT_ADDRESS,
+        transactionHash: receipt.transactionHash,
+        startTime: new Date().toISOString(),
+        status: 'active'
+      };
 
-      alert("✅ Auction started successfully!");
-      
-      // Clear form
-      setBiddingTime("");
-      setMinIncrement("");
-      setExtensionTime("");
-      setMaxBid("");
-
-    } catch (err) {
-      console.error("Error starting auction:", err);
-      
-      if (err.code === 4001) {
-        alert("Transaction rejected by user");
-      } else if (err.message.includes("Auction already started")) {
-        alert("Auction is already running");
-      } else if (err.message.includes("Only seller")) {
-        alert("Only the seller can start the auction");
-      } else {
-        alert(`Error: ${err.message}`);
-      }
-    }
-  };
-
-  const endAuctionOnChain = async () => {
-    if (!contract) {
-      alert("Contract not loaded");
-      return;
-    }
-
-    try {
-      // Check if enough time has passed
-      const currentTime = Math.floor(Date.now() / 1000);
-      
-      if (endTime && currentTime < endTime) {
-        alert(
-          `Auction cannot be ended yet. Please wait until ${new Date(
-            endTime * 1000
-          ).toLocaleString()}`
-        );
-        return;
-      }
-
-      const gasEstimate = await contract.methods
-        .endAuction()
-        .estimateGas({ from: accounts[0] });
-
-      const receipt = await contract.methods.endAuction().send({
-        from: accounts[0],
-        gas: Math.floor(Number(gasEstimate) * 1.2), // Convert BigInt to Number
+      const backendResponse = await fetch('http://localhost:8080/api/auctions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(auctionData)
       });
 
-      console.log("Auction ended:", receipt);
-
-      // Reload state
-      await loadAuctionState(contract, web3);
-
-      alert("✅ Auction ended successfully!");
-
-    } catch (err) {
-      console.error("Error ending auction:", err);
-      
-      if (err.code === 4001) {
-        alert("Transaction rejected by user");
-      } else if (err.message.includes("Auction not yet ended")) {
-        alert("Auction time has not elapsed yet");
-      } else if (err.message.includes("Only seller")) {
-        alert("Only the seller can end the auction");
-      } else {
-        alert(`Error: ${err.message}`);
+      if (!backendResponse.ok) {
+        console.error("Failed to save auction to backend");
       }
-    }
-  };
 
-  const refreshState = async () => {
-    if (contract && web3) {
-      await loadAuctionState(contract, web3);
-      alert("State refreshed!");
+      console.log("Auction created successfully!");
+      alert("✅ Auction created successfully!");
+
+      // Reset form
+      setFormData({
+        itemName: "",
+        biddingTime: "",
+        minIncrement: "",
+        extensionTime: "",
+        maxBid: "",
+      });
+      setSelectedFile(null);
+      setImagePreview(null);
+
+    } catch (error) {
+      console.error("Error creating auction:", error);
+      alert("❌ Failed to create auction: " + error.message);
+    } finally {
+      setUploading(false);
     }
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto", fontFamily: "Arial, sans-serif" }}>
-      <h1>🔨 Seller Dashboard</h1>
+    <div
+      className="upload-container"
+      style={{ backgroundImage: `url(${loginBg})` }}
+    >
+      <div className="upload-content">
+        <div className="upload-box">
+          <div className="upload-title">
+            <span className="upload-main-text">Create NFT Auction</span>
+          </div>
 
-      {error && (
-        <div style={{
-          padding: "15px",
-          backgroundColor: "#fee",
-          border: "1px solid #fcc",
-          borderRadius: "5px",
-          marginBottom: "20px",
-          color: "#c00"
-        }}>
-          <strong>⚠️ Error:</strong> {error}
+          <form className="upload-form" onSubmit={handleCreateAuction}>
+            {/* NFT Image Upload */}
+            <div className="form-group">
+              <label className="form-label">NFT Image *</label>
+              <div
+                className={`upload-area ${
+                  isDragging ? "dragging" : ""
+                } ${selectedFile ? "has-file" : ""}`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                {selectedFile ? (
+                  <div className="file-selected">
+                    {imagePreview && (
+                      <div style={{
+                        width: "100%",
+                        marginBottom: "15px",
+                        borderRadius: "8px",
+                        overflow: "hidden"
+                      }}>
+                        <img 
+                          src={imagePreview} 
+                          alt="NFT Preview" 
+                          style={{
+                            width: "100%",
+                            maxHeight: "300px",
+                            objectFit: "cover"
+                          }}
+                        />
+                      </div>
+                    )}
+                    <div className="file-info">
+                      <p className="file-name">{selectedFile.name}</p>
+                      <p className="file-size">
+                        {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className="remove-file"
+                      onClick={() => {
+                        setSelectedFile(null);
+                        setImagePreview(null);
+                      }}
+                      style={{
+                        marginTop: "10px",
+                        padding: "8px 16px",
+                        backgroundColor: "#f44336",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        cursor: "pointer"
+                      }}
+                    >
+                      Remove Image
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="upload-icon">🖼️</div>
+                    <p className="upload-text">Drag and Drop your NFT</p>
+                    <p className="upload-subtext">or</p>
+                    <label className="file-input-label">
+                      Click to Upload
+                      <input
+                        type="file"
+                        accept=".jpeg,.jpg,.png,.gif,.webp"
+                        onChange={handleFileSelect}
+                        className="file-input"
+                      />
+                    </label>
+                    <p style={{ fontSize: "12px", color: "#666", marginTop: "10px" }}>
+                      Supported formats: JPEG, PNG, GIF, WEBP (Max 10MB)
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Item Name */}
+            <div className="form-group">
+              <label className="form-label">NFT Name *</label>
+              <input
+                type="text"
+                name="itemName"
+                placeholder="Enter NFT name (e.g., CryptoPunk #1234)"
+                className="form-input"
+                value={formData.itemName}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+
+            {/* Bidding Time */}
+            <div className="form-group">
+              <label className="form-label">Bidding Time (seconds) *</label>
+              <input
+                type="number"
+                name="biddingTime"
+                placeholder="e.g., 300 (5 minutes)"
+                className="form-input"
+                value={formData.biddingTime}
+                onChange={handleInputChange}
+                min="60"
+                required
+              />
+            </div>
+
+            {/* Min Increment */}
+            <div className="form-group">
+              <label className="form-label">Minimum Bid Increment (ETH) *</label>
+              <input
+                type="number"
+                name="minIncrement"
+                placeholder="e.g., 0.001"
+                className="form-input"
+                value={formData.minIncrement}
+                onChange={handleInputChange}
+                min="0.001"
+                step="0.001"
+                required
+              />
+            </div>
+
+            {/* Extension Time */}
+            <div className="form-group">
+              <label className="form-label">Extension Time (seconds) *</label>
+              <input
+                type="number"
+                name="extensionTime"
+                placeholder="e.g., 60"
+                className="form-input"
+                value={formData.extensionTime}
+                onChange={handleInputChange}
+                min="0"
+                required
+              />
+            </div>
+
+            {/* Max Bid (Optional) */}
+            <div className="form-group">
+              <label className="form-label">Maximum Bid (ETH) - Optional</label>
+              <input
+                type="number"
+                name="maxBid"
+                placeholder="e.g., 10 (leave empty for no limit)"
+                className="form-input"
+                value={formData.maxBid}
+                onChange={handleInputChange}
+                min="0"
+                step="0.001"
+              />
+            </div>
+
+            {/* Wallet Connection */}
+            <div className="form-group">
+              <label className="form-label">Wallet</label>
+              <div className="wallet-address">
+                {walletAddress ? (
+                  <span className="wallet-text">
+                    {walletAddress.substring(0, 10)}...
+                    {walletAddress.substring(walletAddress.length - 8)}
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    className="copy-btn"
+                    onClick={connectWallet}
+                  >
+                    Connect Wallet
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="form-group">
+              <button 
+                type="submit" 
+                className="create-auction-btn"
+                disabled={uploading || !walletAddress}
+                style={{
+                  backgroundColor: (uploading || !walletAddress) ? "#ccc" : "#4CAF50",
+                  cursor: (uploading || !walletAddress) ? "not-allowed" : "pointer"
+                }}
+              >
+                {uploading ? "Creating Auction... ⏳" : "Create NFT Auction"}
+              </button>
+            </div>
+          </form>
         </div>
-      )}
-
-      <div style={{
-        padding: "10px",
-        backgroundColor: "#f0f0f0",
-        borderRadius: "5px",
-        marginBottom: "20px",
-        fontSize: "13px"
-      }}>
-        <strong>Connection Info:</strong><br/>
-        Network ID: {networkId || "Not connected"}<br/>
-        Your Account: {accounts[0] || "Not connected"}<br/>
-        Contract: {CONTRACT_ADDRESS}<br/>
-        Contract Exists: {contractExists ? "✅ Yes" : "❌ No"}<br/>
-        Seller: {seller || "Unknown"}
-        <button 
-          onClick={refreshState}
-          style={{
-            marginLeft: "10px",
-            padding: "5px 10px",
-            fontSize: "12px"
-          }}
-        >
-          🔄 Refresh
-        </button>
-      </div>
-
-      <div style={{
-        border: "1px solid #ddd",
-        borderRadius: "5px",
-        padding: "20px",
-        marginBottom: "20px",
-        backgroundColor: "#fafafa"
-      }}>
-        <h2>Start New Auction</h2>
-        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-          <input
-            type="number"
-            placeholder="Bidding Time (seconds) *"
-            value={biddingTime}
-            onChange={(e) => setBiddingTime(e.target.value)}
-            style={{ padding: "10px", fontSize: "14px" }}
-          />
-          <input
-            type="number"
-            step="0.001"
-            placeholder="Min Increment (ETH) *"
-            value={minIncrement}
-            onChange={(e) => setMinIncrement(e.target.value)}
-            style={{ padding: "10px", fontSize: "14px" }}
-          />
-          <input
-            type="number"
-            placeholder="Extension Time (seconds) *"
-            value={extensionTime}
-            onChange={(e) => setExtensionTime(e.target.value)}
-            style={{ padding: "10px", fontSize: "14px" }}
-          />
-          <input
-            type="number"
-            step="0.001"
-            placeholder="Max Bid (ETH) - Optional"
-            value={maxBid}
-            onChange={(e) => setMaxBid(e.target.value)}
-            style={{ padding: "10px", fontSize: "14px" }}
-          />
-          <button
-            onClick={startAuctionOnChain}
-            disabled={!contractExists || (auctionStarted && !auctionEnded)}
-            style={{
-              padding: "12px",
-              fontSize: "16px",
-              backgroundColor: (!contractExists || (auctionStarted && !auctionEnded)) ? "#ccc" : "#4CAF50",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: (!contractExists || (auctionStarted && !auctionEnded)) ? "not-allowed" : "pointer",
-              fontWeight: "bold"
-            }}
-          >
-            {auctionStarted && !auctionEnded ? "Auction Already Running" : "Start Auction"}
-          </button>
-        </div>
-      </div>
-
-      <div style={{
-        border: "1px solid #ddd",
-        borderRadius: "5px",
-        padding: "20px",
-        backgroundColor: "#fafafa"
-      }}>
-        <h2>📊 Current Auction Status</h2>
-        <div style={{ fontSize: "16px", lineHeight: "1.8" }}>
-          <p>
-            <strong>Status:</strong>{" "}
-            <span style={{
-              padding: "3px 8px",
-              borderRadius: "3px",
-              backgroundColor: auctionStarted ? "#4CAF50" : auctionEnded ? "#f44336" : "#999",
-              color: "white",
-              fontSize: "14px"
-            }}>
-              {auctionStarted ? "🟢 Running" : auctionEnded ? "🔴 Ended" : "⚪ Not Started"}
-            </span>
-          </p>
-          <p><strong>Highest Bid:</strong> {highestBid} ETH</p>
-          <p><strong>Highest Bidder:</strong> {highestBidder}</p>
-          <p>
-            <strong>End Time:</strong>{" "}
-            {endTime && endTime > 0
-              ? new Date(endTime * 1000).toLocaleString()
-              : "Not started"}
-          </p>
-        </div>
-
-        <button
-          onClick={endAuctionOnChain}
-          disabled={!contractExists || !auctionStarted || auctionEnded}
-          style={{
-            padding: "12px 24px",
-            fontSize: "16px",
-            backgroundColor: (!contractExists || !auctionStarted || auctionEnded) ? "#ccc" : "#f44336",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: (!contractExists || !auctionStarted || auctionEnded) ? "not-allowed" : "pointer",
-            marginTop: "15px",
-            fontWeight: "bold"
-          }}
-        >
-          End Auction
-        </button>
       </div>
     </div>
   );
-}
+};
+
+export default Upload;

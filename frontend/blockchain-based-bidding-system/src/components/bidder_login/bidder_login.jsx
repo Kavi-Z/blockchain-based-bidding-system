@@ -1,11 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import loginBg from "../../assets/login.png";
 import logo from "../../assets/cryptops.png";
 import googleIcon from "../../assets/google.png"; 
 import userIcon from "../../assets/user.png";
 import lockIcon from "../../assets/lock.png";
-import { Link, useNavigate } from "react-router-dom";
 import "./bidder_login.css";
+import axios from "axios";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -14,75 +15,44 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-  e.preventDefault();
-
-  try {
-    const res = await axios.post("http://localhost:8080/api/auth/login", {
-      email,
-      password,
-    });
-
-    console.log("Login Response:", res.data);
-
-    const userId =
-      res.data.userId ||
-      res.data.id ||
-      res.data._id ||
-      (res.data.user && res.data.user._id) ||
-      (res.data.data && res.data.data._id);
-
-    console.log("Extracted userId:", userId);
-
-    if (!userId) {
-      console.log("❌ userId not found in response!");
-      return;
-    }
-
-    localStorage.setItem("userId", userId);
-
-    navigate("/profile");
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
-      const res = await fetch("http://localhost:8080/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const res = await axios.post("http://localhost:8080/api/auth/login", {
+        email,
+        password,
       });
 
-      if (!res.ok) {
-        throw new Error("Invalid username or password");
+      const { id, token, role } = res.data;
+
+      if (!id || !token) {
+        setError("Login failed: No user data returned");
+        return;
       }
 
-      const data = await res.json();
- 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data));
-      localStorage.setItem("userId", data.id);
+      // Save user info
+      localStorage.setItem("userId", id);
+      localStorage.setItem("token", token);
+      localStorage.setItem("role", role);
 
-      navigate("/my-nft");  
+      // Navigate to bidder dashboard or NFTs page
+      navigate("/my-nft");
     } catch (err) {
-      setError(err.message);
+      console.error(err);
+      if (err.response && err.response.status === 401) {
+        setError("Invalid email or password");
+      } else {
+        setError("Login failed. Please try again later.");
+      }
     }
   };
 
   return (
-    <div
-      className="login-container"
-      style={{ backgroundImage: `url(${loginBg})` }}
-    >
+    <div className="login-container" style={{ backgroundImage: `url(${loginBg})` }}>
       <div className="logo-container">
         <img src={logo} alt="Logo" className="logo" />
-        <Link to="/" className="logo-text">CryptOps</Link>
       </div>
 
       <div className="login-box">
@@ -95,16 +65,16 @@ const Login = () => {
 
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="input-group">
-            <img src={userIcon} alt="Username" className="input-icon" />
+            <img src={userIcon} alt="Email" className="input-icon" />
             <input
-              type="text"
+              type="email"
               placeholder="Email"
               className="login-input"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
-
           <div className="input-group">
             <img src={lockIcon} alt="Password" className="input-icon" />
             <input
@@ -113,9 +83,9 @@ const Login = () => {
               className="login-input"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
-
           <button type="submit" className="login-btn">Login</button>
         </form>
 
@@ -125,7 +95,7 @@ const Login = () => {
         </button>
 
         <div className="signup-link">
-          Don't have an account? <Link to="/signup">Sign Up</Link>
+          Don't have an account? <a href="/signup">Sign Up</a>
         </div>
       </div>
     </div>

@@ -14,8 +14,7 @@ export default function Chatbot() {
 
     const userMessage = { sender: "user", text: input };
     setMessages(prev => [...prev, userMessage]);
-
-    // Temporary bot reply (AI will come later)
+ 
     setTimeout(() => {
       const botReply = {
         sender: "bot",
