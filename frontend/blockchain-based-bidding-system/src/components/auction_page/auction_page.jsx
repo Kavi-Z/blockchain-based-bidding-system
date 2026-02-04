@@ -1,89 +1,114 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './auction_page.css';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Web3 from "web3";
+import AuctionContract from "./SecureAuction.json";
+import "./auction_page.css";
+
+const CONTRACT_ADDRESS = "0xc3662276B3594bD8d70778b093caC2F31E6D497E";
 
 const AuctionPage = () => {
-  const [auctions] = useState([
-    {
-      id: 1,
-      image: 'https://i.seadn.io/gae/LIov33kogXOK4XZd2ESj29sqm_Hww5JSdO7AFn5wjt8xgnJJ0UpNV9yITqxra3s_LMEW1AnnrgOVB_hDpjJRA1uF4skI5Sdi_9rULi8?auto=format&dpr=1&w=384',
-      floorPrice: '0.05',
-      priceChange: '-20.95%',
-      changeType: 'negative',
-      endTime: '45 min',
-      status: 'active'
-    },
-    {
-      id: 2,
-      image: 'https://i.seadn.io/gae/7B0qai02OdHA8P_EOVK672qUliyjQdQDGNrACxs7WnTgZAkJa_wWURnIFKeOh5VTf8cfTqW3wQpozGedaC9mteKphEOtztls02RlWQ?auto=format&dpr=1&w=384',
-      floorPrice: '0.052',
-      priceChange: '+0.28%',
-      changeType: 'positive',
-      endTime: null,
-      status: 'ended'
-    },
-    {
-      id: 3,
-      image: 'https://i.seadn.io/gae/nKtGrmFLM_9vSogFbQTOAi5Vp8nJz_cXLdSq3d6nDr8pqcN_7qBIp-3xPvX5CqrPZ2DRhxBFpF6aYQcQxE_9nMkV_TjRAFcVDqYqGg?auto=format&dpr=1&w=384',
-      floorPrice: '0.01',
-      priceChange: '+41.5%',
-      changeType: 'positive',
-      endTime: '25 min',
-      status: 'active'
-    }
-  ]);
-
-  const [userId] = useState('0xbaf....5554');
+  const [auctions, setAuctions] = useState([]);
+  const [account, setAccount] = useState("");
   const navigate = useNavigate();
 
-  const handleCreateAuction = () => {
-    navigate('/upload');
+  useEffect(() => {
+    loadSellerAuctions();
+    const interval = setInterval(loadSellerAuctions, 5000);  
+    return () => clearInterval(interval);
+  }, []);
+
+  const loadSellerAuctions = async () => {
+    if (!window.ethereum) {
+      alert("MetaMask not detected");
+      return;
+    }
+
+    const web3 = new Web3(window.ethereum);
+    const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+    const sellerAddress = accounts[0];
+    setAccount(sellerAddress);
+
+    const contract = new web3.eth.Contract(AuctionContract.abi, CONTRACT_ADDRESS);
+    const auctionCount = await contract.methods.auctionCount().call();
+
+    const allAuctions = await Promise.all(
+      Array.from({ length: auctionCount }, (_, i) => contract.methods.auctions(i).call())
+    );
+
+    // Filter only current active auctions by this seller
+    const activeSellerAuctions = allAuctions
+      .filter(
+        (a) =>
+          a.seller.toLowerCase() === sellerAddress.toLowerCase() &&
+          a.active &&
+          Number(a.endTime) > Math.floor(Date.now() / 1000)
+      )
+      .map((a, idx) => ({
+        id: idx,
+        image: a.nftURI,
+        startPrice: web3.utils.fromWei(a.startPrice, "ether"),
+        highestBid: web3.utils.fromWei(a.highestBid, "ether"),
+        highestBidder: a.highestBidder,
+        endTime: Number(a.endTime),
+        active: a.active,
+      }));
+
+    setAuctions(activeSellerAuctions);
+  };
+
+  const getRemainingTime = (endTime) => {
+    const now = Math.floor(Date.now() / 1000);
+    const diff = endTime - now;
+
+    if (diff <= 0) return "Ended";
+
+    const minutes = Math.floor(diff / 60);
+    const seconds = diff % 60;
+    return `${minutes}m ${seconds}s`;
+  };
+
+  const shortenAddress = (addr) => {
+    if (!addr || addr === "0x0000000000000000000000000000000000000000") return "No bids";
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
   };
 
   return (
     <div className="auction-page">
       <div className="auction-navbar">
-        <div className="auction-navbar-content">
-          <h2 className="auction-logo">CryptOps</h2>
-          <button className="auction-connect-btn" onClick={() => navigate('/')}>
-            Home
-          </button>
-        </div>
+        <h2 className="auction-logo">CryptOps</h2>
+        <button onClick={() => navigate("/")}>Home</button>
       </div>
-      <div className="auction-content">
-        <div className="auction-header">
-          <h1>Your Auctions</h1>
-          <p className="user-id">Your id {userId}</p>
-        </div>
 
-        <div className="auctions-grid">
-          {auctions.map((auction) => (
-            <div key={auction.id} className="auction-card">
-              <div className="auction-image-container">
-                <img src={auction.image} alt="NFT Auction" className="auction-image" />
-              </div>
-              <div className="auction-details">
-                <div className="price-info">
-                  <span className="price-label">Floor price</span>
-                  <span className="price-value">{auction.floorPrice} ETH</span>
-                  <span className={`price-change ${auction.changeType}`}>
-                    {auction.priceChange}
-                  </span>
-                </div>
-                {auction.status === 'active' ? (
-                  <p className="auction-time">End in {auction.endTime}</p>
-                ) : (
-                  <p className="auction-ended">Auction has Ended</p>
-                )}
-              </div>
+      <div className="auction-header">
+        <h1>Your Current Auctions</h1>
+        <p className="user-id">Seller: {shortenAddress(account)}</p>
+      </div>
+
+      <div className="auctions-grid">
+        {auctions.length === 0 && (
+          <p className="no-auctions">No active auctions at the moment</p>
+        )}
+
+        {auctions.map((auction) => (
+          <div key={auction.id} className="auction-card">
+            <img src={auction.image} alt="NFT" className="auction-image" />
+
+            <div className="auction-details">
+              <p>Start Price: {auction.startPrice} ETH</p>
+              <p>Highest Bid: {auction.highestBid} ETH</p>
+              <p>Highest Bidder: {shortenAddress(auction.highestBidder)}</p>
+
+              <p className="auction-time">
+                Ends in {getRemainingTime(auction.endTime)}
+              </p>
             </div>
-          ))}
-        </div>
-
-        <button className="create-auction-btn" onClick={handleCreateAuction}>
-          Create An Auction
-        </button>
+          </div>
+        ))}
       </div>
+
+      <button className="create-auction-btn" onClick={() => navigate("/upload")}>
+        Create New Auction
+      </button>
     </div>
   );
 };

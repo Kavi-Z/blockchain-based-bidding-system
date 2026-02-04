@@ -1,138 +1,214 @@
 package com.cryptops.bidding.cryptops.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.cryptops.bidding.cryptops.model.User;
 import com.cryptops.bidding.cryptops.service.AuthService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173"})
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000"})
 public class AuthController {
 
     @Autowired
     private AuthService authService;
 
-    // REGISTER
-    @PostMapping("/register")
-    public Map<String, Object> register(@RequestBody User user) {
-        User savedUser = authService.register(user);
+    // ==================== BIDDER REGISTRATION ====================
+    @PostMapping("/register/bidder")
+    public ResponseEntity<?> registerBidder(@RequestBody RegisterRequest request) {
+        try {
+            if (request.getEmail() == null || request.getPassword() == null || request.getUsername() == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Missing required fields"));
+            }
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("id", savedUser.getId());
-        response.put("email", savedUser.getEmail());
-        response.put("role", savedUser.getRole());
+            User user = new User();
+            user.setEmail(request.getEmail());
+            user.setUsername(request.getUsername());
+            user.setPassword(request.getPassword()); // AuthService will hash
+            user.setRole("BIDDER");
 
-        return response;
-    }
+            User savedUser = authService.register(user);
+            String token = authService.generateToken(savedUser);
 
-    // LOGIN
-    @PostMapping("/login")
-    public Map<String, Object> login(@RequestBody User user) {
-        User loggedInUser = authService.login(user.getEmail(), user.getPassword());
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("id", loggedInUser.getId());
-        response.put("email", loggedInUser.getEmail());
-        response.put("role", loggedInUser.getRole());
-
-        return response;
-    }
-
-    // UPDATE EMAIL
-    @PutMapping("/users/{id}/update-email")
-    public Map<String, Object> updateEmail(@PathVariable String id, @RequestBody Map<String, String> request) {
-        String newEmail = request.get("email");
-        User updatedUser = authService.updateEmail(id, newEmail);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("id", updatedUser.getId());
-        response.put("email", updatedUser.getEmail());
-        response.put("role", updatedUser.getRole());
-
-        return response;
-    }
-
-    // CHANGE PASSWORD
-    @PutMapping("/users/{id}/change-password")
-    public Map<String, String> changePassword(@PathVariable String id, @RequestBody Map<String, String> passwords) {
-        String oldPassword = passwords.get("oldPassword");
-        String newPassword = passwords.get("newPassword");
-
-        boolean success = authService.changePassword(id, oldPassword, newPassword);
-
-        Map<String, String> response = new HashMap<>();
-        if(success) {
-            response.put("message", "Password changed successfully");
-        } else {
-            response.put("message", "Old password is incorrect");
+            return ResponseEntity.ok(Map.of(
+                    "id", savedUser.getId(),
+                    "email", savedUser.getEmail(),
+                    "username", savedUser.getUsername(),
+                    "role", savedUser.getRole(),
+                    "token", token,
+                    "message", "Bidder registered successfully"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
-
-        return response;
     }
 
+    // ==================== SELLER REGISTRATION ====================
+    @PostMapping("/register/seller")
+    public ResponseEntity<?> registerSeller(@RequestBody RegisterRequest request) {
+        try {
+            if (request.getEmail() == null || request.getPassword() == null || request.getUsername() == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Missing required fields"));
+            }
 
+            User user = new User();
+            user.setEmail(request.getEmail());
+            user.setUsername(request.getUsername());
+            user.setPassword(request.getPassword()); // AuthService will hash
+            user.setRole("SELLER");
 
-    // --- WALLET VERIFICATION ---
+            User savedUser = authService.register(user);
+            String token = authService.generateToken(savedUser);
 
-    // 1️⃣ Generate nonce for wallet connection
-    // @GetMapping("/nonce")
-    // public Map<String, String> getNonce(@RequestParam String wallet) {
-    //     String nonce = "Login-" + System.currentTimeMillis();
-    //     walletNonces.put(wallet, nonce);
+            return ResponseEntity.ok(Map.of(
+                    "id", savedUser.getId(),
+                    "email", savedUser.getEmail(),
+                    "username", savedUser.getUsername(),
+                    "role", savedUser.getRole(),
+                    "token", token,
+                    "message", "Seller registered successfully"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 
-    //     Map<String, String> response = new HashMap<>();
-    //     response.put("nonce", nonce);
-    //     return response;
-    // }
+    // ==================== UNIFIED LOGIN (BIDDER & SELLER) ====================
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        try {
+            if (request.getEmail() == null || request.getPassword() == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Email and password required"));
+            }
 
-    // 2️⃣ Verify wallet signature using Web3j
-    // @PostMapping("/verify-wallet")
-    // public Map<String, Object> verifyWallet(@RequestBody Map<String, String> payload) {
-    //     String wallet = payload.get("wallet");
-    //     String signature = payload.get("signature");
+            User loggedInUser = authService.login(request.getEmail(), request.getPassword());
+            
+            if (loggedInUser == null) {
+                return ResponseEntity.status(401).body(Map.of("error", "Invalid email or password"));
+            }
 
-    //     String nonce = walletNonces.get(wallet);
-    //     if (nonce == null) {
-    //         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nonce not found");
-    //     }
+            String token = authService.generateToken(loggedInUser);
 
-    //     boolean isValid;
-    //     try {
-    //         byte[] msg = nonce.getBytes();
-    //         byte[] sigBytes = Numeric.hexStringToByteArray(signature);
+            return ResponseEntity.ok(Map.of(
+                    "id", loggedInUser.getId(),
+                    "email", loggedInUser.getEmail(),
+                    "username", loggedInUser.getUsername() != null ? loggedInUser.getUsername() : "",
+                    "role", loggedInUser.getRole(),
+                    "walletAddress", loggedInUser.getWalletAddress() != null ? loggedInUser.getWalletAddress() : "",
+                    "token", token,
+                    "message", "Login successful"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "Login failed: " + e.getMessage()));
+        }
+    }
 
-    //         byte v = sigBytes[64];
-    //         byte[] r = Arrays.copyOfRange(sigBytes, 0, 32);
-    //         byte[] s = Arrays.copyOfRange(sigBytes, 32, 64);
+    // ==================== SELLER-SPECIFIC LOGIN (OPTIONAL) ====================
+    @PostMapping("/seller-login")
+    public ResponseEntity<?> sellerLogin(@RequestBody LoginRequest request) {
+        try {
+            if (request.getEmail() == null || request.getPassword() == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "Email and password required"));
+            }
 
-    //         Sign.SignatureData sigData = new Sign.SignatureData(v, r, s);
-    //         String recovered = "0x" + Keys.getAddress(Sign.signedMessageToKey(msg, sigData));
-    //         isValid = recovered.equalsIgnoreCase(wallet);
-    //     } catch (Exception e) {
-    //         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid signature");
-    //     }
+            User loggedInUser = authService.login(request.getEmail(), request.getPassword());
+            
+            if (loggedInUser == null) {
+                return ResponseEntity.status(401).body(Map.of("error", "Invalid email or password"));
+            }
 
-    //     if (!isValid) {
-    //         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid wallet signature");
-    //     }
+            // Verify user is a seller
+            if (!"SELLER".equals(loggedInUser.getRole())) {
+                return ResponseEntity.status(403).body(Map.of("error", "Access denied. Sellers only."));
+            }
 
-    //     walletNonces.remove(wallet);
+            String token = authService.generateToken(loggedInUser);
 
-    //     Map<String, Object> response = new HashMap<>();
-    //     response.put("wallet", wallet);
-    //     response.put("verified", true);
+            return ResponseEntity.ok(Map.of(
+                    "id", loggedInUser.getId(),
+                    "email", loggedInUser.getEmail(),
+                    "username", loggedInUser.getUsername() != null ? loggedInUser.getUsername() : "",
+                    "role", loggedInUser.getRole(),
+                    "walletAddress", loggedInUser.getWalletAddress() != null ? loggedInUser.getWalletAddress() : "",
+                    "token", token,
+                    "message", "Seller login successful"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "Login failed: " + e.getMessage()));
+        }
+    }
 
-    //     return response;
-    // }
+    // ==================== GET USER BY ID ====================
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable String id) {
+        try {
+            User user = authService.findById(id);
+            
+            if (user == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok(Map.of(
+                    "id", user.getId(),
+                    "email", user.getEmail(),
+                    "username", user.getUsername() != null ? user.getUsername() : "",
+                    "role", user.getRole(),
+                    "walletAddress", user.getWalletAddress() != null ? user.getWalletAddress() : ""
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // ==================== UPDATE USER ====================
+    @PutMapping("/user/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody User updatedUser) {
+        try {
+            User user = authService.updateUser(id, updatedUser);
+            
+            if (user == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok(Map.of(
+                    "id", user.getId(),
+                    "email", user.getEmail(),
+                    "username", user.getUsername() != null ? user.getUsername() : "",
+                    "role", user.getRole(),
+                    "message", "User updated successfully"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // ==================== REQUEST DTOs ====================
+    public static class RegisterRequest {
+        private String email;
+        private String password;
+        private String username;
+
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+        
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
+        
+        public String getUsername() { return username; }
+        public void setUsername(String username) { this.username = username; }
+    }
+
+    public static class LoginRequest {
+        private String email;
+        private String password;
+
+        public String getEmail() { return email; }
+        public void setEmail(String email) { this.email = email; }
+        
+        public String getPassword() { return password; }
+        public void setPassword(String password) { this.password = password; }
+    }
 }
