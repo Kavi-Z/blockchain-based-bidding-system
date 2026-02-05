@@ -17,7 +17,7 @@ def get_chain():
     retriever = vectordb.as_retriever(search_kwargs={"k": 3})
 
     llm = ChatOpenAI(
-        model_name="models/text-bison-001",  # Gemini chat model
+        model_name="models/text-bison-001",   
         temperature=0
     )
 
