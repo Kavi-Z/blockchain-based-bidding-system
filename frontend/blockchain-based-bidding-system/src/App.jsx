@@ -14,6 +14,14 @@ import SellerLogin from './components/seller_login/seller_login';
 import SellerSignup from './components/seller_signup/seller_signup';
 import Chatbot from "./components/chatbot/chatbot";
 import BiddersDashboard from "./components/BidderDashboard/bidderdashboard.jsx";
+import Documentation from "./components/documentation/documentation";
+import Whitepaper from "./components/whitepaper/whitepaper";
+import Community from "./components/community/community";
+import Support from "./components/support/support";
+import PrivacyPolicy from "./components/privacy-policy/privacy-policy";
+import TermsOfService from "./components/terms-of-service/terms-of-service";
+import CookiePolicy from "./components/cookie-policy/cookie-policy";
+import Disclaimer from "./components/disclaimer/disclaimer";
 
 
 function App() {
@@ -33,6 +41,14 @@ function App() {
         <Route path="/seller-login" element={<SellerLogin />} />
         <Route path="/seller-signup" element={<SellerSignup />} />
         <Route path="/bidder-dashboard" element={<BiddersDashboard />} />
+        <Route path="/documentation" element={<Documentation />} />
+        <Route path="/whitepaper" element={<Whitepaper />} />
+        <Route path="/community" element={<Community />} />
+        <Route path="/support" element={<Support />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/cookie-policy" element={<CookiePolicy />} />
+        <Route path="/disclaimer" element={<Disclaimer />} />
 
       </Routes>
  
