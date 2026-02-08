@@ -1,8 +1,9 @@
 import os
 from langchain.text_splitters import RecursiveCharacterTextSplitter
 from langchain.schema import Document
-from langchain_community.vectorstores import Chroma
-from langchain_google_genai.embeddings import GoogleGenerativeAIEmbeddings
+from langchain.vectorstores import Chroma
+from langchain.embeddings import GoogleGenerativeAIEmbeddings
+
 
 from config import DATA_PATH, VECTOR_DB_PATH, CHUNK_SIZE, CHUNK_OVERLAP, GEMINI_API_KEY
 

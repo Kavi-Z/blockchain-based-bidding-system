@@ -1,0 +1,28 @@
+Auction Rules and Regulations
+
+Auction Type
+The system supports time-based online auctions. Each auction has a fixed start time and end time.
+
+Bid Eligibility
+Only registered and verified users are allowed to place bids. Users must be logged in to participate in an auction.
+
+Minimum Bid Increment
+Each new bid must be higher than the current highest bid by at least the minimum increment defined by the auction creator.
+
+Bid Validity
+A bid is considered valid only if it is successfully recorded on the blockchain. Failed or reverted transactions are ignored.
+
+Auction Closing
+Once the auction end time is reached, no further bids are accepted. The highest valid bid at closing time is declared the winner.
+
+Winner Declaration
+The winning bidder is automatically selected by the smart contract and announced through the system interface.
+
+Bid Cancellation
+Bids cannot be withdrawn once submitted and confirmed on the blockchain.
+
+Fraud Prevention
+All bids are immutable and transparent, preventing bid manipulation or tampering.
+
+Dispute Resolution
+In case of disputes, the blockchain transaction records serve as the final source of truth.

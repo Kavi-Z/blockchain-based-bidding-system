@@ -1,0 +1,25 @@
+Security Guidelines
+
+User Authentication
+Strong passwords and secure authentication mechanisms are enforced.
+
+Wallet Security
+Users should never share private keys or recovery phrases.
+
+Smart Contract Security
+Smart contracts are audited to prevent vulnerabilities such as reentrancy attacks.
+
+Data Integrity
+Blockchain immutability ensures bids cannot be altered once confirmed.
+
+Environment Variables
+Sensitive keys and credentials must be stored in environment variables, not source code.
+
+Access Control
+Only authorized users and services can access critical system components.
+
+Monitoring
+The system continuously monitors for suspicious activities and anomalies.
+
+Backup and Recovery
+Critical data and configurations are backed up regularly to ensure recovery in case of failures.
