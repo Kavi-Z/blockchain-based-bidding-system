@@ -1,0 +1,25 @@
+System Architecture Overview
+
+Frontend Layer
+The frontend is a web-based interface that allows users to view auctions, place bids, and interact with the system.
+
+Backend Layer
+The backend handles user authentication, auction management, and communication with blockchain services.
+
+Blockchain Layer
+Smart contracts deployed on the blockchain manage auctions, bids, and winner selection in a decentralized manner.
+
+AI Services Layer
+The AI service provides intelligent question-answering using Retrieval Augmented Generation (RAG).
+
+Vector Database
+Textual knowledge is stored as embeddings in a vector database to enable semantic search.
+
+Data Flow
+User queries are processed by the backend and routed to the AI service, which retrieves relevant documents and generates responses.
+
+Security Layer
+Authentication, authorization, and encrypted communication ensure system security.
+
+Scalability
+The system is designed to scale horizontally by separating frontend, backend, blockchain, and AI services.

@@ -1,0 +1,28 @@
+User Manual for Blockchain-Based Bidding System
+
+User Registration
+Users must register with a valid email address and complete identity verification before participating in auctions.
+
+Logging In
+Registered users can log in using their credentials to access bidding features.
+
+Viewing Auctions
+Users can browse active, upcoming, and closed auctions from the dashboard.
+
+Placing a Bid
+To place a bid, select an auction, enter a bid amount, and confirm the transaction using a connected wallet.
+
+Wallet Connection
+The system requires users to connect a blockchain wallet to submit bids and sign transactions securely.
+
+Bid Confirmation
+Once a bid is placed, users receive confirmation after the transaction is successfully mined.
+
+Viewing Bid History
+Users can view their bidding history, including bid amounts, timestamps, and auction results.
+
+Winning an Auction
+If a user wins an auction, the system notifies them and provides next steps for payment or asset transfer.
+
+Account Security
+Users are responsible for securing their login credentials and wallet private keys.
