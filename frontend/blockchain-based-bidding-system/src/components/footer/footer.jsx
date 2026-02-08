@@ -1,8 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import './footer.css';
 import logo from '../../assets/cryptops.png';
 
 const Footer = () => {
+  const navigate = useNavigate();
+
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -55,10 +58,10 @@ const Footer = () => {
           <div className='footer-section'>
             <h3 className='footer-title'>Resources</h3>
             <ul className='footer-links'>
-              <li><a href='#'>Documentation</a></li>
-              <li><a href='#'>Whitepaper</a></li>
-              <li><a href='#'>Community</a></li>
-              <li><a href='#'>Support</a></li>
+              <li><a onClick={() => navigate('/documentation')}>Documentation</a></li>
+              <li><a onClick={() => navigate('/whitepaper')}>Whitepaper</a></li>
+              <li><a onClick={() => navigate('/community')}>Community</a></li>
+              <li><a onClick={() => navigate('/support')}>Support</a></li>
             </ul>
           </div>
 
@@ -66,10 +69,10 @@ const Footer = () => {
           <div className='footer-section'>
             <h3 className='footer-title'>Legal</h3>
             <ul className='footer-links'>
-              <li><a href='#'>Privacy Policy</a></li>
-              <li><a href='#'>Terms of Service</a></li>
-              <li><a href='#'>Cookie Policy</a></li>
-              <li><a href='#'>Disclaimer</a></li>
+              <li><a onClick={() => navigate('/privacy-policy')}>Privacy Policy</a></li>
+              <li><a onClick={() => navigate('/terms-of-service')}>Terms of Service</a></li>
+              <li><a onClick={() => navigate('/cookie-policy')}>Cookie Policy</a></li>
+              <li><a onClick={() => navigate('/disclaimer')}>Disclaimer</a></li>
             </ul>
           </div>
         </div>
