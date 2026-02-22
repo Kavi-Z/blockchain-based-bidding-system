@@ -4,7 +4,7 @@ import Web3 from "web3";
 import AuctionContract from "./SecureAuction.json";
 import "./auction_page.css";
 
-const CONTRACT_ADDRESS = "0xc3662276B3594bD8d70778b093caC2F31E6D497E";
+const CONTRACT_ADDRESS = "0x55286Ac3A309c90918CDa8B0093ED5ECb5aF07fD";
 
 const AuctionPage = () => {
   const [auctions, setAuctions] = useState([]);
@@ -34,8 +34,7 @@ const AuctionPage = () => {
     const allAuctions = await Promise.all(
       Array.from({ length: auctionCount }, (_, i) => contract.methods.auctions(i).call())
     );
-
-    // Filter only current active auctions by this seller
+ 
     const activeSellerAuctions = allAuctions
       .filter(
         (a) =>
@@ -106,7 +105,7 @@ const AuctionPage = () => {
         ))}
       </div>
 
-      <button className="create-auction-btn" onClick={() => navigate("/upload")}>
+      <button className="create-auction-btn" onClick={() => navigate("/Seller_dashboard")}>
         Create New Auction
       </button>
     </div>

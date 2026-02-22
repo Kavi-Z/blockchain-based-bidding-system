@@ -17,10 +17,7 @@ public class AuthService {
     private UserRepository userRepository;
 
     private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-    /**
-     * Register a new user
-     */
+ 
     public User register(User user) {
         // Check if email already exists
         if (userRepository.existsByEmail(user.getEmail())) {

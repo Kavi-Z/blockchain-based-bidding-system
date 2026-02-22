@@ -16,7 +16,7 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    // ==================== BIDDER REGISTRATION ====================
+ 
     @PostMapping("/register/bidder")
     public ResponseEntity<?> registerBidder(@RequestBody RegisterRequest request) {
         try {
@@ -27,7 +27,7 @@ public class AuthController {
             User user = new User();
             user.setEmail(request.getEmail());
             user.setUsername(request.getUsername());
-            user.setPassword(request.getPassword()); // AuthService will hash
+            user.setPassword(request.getPassword());
             user.setRole("BIDDER");
 
             User savedUser = authService.register(user);
@@ -143,7 +143,7 @@ public class AuthController {
 
     // ==================== GET USER BY ID ====================
     @GetMapping("/user/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable String id) {
+    public ResponseEntity<?> getUserById(@PathVariable("id") String id) {
         try {
             User user = authService.findById(id);
             
@@ -165,7 +165,7 @@ public class AuthController {
 
     // ==================== UPDATE USER ====================
     @PutMapping("/user/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody User updatedUser) {
+    public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody User updatedUser) {
         try {
             User user = authService.updateUser(id, updatedUser);
             

@@ -1,1 +1,4 @@
 ai-services/app/.env
+backend/cryptops/.env
+ai-services/venv
+
