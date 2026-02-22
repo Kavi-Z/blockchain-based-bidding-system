@@ -36,9 +36,15 @@ const Login = () => {
       localStorage.setItem("userId", id);
       localStorage.setItem("token", token);
       localStorage.setItem("role", role);
+      // Also store a `user` object for components that expect a single user JSON
+      try {
+        localStorage.setItem("user", JSON.stringify(res.data));
+      } catch (e) {
+        console.warn("Failed to store user object in localStorage", e);
+      }
 
       // Navigate to bidder dashboard or NFTs page
-      navigate("/my-nft");
+      navigate("/bidder-dashboard");
     } catch (err) {
       console.error(err);
       if (err.response && err.response.status === 401) {

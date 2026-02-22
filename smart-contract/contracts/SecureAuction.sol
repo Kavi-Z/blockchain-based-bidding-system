@@ -2,18 +2,23 @@
 pragma solidity ^0.8.17;
 
 contract SecureAuction {
-    address payable public seller;
-    uint public startTime;
-    uint public endTime;
-    bool public ended;
-    bool public auctionStarted;
 
-    address public highestBidder;
-    uint public highestBid;
+    struct Auction {
+        address payable seller;
+        uint startTime;
+        uint endTime;
+        bool ended;
 
-    uint public minIncrement;
-    uint public extensionTime;
-    uint public maxBid;
+        address highestBidder;
+        uint highestBid;
+
+        uint minIncrement;
+        uint extensionTime;
+        uint maxBid;
+    }
+
+    uint public auctionCount;
+    mapping(uint => Auction) public auctions;
 
     mapping(address => uint) public pendingReturns;
     mapping(address => bool) private hasPendingRecorded;
@@ -21,17 +26,13 @@ contract SecureAuction {
 
     bool private locked;
 
-    event HighestBidIncreased(address indexed bidder, uint amount);
-    event AuctionExtended(uint newEndTime);
-    event AuctionEnded(address winner, uint amount);
-    event AuctionCancelled();
+    event AuctionCreated(uint auctionId, address seller);
+    event HighestBidIncreased(uint auctionId, address bidder, uint amount);
+    event AuctionExtended(uint auctionId, uint newEndTime);
+    event AuctionEnded(uint auctionId, address winner, uint amount);
+    event AuctionCancelled(uint auctionId);
     event Withdrawn(address indexed who, uint amount);
     event WithdrawFailed(address indexed who, uint amount);
-
-    modifier onlySeller() {
-        require(msg.sender == seller, "Only seller");
-        _;
-    }
 
     modifier noReentrant() {
         require(!locked, "Reentrant call");
@@ -40,118 +41,134 @@ contract SecureAuction {
         locked = false;
     }
 
-    constructor() {
-        seller = payable(msg.sender);
-        auctionStarted = false;
-        ended = false;
-    }
-
-    function startAuction(
+    function createAuction(
         uint _biddingTime,
         uint _minIncrement,
         uint _extensionTime,
         uint _maxBid
-    ) public onlySeller {
-        require(!auctionStarted, "Auction already started");
+    ) external {
+
         require(_biddingTime > 0, "Invalid bidding time");
         require(_minIncrement > 0, "Invalid min increment");
 
-        startTime = block.timestamp;
-        endTime = block.timestamp + _biddingTime;
-        minIncrement = _minIncrement;
-        extensionTime = _extensionTime;
-        maxBid = _maxBid;
+        auctionCount++;
 
-        auctionStarted = true;
-        ended = false;
-        highestBid = 0;
-        highestBidder = address(0);
+        auctions[auctionCount] = Auction({
+            seller: payable(msg.sender),
+            startTime: block.timestamp,
+            endTime: block.timestamp + _biddingTime,
+            ended: false,
+            highestBidder: address(0),
+            highestBid: 0,
+            minIncrement: _minIncrement,
+            extensionTime: _extensionTime,
+            maxBid: _maxBid
+        });
+
+        emit AuctionCreated(auctionCount, msg.sender);
     }
 
-    function bid() external payable {
-        require(auctionStarted, "Auction not started");
-        require(block.timestamp < endTime, "Auction ended");
-        require(msg.sender != seller, "Seller cannot bid");
+    function bid(uint auctionId) external payable {
+        Auction storage auction = auctions[auctionId];
 
-        uint required = highestBid + minIncrement;
+        require(block.timestamp >= auction.startTime, "Not started");
+        require(block.timestamp < auction.endTime, "Auction ended");
+        require(!auction.ended, "Already ended");
+        require(msg.sender != auction.seller, "Seller cannot bid");
+
+        uint required = auction.highestBid + auction.minIncrement;
         require(msg.value >= required, "Bid below min increment");
-        if (maxBid != 0) {
-            require(msg.value <= maxBid, "Above maxBid");
+
+        if (auction.maxBid != 0) {
+            require(msg.value <= auction.maxBid, "Above maxBid");
         }
 
-        if (highestBid != 0) {
-            pendingReturns[highestBidder] += highestBid;
-            if (!hasPendingRecorded[highestBidder]) {
-                hasPendingRecorded[highestBidder] = true;
-                pendingParties.push(highestBidder);
+        if (auction.highestBid != 0) {
+            pendingReturns[auction.highestBidder] += auction.highestBid;
+
+            if (!hasPendingRecorded[auction.highestBidder]) {
+                hasPendingRecorded[auction.highestBidder] = true;
+                pendingParties.push(auction.highestBidder);
             }
         }
 
-        highestBidder = msg.sender;
-        highestBid = msg.value;
+        auction.highestBidder = msg.sender;
+        auction.highestBid = msg.value;
 
-        if (endTime - block.timestamp < extensionTime) {
-            endTime += extensionTime;
-            emit AuctionExtended(endTime);
+        if (auction.endTime - block.timestamp < auction.extensionTime) {
+            auction.endTime += auction.extensionTime;
+            emit AuctionExtended(auctionId, auction.endTime);
         }
 
-        emit HighestBidIncreased(msg.sender, msg.value);
+        emit HighestBidIncreased(auctionId, msg.sender, msg.value);
     }
 
-    function withdraw() external noReentrant returns (bool) {
-        uint amount = pendingReturns[msg.sender];
-        require(amount > 0, "No funds");
-        pendingReturns[msg.sender] = 0;
-        (bool success, ) = payable(msg.sender).call{value: amount}("");
-        if (!success) {
-            pendingReturns[msg.sender] = amount;
-            emit WithdrawFailed(msg.sender, amount);
-            return false;
-        }
-        emit Withdrawn(msg.sender, amount);
-        return true;
-    }
+    function endAuction(uint auctionId) external noReentrant {
+        Auction storage auction = auctions[auctionId];
 
-    function endAuction() external onlySeller noReentrant {
-        require(auctionStarted, "Auction not started");
-        require(block.timestamp >= endTime, "Auction not yet ended");
-        require(!ended, "Already ended");
+        require(msg.sender == auction.seller, "Only seller");
+        require(block.timestamp >= auction.endTime, "Not ended yet");
+        require(!auction.ended, "Already ended");
 
-        ended = true;
-        auctionStarted = false;
+        auction.ended = true;
 
-        emit AuctionEnded(highestBidder, highestBid);
+        emit AuctionEnded(auctionId, auction.highestBidder, auction.highestBid);
 
-        uint amount = highestBid;
-        highestBid = 0;
+        uint amount = auction.highestBid;
+        auction.highestBid = 0;
+
         if (amount > 0) {
-            (bool success, ) = seller.call{value: amount}("");
+            (bool success, ) = auction.seller.call{value: amount}("");
+
             if (!success) {
-                pendingReturns[seller] += amount;
-                if (!hasPendingRecorded[seller]) {
-                    hasPendingRecorded[seller] = true;
-                    pendingParties.push(seller);
+                pendingReturns[auction.seller] += amount;
+
+                if (!hasPendingRecorded[auction.seller]) {
+                    hasPendingRecorded[auction.seller] = true;
+                    pendingParties.push(auction.seller);
                 }
             }
         }
     }
 
-    function cancelAuction() external onlySeller noReentrant {
-        require(!ended, "Already ended");
+    function cancelAuction(uint auctionId) external noReentrant {
+        Auction storage auction = auctions[auctionId];
 
-        ended = true;
-        auctionStarted = false;
+        require(msg.sender == auction.seller, "Only seller");
+        require(!auction.ended, "Already ended");
 
-        emit AuctionCancelled();
+        auction.ended = true;
 
-        if (highestBid != 0) {
-            pendingReturns[highestBidder] += highestBid;
-            if (!hasPendingRecorded[highestBidder]) {
-                hasPendingRecorded[highestBidder] = true;
-                pendingParties.push(highestBidder);
+        emit AuctionCancelled(auctionId);
+
+        if (auction.highestBid != 0) {
+            pendingReturns[auction.highestBidder] += auction.highestBid;
+
+            if (!hasPendingRecorded[auction.highestBidder]) {
+                hasPendingRecorded[auction.highestBidder] = true;
+                pendingParties.push(auction.highestBidder);
             }
-            highestBid = 0;
+
+            auction.highestBid = 0;
         }
+    }
+
+    function withdraw() external noReentrant returns (bool) {
+        uint amount = pendingReturns[msg.sender];
+        require(amount > 0, "No funds");
+
+        pendingReturns[msg.sender] = 0;
+
+        (bool success, ) = payable(msg.sender).call{value: amount}("");
+
+        if (!success) {
+            pendingReturns[msg.sender] = amount;
+            emit WithdrawFailed(msg.sender, amount);
+            return false;
+        }
+
+        emit Withdrawn(msg.sender, amount);
+        return true;
     }
 
     function getPendingParties() external view returns (address[] memory) {

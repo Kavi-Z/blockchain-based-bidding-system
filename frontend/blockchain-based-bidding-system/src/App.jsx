@@ -10,10 +10,12 @@ import NFTDetail from "./components/NFTDetails/NFTDetails";
 import Seller_dashboard from "./components/seller_dashboard/seller_dashboard";
 import Update_profile from "./components/ProfilePage/ProfilePage";
 import AuctionPage from "./components/auction_page/auction_page";
+import AuctionCreate from "./components/auction_page/AuctionCreate";
 import SellerLogin from './components/seller_login/seller_login';
 import SellerSignup from './components/seller_signup/seller_signup';
 import Chatbot from "./components/chatbot/chatbot";
 import BiddersDashboard from "./components/BidderDashboard/bidderdashboard.jsx";
+import BiddersInfo from "./components/BiddersInfo/BiddersInfo.jsx";
 import Documentation from "./components/documentation/documentation";
 import Whitepaper from "./components/whitepaper/whitepaper";
 import Community from "./components/community/community";
@@ -22,6 +24,8 @@ import PrivacyPolicy from "./components/privacy-policy/privacy-policy";
 import TermsOfService from "./components/terms-of-service/terms-of-service";
 import CookiePolicy from "./components/cookie-policy/cookie-policy";
 import Disclaimer from "./components/disclaimer/disclaimer";
+import Seller_Page from "./components/seller_page/seller_page";
+import AuctionDetails from "./components/auction_page/AuctionDetails";
 
 
 function App() {
@@ -33,14 +37,18 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/my-nft" element={<NFTGallery />} />
         <Route path="/main-login" element={<Main_Login />} />
-        <Route path="/upload" element={<Upload />} /> 
         <Route path="/nft/:id" element={<NFTDetail />} />
-        <Route path="/seller_dashboard" element={<Seller_dashboard />} />
+        <Route path="/create-auction" element={<Seller_dashboard />} />
+        <Route path="/auction-create" element={<AuctionCreate />} />
         <Route path="/profile" element={<Update_profile />} />
         <Route path="/auctions" element={<AuctionPage />} />
+        <Route path="/auctions/:id" element={<AuctionPage />} />
+        <Route path="/auction/:auctionId" element={<AuctionDetails />} />
         <Route path="/seller-login" element={<SellerLogin />} />
         <Route path="/seller-signup" element={<SellerSignup />} />
+        <Route path="/seller-dashboard" element={<Seller_Page />} />
         <Route path="/bidder-dashboard" element={<BiddersDashboard />} />
+        <Route path="/bidders-info" element={<BiddersInfo />} />
         <Route path="/documentation" element={<Documentation />} />
         <Route path="/whitepaper" element={<Whitepaper />} />
         <Route path="/community" element={<Community />} />
@@ -49,7 +57,7 @@ function App() {
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/cookie-policy" element={<CookiePolicy />} />
         <Route path="/disclaimer" element={<Disclaimer />} />
-
+        <Route path="/Seller_dashboard" element={<Seller_Page />} />
       </Routes>
  
       <Chatbot />

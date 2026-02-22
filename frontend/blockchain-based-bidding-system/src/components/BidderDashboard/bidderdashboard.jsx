@@ -1,463 +1,613 @@
-import React, { useState, useEffect } from "react";
-import Web3 from "web3";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { ethers } from "ethers";
 import SecureAuction from "./SecureAuction.json";
-import loginBg from "../../assets/login.png";
+import "./bidderdashboard.css";
 
-
-export default function BiddersDashboard() {
-  const [web3, setWeb3] = useState(null);
-  const [account, setAccount] = useState("");
-  const [contract, setContract] = useState(null);
-  const [auctionStarted, setAuctionStarted] = useState(false);
-  const [auctionEnded, setAuctionEnded] = useState(false);
-  const [highestBid, setHighestBid] = useState("0");
-  const [highestBidder, setHighestBidder] = useState("None");
-  const [endTime, setEndTime] = useState(0);
-  const [bidAmount, setBidAmount] = useState("");
-  const [showConnectionInfo, setShowConnectionInfo] = useState(false);
-  
-  
-  const [currentAuction, setCurrentAuction] = useState(null);
-  const [myBids, setMyBids] = useState([]);
-  const [isWinning, setIsWinning] = useState(false);
-
-  const CONTRACT_ADDRESS = "0xc3662276B3594bD8d70778b093caC2F31E6D497E";
-
-  useEffect(() => {
-    const init = async () => {
-      if (!window.ethereum) {
-        alert("Please install MetaMask!");
-        return;
-      }
-
+const BidderDashboard = () => {
+  const navigate = useNavigate();
+ 
+  const getStoredUser = () => {
+    const raw = localStorage.getItem("user");
+    if (raw) {
       try {
-        const web3Instance = new Web3(window.ethereum);
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        const accounts = await web3Instance.eth.getAccounts();
+        return JSON.parse(raw);
+      } catch (e) {
+        console.warn("Invalid JSON in localStorage.user", e);
+      }
+    }
+ 
+    const id = localStorage.getItem("userId") || localStorage.getItem("id");
+    const token = localStorage.getItem("token") || localStorage.getItem("authToken");
+    const role = localStorage.getItem("role") || localStorage.getItem("userRole");
 
-        setAccount(accounts[0]);
-        setWeb3(web3Instance);
+    if (id || token || role) {
+      return { id, token, role };
+    }
 
-        const contractInstance = new web3Instance.eth.Contract(
-          SecureAuction.abi,
-          CONTRACT_ADDRESS
-        );
-        setContract(contractInstance);
+    return null;
+  };
 
-        await loadAuction(contractInstance, web3Instance, accounts[0]);
-        setupEvents(contractInstance, web3Instance);
-        
-        // Load auction data from backend
-        await fetchCurrentAuction();
-        await fetchMyBids(accounts[0]);
+  const [user, setUser] = useState(getStoredUser());
+
+  // Wallet & Contract state
+  const [walletAddress, setWalletAddress] = useState("");
+  const [contract, setContract] = useState(null);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  // Auctions state
+  const [auctions, setAuctions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedAuctionId, setSelectedAuctionId] = useState(null);
+  const [bidAmount, setBidAmount] = useState("");
+
+  // Fetching control
+  const fetchOnce = useRef(false);
+
+  const CONTRACT_ADDRESS =
+    (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_CONTRACT_ADDRESS) ||
+    (typeof process !== "undefined" && process.env && (process.env.REACT_APP_CONTRACT_ADDRESS || process.env.VITE_CONTRACT_ADDRESS)) ||
+    "0x55286Ac3A309c90918CDa8B0093ED5ECb5aF07fD";
+ 
+  useEffect(() => {
+    if (!user || user.role !== "BIDDER") {
+      alert("You must be logged in as a bidder to access this dashboard");
+      navigate("/bidder-dashboard");
+    }
+  }, [user, navigate]);
+ 
+  useEffect(() => {
+    if (fetchOnce.current) return;
+    fetchOnce.current = true;
+
+    const init = async () => {
+      setLoading(true);
+      try {
+        // Fetch active auctions from backend
+        await fetchActiveAuctions();
       } catch (err) {
-        console.error("Web3 initialization error:", err);
-        alert("Failed to connect wallet: " + err.message);
+        setError(err.message || "Failed to initialize dashboard");
+      } finally {
+        setLoading(false);
       }
     };
 
     init();
   }, []);
-
-  // Fetch current auction from Spring Boot backend
-  const fetchCurrentAuction = async () => {
+ 
+  const fetchActiveAuctions = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/auctions/current');
-      if (response.ok) {
-        const data = await response.json();
-        setCurrentAuction(data);
-      }
-    } catch (error) {
-      console.error("Error fetching auction:", error);
-    }
-  };
-
-  // Fetch my bids from backend
-  const fetchMyBids = async (walletAddress) => {
-    try {
-      const response = await fetch(`http://localhost:8080/api/bids/user/${walletAddress}`);
-      if (response.ok) {
-        const data = await response.json();
-        setMyBids(data);
-      }
-    } catch (error) {
-      console.error("Error fetching bids:", error);
-    }
-  };
-
-  // Load auction state from blockchain
-  const loadAuction = async (contractInstance, web3Instance, userAccount) => {
-    try {
-      const started = await contractInstance.methods.auctionStarted().call();
-      const ended = await contractInstance.methods.ended().call();
-      const bid = await contractInstance.methods.highestBid().call();
-      const bidder = await contractInstance.methods.highestBidder().call();
-      const end = await contractInstance.methods.endTime().call();
-
-      setAuctionStarted(started);
-      setAuctionEnded(ended);
-      setHighestBid(web3Instance.utils.fromWei(bid.toString(), "ether"));
-      
-      const bidderAddress = bidder !== "0x0000000000000000000000000000000000000000" ? bidder : "None";
-      setHighestBidder(bidderAddress);
-      setEndTime(Number(end));
-      
-      // Check if current user is winning
-      if (userAccount && bidderAddress.toLowerCase() === userAccount.toLowerCase()) {
-        setIsWinning(true);
-      } else {
-        setIsWinning(false);
-      }
-    } catch (err) {
-      console.error("Error loading auction:", err);
-    }
-  };
-
-  // Event listeners
-  const setupEvents = (contractInstance, web3Instance) => {
-    contractInstance.events.HighestBidIncreased({})
-      .on("data", (event) => {
-        setHighestBid(web3Instance.utils.fromWei(event.returnValues.amount, "ether"));
-        setHighestBidder(event.returnValues.bidder);
-        
-        // Check if current user is the new highest bidder
-        if (account && event.returnValues.bidder.toLowerCase() === account.toLowerCase()) {
-          setIsWinning(true);
-        } else {
-          setIsWinning(false);
-        }
-        
-        // Reload bids from backend
-        fetchMyBids(account);
-      })
-      .on("error", (err) => console.error("Event error:", err));
-
-    contractInstance.events.AuctionEnded({})
-      .on("data", () => {
-        setAuctionEnded(true);
-        setAuctionStarted(false);
-        
-        // Reload auction data
-        fetchCurrentAuction();
-      })
-      .on("error", (err) => console.error("Event error:", err));
-  };
-
-  // Place a bid
-  const placeBid = async (e) => {
-    e.preventDefault();
-    
-    if (!web3 || !contract) {
-      alert("Web3 or contract not loaded yet!");
-      return;
-    }
-
-    if (!bidAmount || Number(bidAmount) <= 0) {
-      alert("Enter a valid bid amount");
-      return;
-    }
-
-    try {
-      const value = web3.utils.toWei(bidAmount.toString(), "ether");
-
-      // Send transaction to blockchain
-      const receipt = await contract.methods.bid().send({
-        from: account,
-        value,
-      });
-
-      console.log("Bid transaction:", receipt);
-
-      // Save bid to backend
-      await saveBidToBackend({
-        walletAddress: account,
-        auctionId: currentAuction?.id,
-        bidAmount: bidAmount,
-        transactionHash: receipt.transactionHash,
-        timestamp: new Date().toISOString()
-      });
-
-      setBidAmount("");
-      alert("✅ Bid placed successfully!");
-      
-      // Reload data
-      await loadAuction(contract, web3, account);
-      await fetchMyBids(account);
-      
-    } catch (err) {
-      console.error("Bid error:", err);
-      if (err.code === 4001) {
-        alert("❌ Transaction rejected by user");
-      } else {
-        alert("❌ Failed to place bid: " + err.message);
-      }
-    }
-  };
-
-  // Save bid to Spring Boot backend
-  const saveBidToBackend = async (bidData) => {
-    try {
-      const response = await fetch('http://localhost:8080/api/bids', {
-        method: 'POST',
+      const response = await fetch("http://localhost:8080/api/auctions", {
         headers: {
-          'Content-Type': 'application/json',
+          "Authorization": `Bearer ${user.token}`,
+          "X-User-ID": user.id,
         },
-        body: JSON.stringify(bidData)
       });
 
       if (!response.ok) {
-        console.error("Failed to save bid to backend");
+        throw new Error("Failed to fetch auctions");
       }
-    } catch (error) {
-      console.error("Error saving bid:", error);
+
+      const data = await response.json();
+      // Filter for active auctions only
+      const active = Array.isArray(data) 
+        ? data.filter(a => a.status === "ACTIVE")
+        : data.auctions?.filter(a => a.status === "ACTIVE") || [];
+      
+      // Log missing blockchain data for debugging
+      active.forEach(auction => {
+        if (!auction.transactionHash || !auction.blockNumber) {
+          console.warn(`Auction ${auction.id} missing blockchain data. TxHash: ${auction.transactionHash}, BlockNum: ${auction.blockNumber}`);
+        }
+      });
+      
+      setAuctions(active);
+      console.log("Loaded active auctions:", active);
+    } catch (err) {
+      console.error("Error fetching auctions:", err);
+      setError(err.message);
+    }
+  };
+  const findBlockchainAuctionIdByFallback = async (sellerWalletAddress, minIncrement) => {
+    try {
+      if (!contract) {
+        throw new Error("Contract not initialized. Please connect your wallet first.");
+      }
+
+      console.log("Attempting fallback lookup with contract address:", CONTRACT_ADDRESS);
+      console.log("Looking for auction: seller =", sellerWalletAddress, "minIncrement =", minIncrement);
+ 
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const code = await provider.getCode(CONTRACT_ADDRESS);
+      if (code === "0x") {
+        throw new Error(
+          `No contract found at address ${CONTRACT_ADDRESS}. ` +
+          `Please ensure the contract is deployed on the correct network (Ganache). ` +
+          `Run 'truffle migrate --network ganache' and update CONTRACT_ADDRESS.`
+        );
+      }
+
+      // Get total auction count
+      let auctionCount;
+      try {
+        auctionCount = await contract.auctionCount();
+      } catch (countErr) {
+        throw new Error(
+          `Failed to read auctionCount from contract. This usually means: ` +
+          `1) Wrong contract address (${CONTRACT_ADDRESS}), ` +
+          `2) Contract not deployed to this network, or ` +
+          `3) ABI mismatch. Error: ${countErr.message}`
+        );
+      }
+
+      const count = Number(auctionCount);
+
+      console.log("Total auctions on blockchain:", count);
+
+      if (count === 0) {
+        throw new Error("No auctions found on blockchain");
+      }
+ 
+      for (let i = 1; i <= count; i++) {
+        try {
+          const auction = await contract.auctions(i);
+          const { seller, minIncrement: chainMinIncrement, endTime, ended } = auction;
+
+          const chainMinIncrementEth = ethers.formatEther(chainMinIncrement);
+          const expectedMinIncrement = parseFloat(minIncrement).toFixed(18);
+          const chainMinIncrementCompare = parseFloat(chainMinIncrementEth).toFixed(18);
+          
+          console.log(`Auction ${i}: seller=${seller}, minIncrement=${chainMinIncrementEth}, ended=${ended}`);
+ 
+          if (
+            seller.toLowerCase() === sellerWalletAddress.toLowerCase() &&
+            Math.abs(parseFloat(chainMinIncrementEth) - parseFloat(minIncrement)) < 0.0001
+          ) {
+            console.log("✓ Found matching auction on blockchain at index:", i);
+            return BigInt(i);
+          }
+        } catch (auctionErr) {
+          console.warn(`Could not read auction ${i}:`, auctionErr.message);
+          continue;
+        }
+      }
+
+      throw new Error(
+        `Could not find matching auction on blockchain. Searched ${count} auctions. ` +
+        `Ensure this auction was created with the correct contract.`
+      );
+    } catch (err) {
+      console.error("Error in fallback auction lookup:", err);
+      throw new Error(`Fallback blockchain lookup failed: ${err.message}`);
+    }
+  }; 
+  const getBlockchainAuctionId = async (transactionHash, blockNumber) => {
+    if (!transactionHash || !window.ethereum) {
+      throw new Error("Missing transaction hash or MetaMask");
+    }
+
+    try {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+       
+      const receipt = await provider.getTransactionReceipt(transactionHash);
+      if (!receipt) {
+        throw new Error("Could not find transaction receipt");
+      }
+ 
+      const iface = new ethers.Interface(SecureAuction.abi);
+      for (const log of receipt.logs) {
+        try {
+          const parsed = iface.parseLog(log);
+          if (parsed && parsed.name === "AuctionCreated") {
+            // AuctionCreated event has: auctionId (indexed), seller
+            const auctionId = parsed.args[0];
+            console.log("Found blockchain auctionId from receipt:", auctionId.toString());
+            return BigInt(auctionId);
+          }
+        } catch {
+         
+        }
+      }
+
+      throw new Error("AuctionCreated event not found in transaction");
+    } catch (err) {
+      console.error("Error extracting auction ID:", err);
+      throw new Error(`Failed to get blockchain auction ID: ${err.message}`);
     }
   };
 
-  const refreshData = async () => {
-    if (contract && web3) {
-      await loadAuction(contract, web3, account);
-      await fetchCurrentAuction();
-      await fetchMyBids(account);
-      alert("✅ Data refreshed!");
+  /**
+   * Connect MetaMask wallet
+   */
+  const connectWallet = async () => {
+    try {
+      if (!window.ethereum) {
+        setError("MetaMask not detected. Please install MetaMask.");
+        return false;
+      }
+
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+
+      setWalletAddress(accounts[0]);
+      setSuccess(`Wallet connected: ${accounts[0].substring(0, 10)}...`);
+      setTimeout(() => setSuccess(""), 3000);
+
+      // Initialize contract
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contractInstance = new ethers.Contract(
+        CONTRACT_ADDRESS,
+        SecureAuction.abi,
+        signer
+      );
+      setContract(contractInstance);
+
+      return true;
+    } catch (err) {
+      setError(`Wallet connection failed: ${err.message}`);
+      return false;
     }
+  };
+
+  /**
+   * Place a bid on selected auction
+   */
+  const placeBid = async () => {
+    if (!selectedAuctionId) {
+      setError("Please select an auction");
+      return;
+    }
+
+    // Pre-bid check: fetch and verify contract state
+    if (!contract) {
+      setError("Contract not initialized. Please connect wallet first.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      // Find the selected auction from frontend state
+      const frontendAuction = auctions.find(a => a.id === selectedAuctionId);
+      if (!frontendAuction) {
+        throw new Error("Auction not found in local state");
+      }
+
+      // Get blockchain auction ID - try transaction hash first, fallback to on-chain lookup
+      let blockchainAuctionId;
+
+      if (frontendAuction.transactionHash && frontendAuction.blockNumber) {
+        blockchainAuctionId = await getBlockchainAuctionId(
+          frontendAuction.transactionHash,
+          frontendAuction.blockNumber
+        );
+      } else {
+        console.warn("Transaction hash/block number missing, using fallback lookup...");
+        // Fallback: query all auctions to find the match
+        blockchainAuctionId = await findBlockchainAuctionIdByFallback(
+          frontendAuction.ownerAddress || walletAddress,
+          frontendAuction.minIncrement
+        );
+      }
+
+      // Fetch auction struct from contract using blockchain auction ID
+      const auction = await contract.auctions(blockchainAuctionId);
+      const { seller, startTime, endTime, ended, highestBidder, highestBid, minIncrement, extensionTime, maxBid } = auction;
+
+      console.log("=== On-Chain Auction State ===");
+      console.log("blockchainAuctionId:", blockchainAuctionId.toString());
+      console.log("seller:", seller);
+      console.log("startTime:", startTime.toString());
+      console.log("endTime:", endTime.toString(), "| now:", Math.floor(Date.now() / 1000));
+      console.log("ended:", ended);
+      console.log("highestBid:", ethers.formatEther(highestBid), "ETH");
+      console.log("minIncrement:", ethers.formatEther(minIncrement), "ETH");
+      console.log("maxBid:", ethers.formatEther(maxBid), "ETH");
+      console.log("bidder (you):", walletAddress);
+      console.log("==============================");
+
+      // Check if auction is active
+      const nowSeconds = Math.floor(Date.now() / 1000);
+      const endTimeSeconds = Number(endTime);
+      const startTimeSeconds = Number(startTime);
+      
+      console.log("Validation check:");
+      console.log("  nowSeconds:", nowSeconds);
+      console.log("  startTimeSeconds:", startTimeSeconds, "started?", startTimeSeconds <= nowSeconds);
+      console.log("  endTimeSeconds:", endTimeSeconds, "not ended?", nowSeconds < endTimeSeconds);
+      console.log("  ended flag:", ended);
+      
+      if (startTimeSeconds > nowSeconds) {
+        throw new Error(`Auction has not started yet on blockchain. Starts at ${new Date(startTimeSeconds * 1000).toLocaleString()}`);
+      }
+      if (nowSeconds >= endTimeSeconds) {
+        throw new Error(`Auction has ended on blockchain at ${new Date(endTimeSeconds * 1000).toLocaleString()}`);
+      }
+      if (ended) {
+        throw new Error("Auction is marked as ended on blockchain.");
+      }
+      if (walletAddress?.toLowerCase() === seller?.toLowerCase()) {
+        throw new Error("You are the seller and cannot bid on your own auction.");
+      }
+
+      if (!bidAmount || parseFloat(bidAmount) <= 0) {
+        throw new Error("Please enter a valid bid amount");
+      }
+
+      if (!walletAddress) {
+        const connected = await connectWallet();
+        if (!connected) return;
+      }
+
+      // Check minimum bid (highest current bid + minimum increment, or starting price if no bids)
+      const highestBidEth = parseFloat(ethers.formatEther(highestBid));
+      const minIncrementEth = parseFloat(ethers.formatEther(minIncrement));
+      const startingPrice = parseFloat(frontendAuction.startingPrice || 0);
+      const minBid = highestBidEth > 0 ? highestBidEth + minIncrementEth : startingPrice;
+
+      console.log("Bid validation:");
+      console.log("  highestBidEth:", highestBidEth);
+      console.log("  minIncrementEth:", minIncrementEth);
+      console.log("  startingPrice:", startingPrice);
+      console.log("  required minBid:", minBid);
+      console.log("  userBidAmount:", parseFloat(bidAmount));
+
+      if (parseFloat(bidAmount) < minBid) {
+        throw new Error(`Your bid ($${parseFloat(bidAmount).toFixed(2)}) is below minimum ($${minBid.toFixed(2)}). Current bid: $${highestBidEth.toFixed(2)} + increment: $${minIncrementEth.toFixed(2)}`);
+      }
+
+      // Check max bid if set
+      if (maxBid && maxBid > 0n) {
+        const maxBidEth = parseFloat(ethers.formatEther(maxBid));
+        if (parseFloat(bidAmount) > maxBidEth) {
+          throw new Error(`Your bid ($${parseFloat(bidAmount).toFixed(2)}) exceeds maximum allowed ($${maxBidEth.toFixed(2)})`);
+        }
+      }
+
+      setSuccess("Confirming bid in MetaMask...");
+
+      // Send bid transaction to blockchain
+      const value = ethers.parseEther(bidAmount.toString());
+      
+      console.log("Sending bid transaction:");
+      console.log("  auctionId:", blockchainAuctionId.toString());
+      console.log("  bidAmount (ETH):", bidAmount);
+      console.log("  value (wei):", value.toString());
+      
+      let tx;
+      try {
+        tx = await contract.bid(blockchainAuctionId, { value });
+        console.log("Bid transaction sent, hash:", tx.hash);
+      } catch (err) {
+        console.error("Bid transaction failed:", err);
+        console.error("Full error object:", JSON.stringify(err, null, 2));
+        
+        // Try to extract revert reason from the error
+        let revertMsg = "Transaction reverted on smart contract";
+        if (err?.reason) {
+          revertMsg = err.reason;
+        } else if (err?.message) {
+          if (err.message.includes("reverted")) {
+            revertMsg = "Smart contract rejected the bid. Check console logs for auction state.";
+          } else {
+            revertMsg = err.message;
+          }
+        }
+
+        // Don't retry - if it reverted, retrying won't help
+        throw new Error(
+          `Blockchain bid failed: ${revertMsg}\n\nCheck browser console (F12) for detailed auction state logs above.`
+        );
+      }
+
+      setSuccess("Bid submitted! Waiting for blockchain confirmation...");
+      
+      // CRITICAL: Wait for transaction to be mined - DO NOT proceed until receipt is received
+      const receipt = await tx.wait();
+      
+      // Verify transaction was actually mined and successful
+      if (!receipt) {
+        throw new Error("Bid transaction was not confirmed (receipt is null). Your bid may have failed or was rejected.");
+      }
+      
+      if (receipt.status === 0) {
+        throw new Error("Bid transaction failed on blockchain (status = 0). Check contract revert reason in console logs.");
+      }
+      
+      console.log("✅ Bid confirmed in block:", receipt.blockNumber, "Tx hash:", receipt.transactionHash);
+
+      // Save bid to backend with confirmed blockchain data
+      const bidData = {
+        auctionId: selectedAuctionId,
+        bidderWalletAddress: walletAddress,
+        bidAmount: parseFloat(bidAmount),
+        transactionHash: receipt.transactionHash,
+        blockNumber: receipt.blockNumber,
+      };
+
+      console.log("Saving bid to backend:", bidData);
+      
+      const backendResponse = await fetch("http://localhost:8080/api/bids", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${user.token}`,
+          "X-User-ID": user.id,
+        },
+        body: JSON.stringify(bidData),
+      });
+
+      if (!backendResponse.ok) {
+        console.warn("Bid saved on blockchain but failed to save backend metadata");
+      }
+
+      setSuccess("✅ Bid placed successfully!");
+      setBidAmount("");
+      setSelectedAuctionId(null);
+
+      // Refresh auctions
+      await fetchActiveAuctions();
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err) {
+      setError(err.message || "Failed to place bid");
+      console.error("Bid error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Format time remaining
+   */
+  const getTimeRemaining = (endTime) => {
+    const now = new Date();
+    const end = new Date(endTime);
+    const diff = end - now;
+
+    if (diff <= 0) return "Ended";
+
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    return `${minutes}m`;
   };
 
   return (
-    <div
-      className="upload-container"
-      style={{ backgroundImage: `url(${loginBg})` }}
-    >
-      <div className="upload-content">
-        <div className="upload-box">
-          <div className="upload-title">
-            <span className="upload-main-text">🛒 Bidders Dashboard</span>
+    <div className="bidder-dashboard-container">
+      <div className="bidder-dashboard-header">
+        <h1>🛒 Bidder Dashboard</h1>
+        <p>Browse and bid on active auctions</p>
+      </div>
+
+      {/* Error & Success Messages */}
+      {error && <div className="alert alert-error">{error}</div>}
+      {success && <div className="alert alert-success">{success}</div>}
+
+      {/* Wallet Connection Status */}
+      <div className="wallet-status-section">
+        {walletAddress ? (
+          <div className="wallet-connected">
+            ✓ Wallet Connected: {walletAddress.substring(0, 10)}...{walletAddress.substring(35)}
           </div>
+        ) : (
+          <button onClick={connectWallet} className="btn-connect-wallet">
+            🔗 Connect MetaMask Wallet
+          </button>
+        )}
+      </div>
 
-          {/* Connection Info - Collapsible */}
-          <div className="form-group">
-            <button
-              type="button"
-              onClick={() => setShowConnectionInfo(!showConnectionInfo)}
-              style={{
-                width: "100%",
-                padding: "12px",
-                backgroundColor: "#f0f0f0",
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                cursor: "pointer",
-                fontSize: "14px",
-                fontWeight: "500",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}
-            >
-              <span>📊 Connection Information</span>
-              <span>{showConnectionInfo ? "▼" : "▶"}</span>
-            </button>
+      {/* Active Auctions Grid */}
+      <div className="auctions-section">
+        <h2>Active Auctions</h2>
+        
+        {loading ? (
+          <div className="loading">Loading auctions...</div>
+        ) : auctions.length === 0 ? (
+          <div className="no-auctions">No active auctions available</div>
+        ) : (
+          <div className="auctions-grid">
+            {auctions.map((auction) => {
+              const isSelected = selectedAuctionId === auction.id;
+              const timeRemaining = getTimeRemaining(auction.endTime);
+              const minNextBid =
+                Math.max(
+                  parseFloat(auction.currentHighestBid || auction.startingPrice) +
+                  parseFloat(auction.minIncrement),
+                  parseFloat(auction.startingPrice)
+                ).toFixed(2);
 
-            {showConnectionInfo && (
-              <div style={{
-                padding: "15px",
-                backgroundColor: "#f9f9f9",
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                marginTop: "10px",
-                fontSize: "13px",
-                lineHeight: "1.8"
-              }}>
-                <div><strong>Your Wallet:</strong> {account ? `${account.substring(0, 10)}...${account.substring(account.length - 8)}` : "Not connected"}</div>
-                <div><strong>Contract:</strong> {CONTRACT_ADDRESS.substring(0, 10)}...{CONTRACT_ADDRESS.substring(CONTRACT_ADDRESS.length - 8)}</div>
-                <div><strong>Status:</strong> {web3 ? "✅ Connected" : "❌ Not Connected"}</div>
-                <button 
-                  onClick={refreshData}
-                  style={{
-                    marginTop: "10px",
-                    padding: "8px 16px",
-                    fontSize: "13px",
-                    backgroundColor: "#4CAF50",
-                    color: "white",
-                    border: "none",
-                    borderRadius: "6px",
-                    cursor: "pointer",
-                    fontWeight: "500"
-                  }}
+              return (
+                <div
+                  key={auction.id}
+                  className={`auction-card ${isSelected ? "selected" : ""}`}
+                  onClick={() => setSelectedAuctionId(isSelected ? null : auction.id)}
                 >
-                  🔄 Refresh Data
-                </button>
-              </div>
-            )}
-          </div>
+                  {/* Auction Image */}
+                  <div className="auction-image">
+                    <img
+                      src={auction.imageCID || auction.imageUrl || "https://via.placeholder.com/200x200?text=No+Image"}
+                      alt={auction.itemName}
+                      onError={(e) => {
+                        console.warn("Image failed to load:", auction.imageCID || auction.imageUrl);
+                        e.target.src = "https://via.placeholder.com/200x200?text=No+Image";
+                      }}
+                      onLoad={() => console.log("Image loaded:", auction.itemName)}
+                    />
+                    <div className="time-badge">{timeRemaining}</div>
+                  </div>
 
-          {/* Current Auction NFT Display */}
-          {currentAuction && (
-            <div className="form-group" style={{
-              padding: "20px",
-              backgroundColor: "#f9f9f9",
-              border: "1px solid #ddd",
-              borderRadius: "8px",
-              marginBottom: "20px"
-            }}>
-              <label className="form-label" style={{ fontSize: "16px", marginBottom: "15px" }}>
-                🎨 Current Auction NFT
-              </label>
-              
-              {/* NFT Image */}
-              <div style={{
-                width: "100%",
-                height: "300px",
-                borderRadius: "8px",
-                overflow: "hidden",
-                marginBottom: "15px",
-                backgroundColor: "#000"
-              }}>
-                <img 
-                  src={currentAuction.imageUrl || "https://via.placeholder.com/400x400?text=NFT"} 
-                  alt={currentAuction.itemName}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover"
-                  }}
-                />
-              </div>
+                  {/* Auction Details */}
+                  <div className="auction-details">
+                    <h3>{auction.itemName}</h3>
+                    <p className="description">{auction.description.substring(0, 50)}...</p>
 
-              <div style={{ fontSize: "14px", lineHeight: "2" }}>
-                <div><strong>Item Name:</strong> {currentAuction.itemName}</div>
-                <div><strong>Owner:</strong> {currentAuction.ownerAddress ? `${currentAuction.ownerAddress.substring(0, 10)}...${currentAuction.ownerAddress.substring(currentAuction.ownerAddress.length - 8)}` : "Unknown"}</div>
-              </div>
-            </div>
-          )}
+                    <div className="bid-info">
+                      <div className="bid-row">
+                        <span>Starting Price:</span>
+                        <strong>${auction.startingPrice}</strong>
+                      </div>
+                      <div className="bid-row">
+                        <span>Current Highest:</span>
+                        <strong>${auction.currentHighestBid || auction.startingPrice}</strong>
+                      </div>
+                      <div className="bid-row">
+                        <span>Min Next Bid:</span>
+                        <strong>${minNextBid}</strong>
+                      </div>
+                      <div className="bid-row">
+                        <span>Seller:</span>
+                        <span>{auction.sellerUsername}</span>
+                      </div>
+                    </div>
 
-          {/* Auction Status */}
-          <div className="form-group" style={{
-            padding: "20px",
-            backgroundColor: "#f9f9f9",
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-            marginBottom: "20px"
-          }}>
-            <label className="form-label" style={{ fontSize: "16px", marginBottom: "15px" }}>
-              📊 Auction Status
-            </label>
-            <div style={{ fontSize: "14px", lineHeight: "2" }}>
-              <div>
-                <strong>Status:</strong>{" "}
-                <span style={{
-                  padding: "4px 10px",
-                  borderRadius: "4px",
-                  backgroundColor: auctionStarted ? "#4CAF50" : auctionEnded ? "#f44336" : "#999",
-                  color: "white",
-                  fontSize: "13px",
-                  marginLeft: "8px"
-                }}>
-                  {auctionStarted ? "🟢 Running" : auctionEnded ? "🔴 Ended" : "⚪ Not Started"}
-                </span>
-              </div>
-              <div><strong>Highest Bid:</strong> {highestBid} ETH</div>
-              <div>
-                <strong>Highest Bidder:</strong>{" "}
-                {highestBidder !== "None" 
-                  ? `${highestBidder.substring(0, 10)}...${highestBidder.substring(highestBidder.length - 8)}`
-                  : "None"}
-                {isWinning && (
-                  <span style={{
-                    marginLeft: "10px",
-                    padding: "2px 8px",
-                    backgroundColor: "#FFD700",
-                    color: "#000",
-                    borderRadius: "4px",
-                    fontSize: "12px",
-                    fontWeight: "bold"
-                  }}>
-                    👑 You're Winning!
-                  </span>
-                )}
-              </div>
-              <div>
-                <strong>End Time:</strong>{" "}
-                {endTime ? new Date(endTime * 1000).toLocaleString() : "N/A"}
-              </div>
-            </div>
-          </div>
-
-          {/* Place Bid Form */}
-          <form className="upload-form" onSubmit={placeBid}>
-            <div className="form-group">
-              <label className="form-label">💰 Place Your Bid</label>
-              <input
-                type="number"
-                step="0.001"
-                placeholder="Enter bid amount in ETH (e.g., 0.015)"
-                className="form-input"
-                value={bidAmount}
-                onChange={(e) => setBidAmount(e.target.value)}
-                min="0"
-                disabled={!auctionStarted || auctionEnded}
-              />
-              <div style={{ 
-                fontSize: "12px", 
-                color: "#666", 
-                marginTop: "8px",
-                fontStyle: "italic"
-              }}>
-                Minimum bid: {highestBid !== "0" ? `${(parseFloat(highestBid) + 0.001).toFixed(3)} ETH` : "0.015 ETH"}
-              </div>
-            </div>
-
-            <div className="form-group">
-              <button
-                type="submit"
-                className="create-auction-btn"
-                disabled={!web3 || !contract || !auctionStarted || auctionEnded}
-                style={{
-                  backgroundColor: (!web3 || !contract || !auctionStarted || auctionEnded) ? "#ccc" : "#4CAF50",
-                  cursor: (!web3 || !contract || !auctionStarted || auctionEnded) ? "not-allowed" : "pointer",
-                }}
-              >
-                {auctionEnded ? "Auction Ended" : !auctionStarted ? "Auction Not Started" : "Place Bid"}
-              </button>
-            </div>
-          </form>
-
-          {/* My Bids History */}
-          {myBids.length > 0 && (
-            <div className="form-group" style={{
-              padding: "20px",
-              backgroundColor: "#f9f9f9",
-              border: "1px solid #ddd",
-              borderRadius: "8px"
-            }}>
-              <label className="form-label" style={{ fontSize: "16px", marginBottom: "15px" }}>
-                📜 My Bid History
-              </label>
-              <div style={{ maxHeight: "200px", overflowY: "auto" }}>
-                {myBids.map((bid, index) => (
-                  <div 
-                    key={index}
-                    style={{
-                      padding: "10px",
-                      backgroundColor: "#fff",
-                      borderRadius: "6px",
-                      marginBottom: "8px",
-                      fontSize: "13px",
-                      border: "1px solid #e0e0e0"
-                    }}
-                  >
-                    <div><strong>Amount:</strong> {bid.bidAmount} ETH</div>
-                    <div><strong>Time:</strong> {new Date(bid.timestamp).toLocaleString()}</div>
-                    {bid.transactionHash && (
-                      <div style={{ fontSize: "11px", color: "#666" }}>
-                        <strong>TX:</strong> {bid.transactionHash.substring(0, 20)}...
+                    {/* Bid Input (shown when selected) */}
+                    {isSelected && (
+                      <div className="bid-input-section">
+                        <input
+                          type="number"
+                          placeholder={`Min: $${minNextBid}`}
+                          value={bidAmount}
+                          onChange={(e) => setBidAmount(e.target.value)}
+                          step="0.01"
+                          min={minNextBid}
+                          className="bid-input"
+                        />
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            placeBid();
+                          }}
+                          disabled={loading || !walletAddress}
+                          className="btn-place-bid"
+                        >
+                          {loading ? "Placing..." : "Place Bid"}
+                        </button>
                       </div>
                     )}
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Links to Profile and Dashboard */}
+      <div className="dashboard-links">
+        <button onClick={() => navigate("/profile")} className="btn-secondary">
+          👤 My Profile (NFTs)
+        </button>
+        <button onClick={() => navigate("/bidders-info")} className="btn-secondary">
+          🏆 My Auction Victories & Bids
+        </button>
       </div>
     </div>
   );
-}
+};
+
+export default BidderDashboard;
