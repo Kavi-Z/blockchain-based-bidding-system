@@ -1,0 +1,25 @@
+Legal Terms and Conditions
+
+User Agreement
+By using the system, users agree to comply with all rules and regulations defined by the platform.
+
+No Guarantee of Winning
+Participation in auctions does not guarantee winning any auction.
+
+Blockchain Responsibility
+Users are responsible for their blockchain transactions, including gas fees and wallet security.
+
+Data Transparency
+All bids and auction results are publicly verifiable on the blockchain.
+
+Limitation of Liability
+The platform is not responsible for losses caused by network failures or blockchain issues.
+
+Prohibited Activities
+Users must not engage in fraud, bid manipulation, or any illegal activities.
+
+Termination
+The platform reserves the right to suspend or terminate accounts that violate terms.
+
+Governing Law
+All disputes are governed by applicable local laws and regulations.
