@@ -177,6 +177,17 @@ public class AuctionService {
     }
 
     /**
+     * Get all auctions (both ACTIVE and CLOSED)
+     */
+    public List<AuctionResponse> getAllAuctions() {
+        // Return all auctions regardless of status
+        List<Auction> auctions = auctionRepository.findAll();
+        return auctions.stream()
+                .map(this::convertToResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Get all active auctions
      */
     public List<AuctionResponse> getAllActiveAuctions() {

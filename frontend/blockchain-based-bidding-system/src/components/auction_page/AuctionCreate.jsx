@@ -29,7 +29,7 @@ const AuctionCreate = () => {
 
   // Blockchain state
   const [walletAddress, setWalletAddress] = useState("");
-  const [contractAddress] = useState("0xD19A4cfF92E1F5F2B63446E3506205e9720793d6");
+  const [contractAddress] = useState("0x55286Ac3A309c90918CDa8B0093ED5ECb5aF07fD");
 
   // Check if user is logged in
   useEffect(() => {
@@ -257,8 +257,7 @@ const AuctionCreate = () => {
           return BigInt(Math.floor(parseFloat(formData.maxBid) * 1e18));
         }
       })() : BigInt(0);
-
-      // Determine which function name is present in the ABI (some deployments use startAuction or createAuction)
+ 
       const ifaceFns = contract.interface.fragments || [];
       console.log("Contract ABI functions:", ifaceFns.map(f => f.name).filter(n => n));
       
@@ -274,8 +273,6 @@ const AuctionCreate = () => {
       }
 
       console.log("Using contract function:", functionName);
-
-      // Encode function data manually (avoid relying on contract.populateTransaction or contract.estimateGas)
       const data = contract.interface.encodeFunctionData(functionName, [
         biddingTimeSeconds,
         minIncrementWei,
@@ -289,12 +286,11 @@ const AuctionCreate = () => {
         data,
         from: signerAddress,
       };
-
-      // Attempt gas estimation first to detect reverts early and surface revert reasons
+ 
       try {
         await provider.estimateGas(populated);
       } catch (estErr) {
-        // Try a raw call to retrieve revert data (some RPCs include it)
+         
         try {
           const callResult = await provider.call(populated).catch(() => null);
           if (callResult && callResult !== "0x") {
@@ -315,10 +311,7 @@ const AuctionCreate = () => {
         } catch (decodeErr) {
           throw decodeErr;
         }
-      }
-
-      // If estimateGas succeeded, send transaction and wait for confirmation
-      // Call the same function name we detected earlier so runtime matches ABI/deployed contract
+      } 
       let tx;
       try {
         if (functionName === "startAuction") {
@@ -353,8 +346,7 @@ const AuctionCreate = () => {
         console.error("Error calling contract method:", methodErr);
         throw new Error(`Failed to call ${functionName}: ${methodErr.message}`);
       }
-
-      // CRITICAL: Wait for transaction to be mined - DO NOT proceed until receipt is received
+ 
       console.log("⏳ Waiting for transaction to be mined...");
       let receipt;
       try {
@@ -363,8 +355,7 @@ const AuctionCreate = () => {
         console.error("Error waiting for transaction:", waitErr);
         throw new Error(`Transaction confirmation failed: ${waitErr.message}`);
       }
-      
-      // Verify transaction was actually mined and successful
+       
       if (!receipt) {
         throw new Error("Transaction was not confirmed (receipt is null). The transaction may have failed or was rejected.");
       }
@@ -381,8 +372,7 @@ const AuctionCreate = () => {
       if (receipt.status === 0 || receipt.status === false) {
         throw new Error("Transaction failed on-chain (status = 0). Check contract revert reason in console logs.");
       }
-      
-      // Extract transaction hash (could be transactionHash or hash depending on ethers version)
+       
       const finalTxHash = receipt.transactionHash || receipt.hash || tx.hash;
       const finalBlockNumber = receipt.blockNumber;
       
@@ -400,7 +390,7 @@ const AuctionCreate = () => {
         contractAddress: contractAddress,
       };
     } catch (error) {
-      // Improve meta-mask/internal RPC error messaging
+     
       const msg = (error && error.message) ? error.message : String(error);
       if (msg.includes("Internal JSON-RPC error") || msg.includes("missing revert data") || msg.includes("CALL_EXCEPTION")) {
         throw new Error(
@@ -635,8 +625,7 @@ const AuctionCreate = () => {
                 />
                 <small>1 min to 7 days (10080 min)</small>
               </div>
-
-              {/* Min Increment */}
+ 
               <div className="form-group">
                 <label htmlFor="minIncrement">Min Bid Increment ($) *</label>
                 <input

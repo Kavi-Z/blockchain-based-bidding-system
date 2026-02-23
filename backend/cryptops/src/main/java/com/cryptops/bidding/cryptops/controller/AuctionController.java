@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/auctions")
@@ -32,25 +33,22 @@ public class AuctionController {
     @Autowired
     private NFTRepository nftRepository;
 
-    /**
-     * Create a new auction (Seller only)
-     * Requires: Authorization token with seller ID
-     */
+    @Autowired
+    private com.cryptops.bidding.cryptops.repository.AuctionRepository auctionRepository;
+
     @PostMapping
     public ResponseEntity<?> createAuction(@Valid @RequestBody AuctionCreateRequest request, 
                                            HttpServletRequest httpRequest) {
-        try {
-            // Extract user ID from token via filter
+        try { 
             String userId = (String) httpRequest.getAttribute("userId");
-            
-            // Verify user ID matches seller ID in request
+             
             if (userId == null || !userId.equals(request.getSellerId())) {
                 throw new UnauthorizedException("You can only create auctions for your own seller account");
             }
 
             logger.info("Creating auction for seller: " + userId);
             
-            // Create auction via service
+            
             Auction createdAuction = auctionService.createAuction(request);
             
             AuctionResponse response = convertToResponse(createdAuction);
@@ -84,13 +82,10 @@ public class AuctionController {
         }
     }
 
-    /**
-     * Get all auctions (paginated)
-     */
     @GetMapping
     public ResponseEntity<?> getAllAuctions() {
         try {
-            List<AuctionResponse> auctions = auctionService.getAllActiveAuctions();
+            List<AuctionResponse> auctions = auctionService.getAllAuctions();
             return ResponseEntity.ok(Map.of(
                     "success", true,
                     "count", auctions.size(),
@@ -101,6 +96,41 @@ public class AuctionController {
             return ResponseEntity.status(500).body(Map.of(
                     "success", false,
                     "error", "Failed to fetch auctions"
+            ));
+        }
+    }
+
+    @GetMapping("/won")
+    public ResponseEntity<?> getWonAuctions(HttpServletRequest httpRequest) {
+        try {
+            String userId = (String) httpRequest.getAttribute("userId");
+            
+            if (userId == null || userId.isEmpty()) {
+                return ResponseEntity.status(401).body(Map.of(
+                        "success", false,
+                        "error", "Authentication required"
+                ));
+            }
+
+            List<Auction> allAuctions = auctionRepository.findAll();
+            java.util.List<AuctionResponse> wonAuctions = allAuctions.stream()
+                    .filter(a -> "CLOSED".equalsIgnoreCase(a.getStatus()) && 
+                               userId.equals(a.getHighestBidderId()))
+                    .map(this::convertToResponse)
+                    .collect(Collectors.toList());
+
+            logger.info("Fetched " + wonAuctions.size() + " won auctions for user: " + userId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "count", wonAuctions.size(),
+                    "auctions", wonAuctions
+            ));
+        } catch (Exception e) {
+            logger.severe("Error fetching won auctions: " + e.getMessage());
+            return ResponseEntity.status(500).body(Map.of(
+                    "success", false,
+                    "error", "Failed to fetch won auctions"
             ));
         }
     }
@@ -249,7 +279,7 @@ public class AuctionController {
     }
 
     @PostMapping("/{auctionId}/finalize")
-    public ResponseEntity<?> finalizeAuctionAndTransferNFT(@PathVariable String auctionId) {
+    public ResponseEntity<?> finalizeAuctionAndTransferNFT(@PathVariable("auctionId") String auctionId) {
         try {
             // Get the auction
             Auction auction = auctionService.getAuctionByIdModel(auctionId);
@@ -343,7 +373,7 @@ public class AuctionController {
      * Shows current state including highest bidder and bid history
      */
     @GetMapping("/{auctionId}/details")
-    public ResponseEntity<?> getAuctionDetails(@PathVariable String auctionId) {
+    public ResponseEntity<?> getAuctionDetails(@PathVariable("auctionId") String auctionId) {
         try {
             Auction auction = auctionService.getAuctionByIdModel(auctionId);
             

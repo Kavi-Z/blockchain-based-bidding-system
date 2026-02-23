@@ -24,7 +24,7 @@ const Upload = () => {
     maxBid: "",
   });
 
-  const CONTRACT_ADDRESS = "0xD19A4cfF92E1F5F2B63446E3506205e9720793d6";
+  const CONTRACT_ADDRESS = "0x55286Ac3A309c90918CDa8B0093ED5ECb5aF07fD";
 
   useEffect(() => {
     if (window.ethereum && walletAddress) {

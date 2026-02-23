@@ -38,6 +38,11 @@ const BidderDashboard = () => {
 
   // Auctions state
   const [auctions, setAuctions] = useState([]);
+  const [ownedNFTs, setOwnedNFTs] = useState([]);
+  const [wonAuctions, setWonAuctions] = useState([]);
+  const [loadingNFTs, setLoadingNFTs] = useState(false);
+  const [loadingWonAuctions, setLoadingWonAuctions] = useState(false);
+  const [activeTab, setActiveTab] = useState("browse");
   const [loading, setLoading] = useState(false);
   const [selectedAuctionId, setSelectedAuctionId] = useState(null);
   const [bidAmount, setBidAmount] = useState("");
@@ -48,7 +53,7 @@ const BidderDashboard = () => {
   const CONTRACT_ADDRESS =
     (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_CONTRACT_ADDRESS) ||
     (typeof process !== "undefined" && process.env && (process.env.REACT_APP_CONTRACT_ADDRESS || process.env.VITE_CONTRACT_ADDRESS)) ||
-    "0xD19A4cfF92E1F5F2B63446E3506205e9720793d6";
+    "0x55286Ac3A309c90918CDa8B0093ED5ECb5aF07fD";
  
   useEffect(() => {
     if (!user || user.role !== "BIDDER") {
@@ -66,6 +71,10 @@ const BidderDashboard = () => {
       try {
         // Fetch active auctions from backend
         await fetchActiveAuctions();
+        // Fetch won auctions
+        await fetchWonAuctions();
+        // Fetch owned NFTs
+        await fetchOwnedNFTs();
       } catch (err) {
         setError(err.message || "Failed to initialize dashboard");
       } finally {
@@ -74,6 +83,13 @@ const BidderDashboard = () => {
     };
 
     init();
+
+    // Auto-refresh won auctions every 5 seconds
+    const wonAuctionsInterval = setInterval(() => {
+      fetchWonAuctions();
+    }, 5000);
+
+    return () => clearInterval(wonAuctionsInterval);
   }, []);
  
   const fetchActiveAuctions = async () => {
@@ -109,6 +125,77 @@ const BidderDashboard = () => {
       setError(err.message);
     }
   };
+
+  const fetchOwnedNFTs = async () => {
+    try {
+      setLoadingNFTs(true);
+      const response = await fetch("http://localhost:8080/api/nft/owned", {
+        headers: {
+          "Authorization": `Bearer ${user.token}`,
+          "X-User-ID": user.id,
+        },
+      });
+
+      if (!response.ok) {
+        console.warn("Failed to fetch owned NFTs");
+        return;
+      }
+
+      const data = await response.json();
+      if (data.success && Array.isArray(data.nfts)) {
+        setOwnedNFTs(data.nfts);
+        console.log("Loaded owned NFTs:", data.nfts);
+      }
+    } catch (err) {
+      console.error("Error fetching owned NFTs:", err);
+    } finally {
+      setLoadingNFTs(false);
+    }
+  };
+
+  const fetchWonAuctions = async () => {
+    try {
+      setLoadingWonAuctions(true);
+      console.log("Fetching won auctions for user ID:", user.id);
+      
+      // Use dedicated backend endpoint for won auctions
+      const response = await fetch("http://localhost:8080/api/auctions/won", {
+        headers: {
+          "Authorization": `Bearer ${user.token}`,
+          "X-User-ID": user.id,
+        },
+      });
+
+      if (!response.ok) {
+        console.warn("Failed to fetch won auctions with status:", response.status);
+        setWonAuctions([]);
+        return;
+      }
+
+      const data = await response.json();
+      console.log("Won auctions API response:", data);
+      
+      let wonArray = [];
+      if (data.success && Array.isArray(data.auctions)) {
+        wonArray = data.auctions;
+        console.log("Won auctions returned:", wonArray.length);
+      } else if (Array.isArray(data)) {
+        wonArray = data;
+        console.log("Direct array format:", wonArray.length);
+      } else {
+        console.warn("Unexpected won auctions response format:", data);
+      }
+
+      setWonAuctions(wonArray);
+      console.log("Won auctions set to:", wonArray);
+    } catch (err) {
+      console.error("Error fetching won auctions:", err);
+      setWonAuctions([]);
+    } finally {
+      setLoadingWonAuctions(false);
+    }
+  };
+
   const findBlockchainAuctionIdByFallback = async (sellerWalletAddress, minIncrement) => {
     try {
       if (!contract) {
@@ -515,6 +602,28 @@ const BidderDashboard = () => {
         <p>Browse and bid on active auctions</p>
       </div>
 
+      {/* Tab Navigation */}
+      <div className="tab-navigation">
+        <button
+          className={`tab-button ${activeTab === "browse" ? "active" : ""}`}
+          onClick={() => setActiveTab("browse")}
+        >
+          🏪 Browse Auctions
+        </button>
+        <button
+          className={`tab-button ${activeTab === "won" ? "active" : ""}`}
+          onClick={() => setActiveTab("won")}
+        >
+          🏆 Won Auctions ({wonAuctions.length})
+        </button>
+        <button
+          className={`tab-button ${activeTab === "owned" ? "active" : ""}`}
+          onClick={() => setActiveTab("owned")}
+        >
+          💎 My Owned Items ({ownedNFTs.length})
+        </button>
+      </div>
+
       {/* Error & Success Messages */}
       {error && <div className="alert alert-error">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
@@ -532,9 +641,10 @@ const BidderDashboard = () => {
         )}
       </div>
 
-      {/* Active Auctions Grid */}
-      <div className="auctions-section">
-        <h2>Active Auctions</h2>
+      {/* Browse Auctions Tab */}
+      {activeTab === "browse" && (
+        <div className="auctions-section">
+          <h2>Active Auctions</h2>
         
         {loading ? (
           <div className="loading">Loading auctions...</div>
@@ -632,7 +742,130 @@ const BidderDashboard = () => {
             })}
           </div>
         )}
-      </div>
+        </div>
+      )}
+
+      {/* My Owned Items Tab */}
+      {activeTab === "owned" && (
+        <div className="owned-nfts-section">
+          <h2>🏆 My Owned Items</h2>
+
+          {loadingNFTs ? (
+            <div className="loading">Loading your owned items...</div>
+          ) : ownedNFTs.length === 0 ? (
+            <div className="no-items">
+              <p>You haven't won any auctions yet.</p>
+              <p>Start bidding on active auctions to own NFTs!</p>
+            </div>
+          ) : (
+            <div className="nfts-grid">
+              {ownedNFTs.map((nft) => (
+                <div key={nft.id} className="nft-card">
+                  <div className="nft-image">
+                    <img
+                      src={nft.imageUrl || "https://via.placeholder.com/200x200?text=NFT"}
+                      alt={nft.name}
+                      onError={(e) => (e.target.src = "https://via.placeholder.com/200x200?text=NFT")}
+                    />
+                    <div className="nft-status-badge">{nft.status}</div>
+                  </div>
+
+                  <div className="nft-details">
+                    <h3>{nft.name}</h3>
+                    <p className="description">{nft.description?.substring(0, 60)}...</p>
+
+                    <div className="nft-info">
+                      <div className="info-row">
+                        <span>Acquired:</span>
+                        <strong>{new Date(nft.acquiredAt).toLocaleDateString()}</strong>
+                      </div>
+                      {nft.tokenId && (
+                        <div className="info-row">
+                          <span>Token ID:</span>
+                          <code>{nft.tokenId.slice(0, 10)}...</code>
+                        </div>
+                      )}
+                      <div className="info-row">
+                        <span>Auction:</span>
+                        <code className="auction-link">{nft.auctionId?.slice(0, 12)}...</code>
+                      </div>
+                    </div>
+
+                    <div className="nft-actions">
+                      <button className="btn-view-details">📋 View Details</button>
+                      <button className="btn-transfer-soon" disabled>
+                        🔄 Transfer (Soon)
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Won Auctions Tab */}
+      {activeTab === "won" && (
+        <div className="won-auctions-section">
+          <h2>🎉 Won Auctions</h2>
+
+          {loadingWonAuctions ? (
+            <div className="loading">Loading your won auctions...</div>
+          ) : wonAuctions.length === 0 ? (
+            <div className="no-items">
+              <p>You haven't won any auctions yet.</p>
+              <p>Keep bidding to become a winning bidder!</p>
+            </div>
+          ) : (
+            <div className="won-auctions-grid">
+              {wonAuctions.map((auction) => (
+                <div key={auction.id} className="won-auction-card">
+                  {/* Won Badge */}
+                  <div className="won-badge">🏆 WON</div>
+
+                  {/* Auction Image */}
+                  <div className="auction-image">
+                    <img
+                      src={auction.imageCID || auction.imageUrl || "https://via.placeholder.com/200x200?text=No+Image"}
+                      alt={auction.itemName}
+                      onError={(e) => {
+                        e.target.src = "https://via.placeholder.com/200x200?text=No+Image";
+                      }}
+                    />
+                  </div>
+
+                  {/* Auction Details */}
+                  <div className="auction-details">
+                    <h3>{auction.itemName}</h3>
+                    <p className="description">{auction.description?.substring(0, 50)}...</p>
+
+                    <div className="bid-info">
+                      <div className="bid-row">
+                        <span>Final Bid Amount:</span>
+                        <strong className="winning-bid">${auction.currentHighestBid}</strong>
+                      </div>
+                      <div className="bid-row">
+                        <span>Auction Ended:</span>
+                        <strong>{new Date(auction.endTime).toLocaleDateString()}</strong>
+                      </div>
+                      <div className="bid-row">
+                        <span>Seller:</span>
+                        <strong>{auction.sellerUsername || "Unknown Seller"}</strong>
+                      </div>
+                    </div>
+
+                    <div className="actions">
+                      <button className="btn-view-details">📋 View Auction Details</button>
+                      <button className="btn-success">✅ You Won This Auction!</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Links to Profile and Dashboard */}
       <div className="dashboard-links">
