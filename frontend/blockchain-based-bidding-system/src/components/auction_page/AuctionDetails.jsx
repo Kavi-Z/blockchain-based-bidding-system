@@ -11,6 +11,8 @@ export default function AuctionDetails() {
   const [bids, setBids] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [finalizing, setFinalizing] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== "SELLER") {
@@ -19,14 +21,16 @@ export default function AuctionDetails() {
       return;
     }
     fetchAuctionDetails();
-  }, [auctionId]); // Only depend on auctionId to prevent infinite loop
+ 
+    const interval = setInterval(fetchAuctionDetails, 5000);
+    return () => clearInterval(interval);
+  }, [auctionId]);
 
   const fetchAuctionDetails = async () => {
     try {
       setLoading(true);
       setError("");
-
-      // Fetch auction details
+ 
       const auctionResponse = await fetch(`http://localhost:8080/api/auctions/${auctionId}`, {
         headers: {
           Authorization: `Bearer ${user.token || ""}`,
@@ -42,24 +46,65 @@ export default function AuctionDetails() {
       if (auctionData.success && auctionData.auction) {
         setAuction(auctionData.auction);
       }
+ 
+      // Fetch bids with comprehensive error handling
+      console.log("Fetching bids for auction:", auctionId);
+      const bidsResponse = await fetch(
+        `http://localhost:8080/api/bids/auction/${auctionId}/bids-with-details`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token || ""}`,
+            "X-User-ID": user.id,
+          },
+        }
+      );
 
-      // Fetch bid history
-      const bidsResponse = await fetch(`http://localhost:8080/api/bids/auction/${auctionId}`, {
-        headers: {
-          Authorization: `Bearer ${user.token || ""}`,
-          "X-User-ID": user.id,
-        },
-      });
+      console.log("Bids response status:", bidsResponse.status);
 
       if (bidsResponse.ok) {
         const bidsData = await bidsResponse.json();
+        console.log("Bids API response:", bidsData);
+        
+        let bidsArray = [];
+        
+        // Handle different response formats
         if (bidsData.success && Array.isArray(bidsData.bids)) {
-          setBids(bidsData.bids);
+          bidsArray = bidsData.bids;
+          console.log("Format 1: success.bids - Loaded", bidsArray.length, "bids");
+        } else if (Array.isArray(bidsData)) {
+          bidsArray = bidsData;
+          console.log("Format 2: direct array - Loaded", bidsArray.length, "bids");
+        } else if (bidsData.data && Array.isArray(bidsData.data)) {
+          bidsArray = bidsData.data;
+          console.log("Format 3: data array - Loaded", bidsArray.length, "bids");
+        } else if (bidsData.success === false) {
+          console.warn("API returned error:", bidsData.message);
+          bidsArray = [];
+        } else {
+          console.warn("Unexpected bids response format:", bidsData);
+          bidsArray = [];
         }
+        
+        setBids(bidsArray);
+        console.log("Final bids set to:", bidsArray.length);
+      } else {
+        console.warn("Bids fetch failed with status:", bidsResponse.status);
+        try {
+          const errorData = await bidsResponse.json();
+          console.warn("Error response:", errorData);
+          if (errorData.message) {
+            setError("Failed to load bids: " + errorData.message);
+          }
+        } catch (e) {
+          const textError = await bidsResponse.text();
+          console.warn("Error response text:", textError);
+        }
+        setBids([]);
       }
     } catch (err) {
       setError(err.message || "Failed to load auction details");
       console.error("Error fetching auction details:", err);
+      setBids([]);
     } finally {
       setLoading(false);
     }
@@ -67,6 +112,84 @@ export default function AuctionDetails() {
 
   const handleRefresh = () => {
     fetchAuctionDetails();
+  };
+
+  const handleEndAuction = async () => {
+    if (!window.confirm("Are you sure you want to end this auction?")) {
+      return;
+    }
+
+    setFinalizing(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/auctions/${auctionId}/end`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${user.token || ""}`,
+            "X-User-ID": user.id,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to end auction");
+      }
+
+      setSuccess("✅ Auction ended successfully! Ready to finalize.");
+      setTimeout(() => {
+        fetchAuctionDetails();
+      }, 1000);
+    } catch (err) {
+      setError(err.message || "Failed to end auction");
+      console.error("Error ending auction:", err);
+    } finally {
+      setFinalizing(false);
+    }
+  };
+
+  const handleFinalizeAuction = async () => {
+    if (!window.confirm("Finalize this auction and transfer NFT to the highest bidder?")) {
+      return;
+    }
+
+    setFinalizing(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/auctions/${auctionId}/finalize`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${user.token || ""}`,
+            "X-User-ID": user.id,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to finalize auction");
+      }
+
+      setSuccess(`🎉 NFT Successfully Transferred to ${data.winner || auction.highestBidderUsername}!`);
+      setTimeout(() => {
+        fetchAuctionDetails();
+      }, 1000);
+    } catch (err) {
+      setError(err.message || "Failed to finalize auction");
+      console.error("Error finalizing auction:", err);
+    } finally {
+      setFinalizing(false);
+    }
   };
 
   if (loading) {
@@ -107,6 +230,7 @@ export default function AuctionDetails() {
       </div>
 
       {error && <div className="alert alert-error">{error}</div>}
+      {success && <div className="alert alert-success">{success}</div>}
 
       <div className="details-content">
         {/* Auction Info Card */}
@@ -173,8 +297,59 @@ export default function AuctionDetails() {
                 <p>{new Date(auction.endTime).toLocaleString()}</p>
               </div>
             </div>
+
+            {/* Action Buttons */}
+            <div className="action-buttons">
+              {auction.status === "ACTIVE" && new Date(auction.endTime) <= new Date() && (
+                <>
+                  <button
+                    onClick={handleEndAuction}
+                    disabled={finalizing}
+                    className="btn-end-auction"
+                  >
+                    {finalizing ? "Processing..." : "🏁 End Auction"}
+                  </button>
+                </>
+              )}
+              {auction.status === "CLOSED" && bids.length > 0 && auction.highestBidderId && (
+                <button
+                  onClick={handleFinalizeAuction}
+                  disabled={finalizing}
+                  className="btn-finalize-auction"
+                >
+                  {finalizing ? "Finalizing..." : "✨ Finalize & Transfer NFT"}
+                </button>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* NFT Ownership Status */}
+        {auction.status === "CLOSED" && auction.highestBidderId && (
+          <div className="nft-ownership-card">
+            <h3>🎁 NFT Ownership</h3>
+            <div className="ownership-info">
+              <div className="ownership-status">
+                <label>Current NFT Owner</label>
+                <div className="owner-display">
+                  <div className="owner-name">
+                    <strong>{auction.highestBidderUsername || "N/A"}</strong>
+                  </div>
+                  <div className="owner-wallet">
+                    <small>Wallet: {auction.highestBidderId}</small>
+                  </div>
+                </div>
+              </div>
+              <div className="ownership-amount">
+                <label>Winning Bid Amount</label>
+                <span className="winning-amount">${auction.currentHighestBid.toFixed(2)}</span>
+              </div>
+            </div>
+            <div className="ownership-note">
+              ✅ The highest bidder has won this auction and owns the NFT!
+            </div>
+          </div>
+        )}
 
         {/* Bidding History */}
         <div className="bidding-history-card">
@@ -188,25 +363,37 @@ export default function AuctionDetails() {
             <div className="bids-table">
               <div className="bids-header">
                 <div className="col-rank">Rank</div>
-                <div className="col-wallet">Wallet Address</div>
+                <div className="col-bidder">Bidder</div>
+                <div className="col-username">Username</div>
                 <div className="col-amount">Bid Amount</div>
-                <div className="col-time">Timestamp</div>
-                <div className="col-tx">Transaction Hash</div>
+                <div className="col-time">Time</div>
               </div>
               {bids.map((bid, index) => (
-                <div key={bid.id} className="bid-row">
-                  <div className="col-rank">#{index + 1}</div>
-                  <div className="col-wallet">
-                    <code>{bid.walletAddress}</code>
+                <div key={bid.bidId} className={`bid-row ${bid.isHighestBid ? "highest-bid" : ""}`}>
+                  <div className="col-rank">#{index + 1} {bid.isHighestBid && "🏆"}</div>
+                  <div className="col-bidder">
+                    {bid.bidderProfileImage ? (
+                      <img
+                        src={bid.bidderProfileImage}
+                        alt={bid.bidderUsername}
+                        className="bidder-avatar"
+                        onError={(e) => (e.target.style.display = "none")}
+                      />
+                    ) : (
+                      <div className="bidder-avatar-placeholder">👤</div>
+                    )}
+                  </div>
+                  <div className="col-username">
+                    <strong>{bid.bidderUsername || "Anonymous"}</strong>
+                    <small>{bid.walletAddress?.slice(0, 10)}...{bid.walletAddress?.slice(-8)}</small>
                   </div>
                   <div className="col-amount">
-                    <span className="amount">${parseFloat(bid.bidAmount).toFixed(2)}</span>
+                    <span className={`amount ${bid.isHighestBid ? "highest" : ""}`}>
+                      ${parseFloat(bid.bidAmount).toFixed(2)}
+                    </span>
                   </div>
                   <div className="col-time">
                     {new Date(bid.timestamp).toLocaleString()}
-                  </div>
-                  <div className="col-tx">
-                    <code className="tx-hash">{bid.transactionHash || "N/A"}</code>
                   </div>
                 </div>
               ))}

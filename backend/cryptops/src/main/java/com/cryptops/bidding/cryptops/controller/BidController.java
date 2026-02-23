@@ -98,19 +98,24 @@ public class BidController {
             }
  
             String bidderUsername = "Anonymous";
+            String bidderProfileImage = "";
             if (userId != null && !userId.isEmpty()) {
                 User bidder = userRepository.findById(userId).orElse(null);
                 if (bidder != null) {
                     bidderUsername = bidder.getUsername();
+                    bidderProfileImage = bidder.getProfileImage() != null ? bidder.getProfileImage() : "";
                 }
             }
  
             Bid bid = new Bid();
             bid.setAuctionId(request.getAuctionId());
+            bid.setBidderId(userId);
+            bid.setBidderUsername(bidderUsername);
+            bid.setBidderProfileImage(bidderProfileImage);
             bid.setWalletAddress(request.getBidderWalletAddress());
             bid.setBidAmount(String.valueOf(request.getBidAmount()));
             bid.setTransactionHash(request.getTransactionHash());
-            bid.setTimestamp(LocalDateTime.now());
+            bid.setBlockNumber(request.getBlockNumber());
             bid.setCreatedAt(LocalDateTime.now());
 
             Bid savedBid = bidRepository.save(bid);
@@ -161,7 +166,7 @@ public class BidController {
     }
  
     @GetMapping("/auction/{auctionId}")
-    public ResponseEntity<?> getAuctionBids(@PathVariable String auctionId) {
+    public ResponseEntity<?> getAuctionBids(@PathVariable("auctionId") String auctionId) {
         try {
             List<Bid> bids = bidRepository.findByAuctionIdOrderByTimestampDesc(auctionId);
             
@@ -181,7 +186,7 @@ public class BidController {
     }
  
     @GetMapping("/{bidId}")
-    public ResponseEntity<?> getBidById(@PathVariable String bidId) {
+    public ResponseEntity<?> getBidById(@PathVariable("bidId") String bidId) {
         try {
             @SuppressWarnings("null")
             Bid bid = bidRepository.findById((String) bidId)
@@ -206,7 +211,7 @@ public class BidController {
      * Shows highest bidder info, current bid amount, bid count
      */
     @GetMapping("/auction/{auctionId}/status")
-    public ResponseEntity<?> getAuctionBiddingStatus(@PathVariable String auctionId) {
+    public ResponseEntity<?> getAuctionBiddingStatus(@PathVariable("auctionId") String auctionId) {
         try {
             @SuppressWarnings("null")
             Auction auction = auctionRepository.findById((String) auctionId)
@@ -233,6 +238,66 @@ public class BidController {
             
         } catch (RuntimeException e) {
             logger.warning("Error fetching auction bidding status: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "error", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * Get all bids for an auction with bidder details
+     * Used by seller to see who bid and their details
+     */
+    @GetMapping("/auction/{auctionId}/bids-with-details")
+    public ResponseEntity<?> getAuctionBidsWithDetails(@PathVariable("auctionId") String auctionId) {
+        try {
+            @SuppressWarnings("null")
+            Auction auction = auctionRepository.findById((String) auctionId)
+                    .orElseThrow(() -> new RuntimeException("Auction not found"));
+            
+            List<Bid> allBids = bidRepository.findByAuctionIdOrderByTimestampDesc(auctionId);
+            
+            // Enrich bids with bidder information
+            java.util.List<Map<String, Object>> enrichedBids = new java.util.ArrayList<>();
+            for (Bid bid : allBids) {
+                Map<String, Object> bidInfo = new LinkedHashMap<>();
+                bidInfo.put("bidId", bid.getId());
+                bidInfo.put("bidderId", bid.getBidderId());
+                bidInfo.put("bidderUsername", bid.getBidderUsername() != null ? bid.getBidderUsername() : "Anonymous");
+                bidInfo.put("bidderProfileImage", bid.getBidderProfileImage() != null ? bid.getBidderProfileImage() : "");
+                bidInfo.put("walletAddress", bid.getWalletAddress());
+                bidInfo.put("bidAmount", bid.getBidAmount());
+                bidInfo.put("timestamp", bid.getTimestamp());
+                bidInfo.put("transactionHash", bid.getTransactionHash());
+                bidInfo.put("blockNumber", bid.getBlockNumber());
+                bidInfo.put("isHighestBid", auction.getHighestBidderId() != null && 
+                                           auction.getHighestBidderId().equals(bid.getBidderId()));
+                enrichedBids.add(bidInfo);
+            }
+            
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("success", true);
+            response.put("auctionId", auctionId);
+            response.put("itemName", auction.getItemName());
+            response.put("status", auction.getStatus());
+            response.put("startTime", auction.getStartTime());
+            response.put("endTime", auction.getEndTime());
+            response.put("imageUrl", auction.getImageUrl());
+            response.put("currentHighestBid", auction.getCurrentHighestBid());
+            response.put("highestBidderId", auction.getHighestBidderId());
+            response.put("highestBidderUsername", auction.getHighestBidderUsername());
+            response.put("totalBids", enrichedBids.size());
+            response.put("minIncrement", auction.getMinIncrement());
+            response.put("startingPrice", auction.getStartingPrice());
+            response.put("bids", enrichedBids);
+            
+            logger.info("Seller fetched " + enrichedBids.size() + " bids for auction: " + auctionId);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (RuntimeException e) {
+            logger.warning("Error fetching auction bids with details: " + e.getMessage());
             return ResponseEntity.badRequest().body(Map.of(
                     "success", false,
                     "error", e.getMessage()

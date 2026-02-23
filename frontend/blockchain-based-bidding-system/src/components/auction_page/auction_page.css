@@ -1,10 +1,9 @@
 .auction-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a1929 0%, #1a2332 100%);
+  background: linear-gradient(135deg, #000000 0%, #0f0f0f 40%, #41e1e3 100%) !important;
   color: white;
   font-family: 'Poppins', sans-serif;
 }
-
 .auction-navbar {
   position: fixed;
   top: 0;
@@ -38,7 +37,7 @@
   padding: 10px 25px;
   font-size: 1rem;
   font-weight: 600;
-  color: white;
+  color: black;
   background: linear-gradient(135deg, #00d4ff 0%, #00ffaa 100%);
   border: none;
   border-radius: 25px;
@@ -230,3 +229,5 @@
     font-size: 1rem;
   }
 }
+
+
