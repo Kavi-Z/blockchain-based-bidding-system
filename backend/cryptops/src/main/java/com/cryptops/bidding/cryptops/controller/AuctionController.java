@@ -4,6 +4,8 @@ import com.cryptops.bidding.cryptops.dto.AuctionCreateRequest;
 import com.cryptops.bidding.cryptops.dto.AuctionResponse;
 import com.cryptops.bidding.cryptops.exception.UnauthorizedException;
 import com.cryptops.bidding.cryptops.model.Auction;
+import com.cryptops.bidding.cryptops.model.NFT;
+import com.cryptops.bidding.cryptops.repository.NFTRepository;
 import com.cryptops.bidding.cryptops.service.AuctionService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 @RestController
@@ -25,6 +28,9 @@ public class AuctionController {
 
     @Autowired
     private AuctionService auctionService;
+
+    @Autowired
+    private NFTRepository nftRepository;
 
     /**
      * Create a new auction (Seller only)
@@ -237,7 +243,132 @@ public class AuctionController {
             logger.severe("Unexpected error ending auction: " + e.getMessage());
             return ResponseEntity.status(500).body(Map.of(
                     "success", false,
-                    "error", "Failed to end auction"
+                    "error", "Unexpected error ending auction: " + e.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("/{auctionId}/finalize")
+    public ResponseEntity<?> finalizeAuctionAndTransferNFT(@PathVariable String auctionId) {
+        try {
+            // Get the auction
+            Auction auction = auctionService.getAuctionByIdModel(auctionId);
+            
+            // Check if auction has ended
+            LocalDateTime now = LocalDateTime.now();
+            if (now.isBefore(auction.getEndTime())) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "success", false,
+                        "error", "Auction has not ended yet. Ends at: " + auction.getEndTime()
+                ));
+            }
+
+            // Check if no bids were placed
+            if (auction.getHighestBidderId() == null || auction.getHighestBidderId().isEmpty()) {
+                auction.setStatus("CLOSED");
+                auctionService.updateAuctionDirect(auction);
+                return ResponseEntity.ok(Map.of(
+                        "success", true,
+                        "message", "Auction ended with no bids",
+                        "nftTransferred", false
+                ));
+            }
+
+            // Check if already finalized
+            if ("CLOSED".equalsIgnoreCase(auction.getStatus())) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "success", false,
+                        "error", "Auction is already finalized"
+                ));
+            }
+
+            // Update auction status to CLOSED
+            auction.setStatus("CLOSED");
+            auctionService.updateAuctionDirect(auction);
+            
+            // Find and transfer NFT to highest bidder
+            Optional<NFT> nftOpt = nftRepository.findByAuctionId(auctionId);
+            if (nftOpt.isPresent()) {
+                NFT nft = nftOpt.get();
+                nft.setPreviousOwner(nft.getCurrentOwner());
+                nft.setCurrentOwner(auction.getHighestBidderId());
+                nft.setStatus(NFT.NFTStatus.OWNED);
+                nft.setAcquiredAt(LocalDateTime.now());
+                nft.setUpdatedAt(LocalDateTime.now());
+                nftRepository.save(nft);
+                
+                logger.info("NFT transferred from seller to bidder: " + auction.getHighestBidderUsername() + 
+                           " for auction: " + auctionId);
+
+                return ResponseEntity.ok(Map.of(
+                        "success", true,
+                        "message", "Auction finalized and NFT transferred to winner",
+                        "auctionId", auctionId,
+                        "winner", auction.getHighestBidderUsername(),
+                        "finalBid", auction.getCurrentHighestBid(),
+                        "nftId", nft.getId(),
+                        "nftName", nft.getName(),
+                        "nftTransferred", true
+                ));
+            } else {
+                // No NFT found for this auction
+                logger.warning("No NFT found for auction: " + auctionId);
+                return ResponseEntity.ok(Map.of(
+                        "success", true,
+                        "message", "Auction finalized but no NFT to transfer",
+                        "auctionId", auctionId,
+                        "winner", auction.getHighestBidderUsername(),
+                        "finalBid", auction.getCurrentHighestBid(),
+                        "nftTransferred", false
+                ));
+            }
+
+        } catch (RuntimeException e) {
+            logger.warning("Error finalizing auction: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "error", e.getMessage()
+            ));
+        } catch (Exception e) {
+            logger.severe("Unexpected error finalizing auction: " + e.getMessage());
+            return ResponseEntity.status(500).body(Map.of(
+                    "success", false,
+                    "error", "Failed to finalize auction: " + e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * Get auction with live bidding information
+     * Shows current state including highest bidder and bid history
+     */
+    @GetMapping("/{auctionId}/details")
+    public ResponseEntity<?> getAuctionDetails(@PathVariable String auctionId) {
+        try {
+            Auction auction = auctionService.getAuctionByIdModel(auctionId);
+            
+            LocalDateTime now = LocalDateTime.now();
+            boolean hasStarted = now.isAfter(auction.getStartTime());
+            boolean hasEnded = now.isAfter(auction.getEndTime());
+            
+            AuctionResponse response = convertToResponse(auction);
+            
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "auction", response,
+                    "hasStarted", hasStarted,
+                    "hasEnded", hasEnded,
+                    "timeRemaining", java.time.temporal.ChronoUnit.SECONDS.between(now, auction.getEndTime()),
+                    "highestBidderId", auction.getHighestBidderId(),
+                    "highestBidderUsername", auction.getHighestBidderUsername(),
+                    "currentHighestBid", auction.getCurrentHighestBid()
+            ));
+
+        } catch (RuntimeException e) {
+            logger.warning("Error fetching auction details: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "error", e.getMessage()
             ));
         }
     }

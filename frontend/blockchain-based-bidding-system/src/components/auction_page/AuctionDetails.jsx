@@ -19,7 +19,7 @@ export default function AuctionDetails() {
       return;
     }
     fetchAuctionDetails();
-  }, [auctionId, user, navigate]);
+  }, [auctionId]); // Only depend on auctionId to prevent infinite loop
 
   const fetchAuctionDetails = async () => {
     try {
