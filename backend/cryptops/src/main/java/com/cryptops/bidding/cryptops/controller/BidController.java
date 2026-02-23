@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -38,6 +39,14 @@ public class BidController {
         try {
             String userId = (String) httpRequest.getAttribute("userId");
             
+            // Validate authentication
+            if (userId == null || userId.isEmpty()) {
+                return ResponseEntity.status(401).body(Map.of(
+                        "success", false,
+                        "error", "Authentication required. Please login to place a bid."
+                ));
+            }
+            
             if (request.getAuctionId() == null || request.getAuctionId().isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of(
                         "success", false,
@@ -53,7 +62,8 @@ public class BidController {
             }
 
             // Fetch auction
-            Auction auction = auctionRepository.findById(request.getAuctionId())
+            @SuppressWarnings("null")
+            Auction auction = auctionRepository.findById((String) request.getAuctionId())
                     .orElseThrow(() -> new RuntimeException("Auction not found"));
 
             // Verify auction is active
@@ -173,7 +183,8 @@ public class BidController {
     @GetMapping("/{bidId}")
     public ResponseEntity<?> getBidById(@PathVariable String bidId) {
         try {
-            Bid bid = bidRepository.findById(bidId)
+            @SuppressWarnings("null")
+            Bid bid = bidRepository.findById((String) bidId)
                     .orElseThrow(() -> new RuntimeException("Bid not found"));
             
             return ResponseEntity.ok(Map.of(
@@ -189,4 +200,103 @@ public class BidController {
             ));
         }
     }
+    
+    /**
+     * Get current bidding status for an auction
+     * Shows highest bidder info, current bid amount, bid count
+     */
+    @GetMapping("/auction/{auctionId}/status")
+    public ResponseEntity<?> getAuctionBiddingStatus(@PathVariable String auctionId) {
+        try {
+            @SuppressWarnings("null")
+            Auction auction = auctionRepository.findById((String) auctionId)
+                    .orElseThrow(() -> new RuntimeException("Auction not found"));
+            
+            List<Bid> allBids = bidRepository.findByAuctionIdOrderByTimestampDesc(auctionId);
+            
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("success", true);
+            response.put("auctionId", auctionId);
+            response.put("itemName", auction.getItemName());
+            response.put("status", auction.getStatus());
+            response.put("startTime", auction.getStartTime());
+            response.put("endTime", auction.getEndTime());
+            response.put("currentHighestBid", auction.getCurrentHighestBid());
+            response.put("highestBidderId", auction.getHighestBidderId());
+            response.put("highestBidderUsername", auction.getHighestBidderUsername());
+            response.put("totalBids", allBids.size());
+            response.put("minIncrement", auction.getMinIncrement());
+            response.put("startingPrice", auction.getStartingPrice());
+            response.put("bids", allBids);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (RuntimeException e) {
+            logger.warning("Error fetching auction bidding status: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "error", e.getMessage()
+            ));
+        }
+    }
+    
+    /**
+     * Get user's bid history
+     * Shows all bids placed by the authenticated user
+     */
+    @GetMapping("/user/history")
+    public ResponseEntity<?> getUserBidHistory(HttpServletRequest httpRequest) {
+        try {
+            String userId = (String) httpRequest.getAttribute("userId");
+            
+            if (userId == null || userId.isEmpty()) {
+                return ResponseEntity.status(401).body(Map.of(
+                        "success", false,
+                        "error", "Authentication required"
+                ));
+            }
+            
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            
+            // Get all bids by this user across all auctions
+            List<Bid> userBids = bidRepository.findByWalletAddressOrderByTimestampDesc(user.getWalletAddress() != null ? user.getWalletAddress() : "");
+            
+            // Enrich with auction details
+            java.util.List<Map<String, Object>> enrichedBids = new java.util.ArrayList<>();
+            for (Bid bid : userBids) {
+                @SuppressWarnings("null")
+                Auction auction = auctionRepository.findById((String) bid.getAuctionId()).orElse(null);
+                if (auction != null) {
+                    enrichedBids.add(Map.of(
+                            "bidId", bid.getId(),
+                            "auctionId", bid.getAuctionId(),
+                            "itemName", auction.getItemName(),
+                            "bidAmount", bid.getBidAmount(),
+                            "timestamp", bid.getTimestamp(),
+                            "isHighestBid", auction.getHighestBidderId() != null && auction.getHighestBidderId().equals(userId),
+                            "auctionStatus", auction.getStatus(),
+                            "imageUrl", auction.getImageUrl()
+                    ));
+                }
+            }
+            
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "userId", userId,
+                    "username", user.getUsername(),
+                    "totalBids", enrichedBids.size(),
+                    "bids", enrichedBids
+            ));
+            
+        } catch (RuntimeException e) {
+            logger.warning("Error fetching user bid history: " + e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "error", e.getMessage()
+            ));
+        }
+    }
 }
+
+

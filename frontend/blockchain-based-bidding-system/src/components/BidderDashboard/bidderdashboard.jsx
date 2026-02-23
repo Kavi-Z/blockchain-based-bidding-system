@@ -48,7 +48,7 @@ const BidderDashboard = () => {
   const CONTRACT_ADDRESS =
     (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_CONTRACT_ADDRESS) ||
     (typeof process !== "undefined" && process.env && (process.env.REACT_APP_CONTRACT_ADDRESS || process.env.VITE_CONTRACT_ADDRESS)) ||
-    "0x55286Ac3A309c90918CDa8B0093ED5ECb5aF07fD";
+    "0xD19A4cfF92E1F5F2B63446E3506205e9720793d6";
  
   useEffect(() => {
     if (!user || user.role !== "BIDDER") {
@@ -189,24 +189,47 @@ const BidderDashboard = () => {
 
     try {
       const provider = new ethers.BrowserProvider(window.ethereum);
-       
+
       const receipt = await provider.getTransactionReceipt(transactionHash);
+      console.log("Transaction receipt for", transactionHash, receipt);
       if (!receipt) {
         throw new Error("Could not find transaction receipt");
       }
- 
+
       const iface = new ethers.Interface(SecureAuction.abi);
+      const targetAddress = (typeof CONTRACT_ADDRESS === "string" ? CONTRACT_ADDRESS.toLowerCase() : "");
+
+      // Try to locate the AuctionCreated event in the logs. First prefer logs emitted by our contract address.
       for (const log of receipt.logs) {
         try {
-          const parsed = iface.parseLog(log);
+          if (log.address && targetAddress && log.address.toLowerCase() !== targetAddress) {
+            // skip logs from other contracts
+            continue;
+          }
+
+          const parsed = iface.parseLog({ topics: log.topics, data: log.data });
           if (parsed && parsed.name === "AuctionCreated") {
-            // AuctionCreated event has: auctionId (indexed), seller
-            const auctionId = parsed.args[0];
-            console.log("Found blockchain auctionId from receipt:", auctionId.toString());
+            const auctionId = parsed.args.auctionId ?? parsed.args[0];
+            console.log("Found blockchain auctionId from receipt:", String(auctionId));
             return BigInt(auctionId);
           }
-        } catch {
-         
+        } catch (e) {
+          // parseLog can throw for non-matching logs — ignore and continue
+          continue;
+        }
+      }
+
+      // As a more permissive attempt, check all logs (ignore address filter)
+      for (const log of receipt.logs) {
+        try {
+          const parsed = iface.parseLog({ topics: log.topics, data: log.data });
+          if (parsed && parsed.name === "AuctionCreated") {
+            const auctionId = parsed.args.auctionId ?? parsed.args[0];
+            console.log("Found blockchain auctionId (permissive) from receipt:", String(auctionId));
+            return BigInt(auctionId);
+          }
+        } catch (_) {
+          continue;
         }
       }
 
@@ -281,10 +304,18 @@ const BidderDashboard = () => {
       let blockchainAuctionId;
 
       if (frontendAuction.transactionHash && frontendAuction.blockNumber) {
-        blockchainAuctionId = await getBlockchainAuctionId(
-          frontendAuction.transactionHash,
-          frontendAuction.blockNumber
-        );
+        try {
+          blockchainAuctionId = await getBlockchainAuctionId(
+            frontendAuction.transactionHash,
+            frontendAuction.blockNumber
+          );
+        } catch (e) {
+          console.warn("Failed to extract auctionId from receipt, falling back to on-chain search:", e.message);
+          blockchainAuctionId = await findBlockchainAuctionIdByFallback(
+            frontendAuction.ownerAddress || walletAddress,
+            frontendAuction.minIncrement
+          );
+        }
       } else {
         console.warn("Transaction hash/block number missing, using fallback lookup...");
         // Fallback: query all auctions to find the match
@@ -555,6 +586,12 @@ const BidderDashboard = () => {
                         <span>Current Highest:</span>
                         <strong>${auction.currentHighestBid || auction.startingPrice}</strong>
                       </div>
+                      {auction.highestBidderUsername && (
+                        <div className="bid-row">
+                          <span>Highest Bidder:</span>
+                          <strong>{auction.highestBidderUsername}</strong>
+                        </div>
+                      )}
                       <div className="bid-row">
                         <span>Min Next Bid:</span>
                         <strong>${minNextBid}</strong>
