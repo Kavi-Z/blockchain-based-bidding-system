@@ -28,6 +28,20 @@
   --success-border: rgba(34, 197, 94, 0.3);
 }
 
+/* ===== GLOBAL FONT ===== */
+*,
+*::before,
+*::after {
+  font-family: "MyFont1", sans-serif;
+}
+
+input,
+button,
+textarea,
+select {
+  font-family: "MyFont1", sans-serif;
+}
+
 /* ===== CONTAINER ===== */
 .bidder-dashboard-container {
   min-height: 100vh;
@@ -47,6 +61,7 @@
   margin: 0;
   margin-bottom: 10px;
   font-weight: 700;
+  font-family: "MyFont1", sans-serif;
   background: linear-gradient(135deg, #a8f5f6 0%, #41E1E3 50%, #2bc8ca 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -60,6 +75,7 @@
   opacity: 0.75;
   margin: 0;
   color: var(--text-secondary);
+  font-family: "MyFont1", sans-serif;
 }
 
 /* ===== ALERTS ===== */
@@ -68,6 +84,7 @@
   border-radius: 10px;
   margin-bottom: 20px;
   font-weight: 600;
+  font-family: "MyFont1", sans-serif;
   animation: slideIn 0.3s ease-out;
   backdrop-filter: blur(8px);
 }
@@ -110,6 +127,7 @@
   border-radius: 10px;
   border: 2px solid var(--success-border);
   font-weight: 600;
+  font-family: "MyFont1", sans-serif;
   word-break: break-all;
   box-shadow: 0 0 16px var(--success-glow);
 }
@@ -122,6 +140,7 @@
   border-radius: 10px;
   font-size: 1rem;
   font-weight: 600;
+  font-family: "MyFont1", sans-serif;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s, background 0.2s, color 0.2s;
   box-shadow: 0 0 16px var(--cyan-glow);
@@ -147,6 +166,7 @@
 .auctions-section h2 {
   color: var(--text-primary);
   font-size: 1.8rem;
+  font-family: "MyFont1", sans-serif;
   margin-bottom: 30px;
   text-shadow: 0 0 20px var(--cyan-glow);
 }
@@ -160,6 +180,7 @@
   border: 1px solid var(--border-color);
   border-radius: 14px;
   font-size: 1.1rem;
+  font-family: "MyFont1", sans-serif;
   backdrop-filter: blur(8px);
 }
 
@@ -217,6 +238,7 @@
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
+  font-family: "MyFont1", sans-serif;
   border: 1px solid var(--cyan-border);
   backdrop-filter: blur(6px);
 }
@@ -230,6 +252,7 @@
   margin: 0 0 8px;
   color: var(--text-primary);
   font-size: 1.2rem;
+  font-family: "MyFont1", sans-serif;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -238,6 +261,7 @@
 .description {
   color: var(--text-muted);
   font-size: 0.9rem;
+  font-family: "MyFont1", sans-serif;
   margin: 0 0 15px;
   line-height: 1.4;
 }
@@ -253,6 +277,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 0.9rem;
+  font-family: "MyFont1", sans-serif;
   color: var(--text-secondary);
 }
 
@@ -281,6 +306,7 @@
   border-radius: 8px;
   font-size: 0.9rem;
   font-weight: 600;
+  font-family: "MyFont1", sans-serif;
   background: var(--bg-input);
   color: var(--text-primary);
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -288,6 +314,7 @@
 
 .bid-input::placeholder {
   color: var(--text-muted);
+  font-family: "MyFont1", sans-serif;
 }
 
 .bid-input:focus {
@@ -304,6 +331,7 @@
   border-radius: 8px;
   font-weight: 600;
   font-size: 0.9rem;
+  font-family: "MyFont1", sans-serif;
   cursor: pointer;
   transition: background-color 0.2s, box-shadow 0.2s;
   white-space: nowrap;
@@ -337,6 +365,7 @@
   border-radius: 10px;
   font-weight: 600;
   font-size: 1rem;
+  font-family: "MyFont1", sans-serif;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -365,6 +394,7 @@
   border-radius: 0.5rem;
   font-size: 1rem;
   font-weight: 600;
+  font-family: "MyFont1", sans-serif;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -392,6 +422,7 @@
 .owned-nfts-section h2 {
   color: var(--text-primary);
   font-size: 1.8rem;
+  font-family: "MyFont1", sans-serif;
   margin-bottom: 2rem;
   text-align: center;
   text-shadow: 0 0 20px var(--cyan-glow);
@@ -442,6 +473,7 @@
   border-radius: 2rem;
   font-size: 0.8rem;
   font-weight: 700;
+  font-family: "MyFont1", sans-serif;
   box-shadow: 0 4px 12px var(--cyan-glow);
 }
 
@@ -453,11 +485,13 @@
   margin: 0 0 0.5rem 0;
   color: var(--text-primary);
   font-size: 1.3rem;
+  font-family: "MyFont1", sans-serif;
 }
 
 .nft-details .description {
   color: var(--text-muted);
   font-size: 0.9rem;
+  font-family: "MyFont1", sans-serif;
   margin-bottom: 1rem;
 }
 
@@ -475,6 +509,7 @@
   justify-content: space-between;
   align-items: center;
   font-size: 0.9rem;
+  font-family: "MyFont1", sans-serif;
 }
 
 .info-row span {
@@ -501,6 +536,7 @@
   cursor: pointer;
   color: var(--cyan-primary);
   text-decoration: none;
+  font-family: "MyFont1", sans-serif;
   transition: color 0.2s;
 }
 
@@ -521,6 +557,7 @@
   border: none;
   border-radius: 0.5rem;
   font-weight: 600;
+  font-family: "MyFont1", sans-serif;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 0.9rem;
@@ -554,6 +591,7 @@
   padding: 4rem 2rem;
   border-radius: 1rem;
   color: var(--text-secondary);
+  font-family: "MyFont1", sans-serif;
 }
 
 .no-items p {
@@ -577,6 +615,7 @@
   margin-top: 0;
   color: var(--text-primary);
   font-size: 1.8rem;
+  font-family: "MyFont1", sans-serif;
   margin-bottom: 30px;
   display: flex;
   align-items: center;
@@ -616,6 +655,7 @@
   border-radius: 50px;
   font-weight: 700;
   font-size: 0.9rem;
+  font-family: "MyFont1", sans-serif;
   z-index: 10;
   box-shadow: 0 4px 14px var(--success-glow);
 }
@@ -646,12 +686,14 @@
   margin: 0 0 10px 0;
   color: var(--text-primary);
   font-size: 1.3rem;
+  font-family: "MyFont1", sans-serif;
   word-wrap: break-word;
 }
 
 .won-auction-card .description {
   color: var(--text-muted);
   font-size: 0.95rem;
+  font-family: "MyFont1", sans-serif;
   margin: 0 0 15px 0;
   line-height: 1.4;
 }
@@ -669,6 +711,7 @@
   justify-content: space-between;
   margin-bottom: 10px;
   font-size: 0.95rem;
+  font-family: "MyFont1", sans-serif;
 }
 
 .bid-row:last-child {
@@ -705,6 +748,7 @@
   padding: 12px 15px;
   border-radius: 10px;
   font-weight: 600;
+  font-family: "MyFont1", sans-serif;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
   font-size: 0.95rem;
