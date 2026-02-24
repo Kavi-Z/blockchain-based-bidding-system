@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './disclaimer.css';
-import Navbar2 from '../navbar2/navbar2';
+import LogoHeader from '../LogoHeader/LogoHeader';
 import Footer from '../footer/footer';
 
 function Disclaimer() {
@@ -49,7 +49,7 @@ function Disclaimer() {
 
   return (
     <div className="disclaimer-page">
-      <Navbar2 />
+      <LogoHeader />
       
       <div className="disclaimer-container">
         <aside className="disclaimer-sidebar">

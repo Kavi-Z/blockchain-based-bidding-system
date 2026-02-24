@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './cookie-policy.css';
-import Navbar2 from '../navbar2/navbar2';
+import LogoHeader from '../LogoHeader/LogoHeader';
 import Footer from '../footer/footer';
 
 function CookiePolicy() {
@@ -49,7 +49,7 @@ function CookiePolicy() {
 
   return (
     <div className="cookie-policy-page">
-      <Navbar2 />
+      <LogoHeader />
       
       <div className="cookie-container">
         <aside className="cookie-sidebar">
