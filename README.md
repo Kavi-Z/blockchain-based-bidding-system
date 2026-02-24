@@ -1,4 +1,4 @@
-
+```mermaid
 erDiagram
     USER {
         String id PK
@@ -74,7 +74,7 @@ erDiagram
     USER ||--o{ NFT : "previously owned (previous_owner)"
     AUCTION ||--o| NFT : "associated with (auction_id)"
 
-
+```
 
 
 
