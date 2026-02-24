@@ -7,6 +7,7 @@ import img3 from '../../assets/img3.png';
 import img4 from '../../assets/img4.png';
 import img5 from '../../assets/img5.png';
 import Footer from '../footer/footer';
+import background from '../../assets/back.png';
 
 const Landing = () => {
   const [openIndex, setOpenIndex] = useState(null);
@@ -18,11 +19,9 @@ const Landing = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' });
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
-
-  // Replace this with your actual Google Apps Script Web App URL
+ 
   const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxTtvMVMOntNC_qwsnaR53Bk1M2opJiDLqd6R8EeC2laKQYwts-woLLxctNoEffC2Jn/exec';
-
-  // Validation constants
+ 
   const MAX_NAME_LENGTH = 100;
   const MAX_MESSAGE_LENGTH = 1000;
   const MIN_MESSAGE_LENGTH = 10;
@@ -31,33 +30,28 @@ const Landing = () => {
   const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
-
-  // Email validation regex
+  
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
-
-  // Sanitize input to prevent XSS attacks (don't trim during typing)
+ 
   const sanitizeInput = (input, maxLength) => {
     return input
-      .replace(/[<>]/g, '') // Remove < and > characters
+      .replace(/[<>]/g, '')  
       .substring(0, maxLength);
   };
-
-  // Validate form data
+ 
   const validateForm = () => {
     const { name, email, message } = formData;
-
-    // Name validation
+ 
     if (!name || name.trim().length === 0) {
       return { valid: false, message: 'Please enter your name.' };
     }
     if (name.length > MAX_NAME_LENGTH) {
       return { valid: false, message: `Name must be less than ${MAX_NAME_LENGTH} characters.` };
     }
-
-    // Email validation
+ 
     if (!email || email.trim().length === 0) {
       return { valid: false, message: 'Please enter your email address.' };
     }
@@ -75,8 +69,7 @@ const Landing = () => {
     if (message.length > MAX_MESSAGE_LENGTH) {
       return { valid: false, message: `Message must be less than ${MAX_MESSAGE_LENGTH} characters.` };
     }
-
-    // Check for spam patterns
+ 
     const spamPatterns = /viagra|casino|lottery|winner|click here|buy now/i;
     if (spamPatterns.test(name) || spamPatterns.test(message)) {
       return { valid: false, message: 'Your message contains prohibited content.' };
@@ -84,8 +77,7 @@ const Landing = () => {
 
     return { valid: true };
   };
-
-  // Rate limiting check
+ 
   const checkRateLimit = () => {
     const now = Date.now();
     const timeSinceLastSubmit = now - lastSubmitTime;
@@ -104,7 +96,7 @@ const Landing = () => {
       ...prev,
       [name]: sanitizedValue
     }));
-    // Clear any previous status messages when user starts typing
+   
     if (submitStatus.message) {
       setSubmitStatus({ type: '', message: '' });
     }
@@ -112,8 +104,7 @@ const Landing = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validate form data
+     
     const validation = validateForm();
     if (!validation.valid) {
       setSubmitStatus({
@@ -122,8 +113,7 @@ const Landing = () => {
       });
       return;
     }
-
-    // Check rate limiting
+ 
     const rateLimit = checkRateLimit();
     if (!rateLimit.allowed) {
       setSubmitStatus({
@@ -139,7 +129,7 @@ const Landing = () => {
     try {
       const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: 'POST',
-        mode: 'no-cors', // Google Apps Script requires no-cors mode
+        mode: 'no-cors',  
         headers: {
           'Content-Type': 'application/json',
         },
@@ -149,9 +139,7 @@ const Landing = () => {
           message: formData.message.trim()
         })
       });
-
-      // Note: With no-cors mode, we can't read the response
-      // Assume success if no error is thrown
+ 
       setSubmitStatus({
         type: 'success',
         message: 'Message sent successfully! We will get back to you soon.'
@@ -194,7 +182,9 @@ const Landing = () => {
   ];
 
   return (
-    <div id="home" className="landing-container">
+    <div id="home" className="landing-container" style ={{ backgroundImage: `url(${background})`, backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat'}}>
       <Navbar2 />
       <p className='Head-landing'>Blockchain Infrastructure</p>
       <p className='sub-landing'>for Secure Online Auctions</p>
