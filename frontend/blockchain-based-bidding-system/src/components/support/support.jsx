@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './support.css';
-import Navbar2 from '../navbar2/navbar2';
+import LogoHeader from '../LogoHeader/LogoHeader';
 import Footer from '../footer/footer';
 
 function Support() {
@@ -49,7 +49,7 @@ function Support() {
 
   return (
     <div className="support-page">
-      <Navbar2 />
+      <LogoHeader />
       
       <div className="support-container">
         <aside className="support-sidebar">

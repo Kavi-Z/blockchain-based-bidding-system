@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './community.css';
-import Navbar2 from '../navbar2/navbar2';
+import LogoHeader from '../LogoHeader/LogoHeader';
 import Footer from '../footer/footer';
 
 function Community() {
@@ -50,7 +50,7 @@ function Community() {
 
   return (
     <div className="community-page">
-      <Navbar2 />
+      <LogoHeader />
       
       <div className="community-container">
         <aside className="community-sidebar">

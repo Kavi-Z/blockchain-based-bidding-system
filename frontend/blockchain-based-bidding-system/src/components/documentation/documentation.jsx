@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './documentation.css';
-import Navbar2 from '../navbar2/navbar2';
+import LogoHeader from '../LogoHeader/LogoHeader';
 import Footer from '../footer/footer';
 
 const Documentation = () => {
@@ -26,7 +26,7 @@ const Documentation = () => {
 
   return (
     <div className="documentation-page">
-      <Navbar2 />
+      <LogoHeader />
       
       <div className="documentation-container">
         <div className="documentation-header">

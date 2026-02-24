@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './whitepaper.css';
-import Navbar2 from '../navbar2/navbar2';
+import LogoHeader from '../LogoHeader/LogoHeader';
 import Footer from '../footer/footer';
 
 const Whitepaper = () => {
@@ -24,7 +24,7 @@ const Whitepaper = () => {
 
   return (
     <div className="whitepaper-page">
-      <Navbar2 />
+      <LogoHeader />
       
       <div className="whitepaper-container">
         <div className="whitepaper-header">

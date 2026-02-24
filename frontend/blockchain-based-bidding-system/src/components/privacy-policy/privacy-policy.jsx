@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './privacy-policy.css';
-import Navbar2 from '../navbar2/navbar2';
+import LogoHeader from '../LogoHeader/LogoHeader';
 import Footer from '../footer/footer';
 
 function PrivacyPolicy() {
@@ -52,7 +52,7 @@ function PrivacyPolicy() {
 
   return (
     <div className="privacy-policy-page">
-      <Navbar2 />
+      <LogoHeader />
       
       <div className="privacy-container">
         <aside className="privacy-sidebar">

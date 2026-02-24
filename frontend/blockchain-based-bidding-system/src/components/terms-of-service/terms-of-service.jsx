@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './terms-of-service.css';
-import Navbar2 from '../navbar2/navbar2';
+import LogoHeader from '../LogoHeader/LogoHeader';
 import Footer from '../footer/footer';
 
 function TermsOfService() {
@@ -51,7 +51,7 @@ function TermsOfService() {
 
   return (
     <div className="terms-page">
-      <Navbar2 />
+      <LogoHeader />
       
       <div className="terms-container">
         <aside className="terms-sidebar">

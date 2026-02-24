@@ -1,0 +1,75 @@
+.logo-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 20px 0;
+  transition: all 0.4s ease;
+  background: transparent;
+}
+
+.logo-header.scrolled {
+  background: transparent;
+  backdrop-filter: blur(15px);
+  padding: 15px 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.logo-header-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+}
+
+.logo-header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logo-header-logo:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 15px rgba(65, 225, 227, 0.8));
+}
+
+.logo-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.logo-text {
+  font-family: "MyFont1", sans-serif;
+  font-size: 2rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #41E1E3, #32AEB0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logo-text:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 10px rgba(65, 225, 227, 0.6));
+}
+
+@media screen and (max-width: 768px) {
+  .logo-header-container {
+    padding: 0 20px;
+  }
+
+  .logo-img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .logo-text {
+    font-size: 1.5rem;
+  }
+}
