@@ -83,94 +83,107 @@ erDiagram
 
 
 
+Blockchain-Based Bidding System
+#📌 Overview
 
+The Blockchain-Based Bidding System is a decentralized auction platform integrating three major layers:
 
+🎨 Frontend built with React
 
-Blockchain‑Based Bidding System
-Overview
+⚙️ Backend built with Spring Boot
 
-The Blockchain‑Based Bidding System is a decentralized auction platform integrating three major layers:
+⛓️ On-chain functionality via Solidity smart contracts
 
-A frontend built with React
+It allows users to participate in transparent and tamper-proof auctions, leveraging blockchain technology for bid records and trust.
 
-A backend built with Spring Boot
-
-On‑chain functionality via Solidity smart contracts
-It allows users to participate in transparent and tamper‑proof auctions, leveraging the blockchain for bid records and trust.
-
-Features
+#🚀 Features
 
 User registration and authentication
 
 Creation of auction listings
 
-Placing bids that are recorded on‑chain
+Placing bids recorded on-chain
 
-Real‑time updates of highest bids
+Real-time updates of highest bids
 
 Bid history tracking
 
-Secure backend REST API for off‑chain operations
+Secure backend REST API for off-chain operations
 
 Smart contract logic enforcing auction rules
 
-Technology Stack
+🛠️ Technology Stack
 Layer	Technology
 Frontend	React.js (JavaScript, HTML, CSS)
 Backend	Spring Boot (Java, REST API)
-Smart Contract	Solidity, Ethereum‑compatible network
-Database	(Optional) PostgreSQL / MongoDB for user and auction data
-Tools	Node.js/npm, Web3.js or Ethers.js, Truffle or Hardhat, MetaMask
-Repository Structure
-blockchain‑based‑bidding‑system/
-├─ frontend/        # React application
-├─ backend/         # Spring Boot application
-├─ smart‑contract/  # Solidity smart contracts
-└─ README.md        # Project overview and setup
+Smart Contract	Solidity, Ethereum-compatible network
+Database (Optional)	PostgreSQL / MongoDB
+Tools	Node.js, npm, Web3.js or Ethers.js, Truffle or Hardhat, MetaMask
+#📁 Repository Structure
+blockchain-based-bidding-system/
+├── frontend/         # React application
+├── backend/          # Spring Boot application
+├── smart-contract/   # Solidity smart contracts
+└── README.md         # Project overview and setup
+⚙️ Getting Started
+#✅ Prerequisites
 
-Getting Started
-Prerequisites
+Make sure you have installed:
 
 Node.js & npm
 
-Java 11 + and Maven
+Java 11+
 
-Ethereum‑compatible environment (e.g., Ganache, Testnet)
+Maven
+
+Ethereum-compatible environment (Ganache or Testnet)
 
 MetaMask browser extension
 
-Setup & Run
-
-Clone the repo
-
+#🧩 Setup & Run
+1️⃣ Clone the Repository
 git clone https://github.com/Kavi-Z/blockchain-based-bidding-system.git
 cd blockchain-based-bidding-system
-
-
-Backend
-
+🔧 Backend Setup (Spring Boot)
 cd backend
 mvn clean install
-mvn spring‑boot:run
+mvn spring-boot:run
 
+Backend will start typically at:
 
-Frontend
-
+http://localhost:8080
+🎨 Frontend Setup (React)
 cd ../frontend
 npm install
 npm start
 
+Frontend will start at:
 
-Smart Contract Deployment
-
-cd ../smart‑contract
+http://localhost:3000
+#⛓️ Smart Contract Deployment
+Using Truffle
+cd ../smart-contract
 truffle migrate --network development
+OR Using Hardhat
+npx hardhat run scripts/deploy.js --network localhost
+#🔗 Connect Everything
 
+Configure React to use Web3.js or Ethers.js
 
-(or use Hardhat scripts: npx hardhat run scripts/deploy.js --network localhost)
+Update the deployed contract address in the frontend
 
-Connect Everything
+Ensure backend API URLs are correctly configured in the frontend
 
-Configure React to use Web3/Ethers and point it to the deployed contracts.
+Make sure MetaMask is connected to the correct network (Ganache/Testnet)
 
-Ensure backend URLs are correctly configured in the frontend.
+#🔐 How It Works
+
+User registers/login via backend
+
+Auctions are created and stored (off-chain)
+
+Bids are placed through smart contracts (on-chain)
+
+Blockchain ensures transparency and tamper-proof bidding
+
+Frontend reflects real-time updates
