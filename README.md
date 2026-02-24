@@ -83,107 +83,94 @@ erDiagram
 
 
 
-Blockchain-Based Bidding System
-#📌 Overview
+# Documentation
+# Blockchain-Based Bidding System
 
-The Blockchain-Based Bidding System is a decentralized auction platform integrating three major layers:
+## Project Overview
+The Blockchain-Based Bidding System is a decentralized auction platform designed to ensure transparent, secure, and tamper-proof bidding using blockchain technology. The system integrates a web-based frontend, a backend REST API, and Ethereum smart contracts to provide a trustworthy auction environment.
 
-🎨 Frontend built with React
+## Main Features
 
-⚙️ Backend built with Spring Boot
+### User Registration and Authentication
+- Users can securely register and log in
+- Only authenticated users can create auctions and place bids
+- Backend manages user verification and access control
 
-⛓️ On-chain functionality via Solidity smart contracts
+### Auction Creation
+- Users can create auction listings
+- Includes item name, description, starting price, and deadline
+- Auction details are stored securely in the backend
 
-It allows users to participate in transparent and tamper-proof auctions, leveraging blockchain technology for bid records and trust.
+### Bidding System
+- Users can place bids on active auctions
+- Bids are recorded on the blockchain
+- Ensures transparency and immutability of bid data
 
-#🚀 Features
+### Real-Time Highest Bid Tracking
+- Displays the current highest bid
+- Automatically updates when a new highest bid is placed
 
-User registration and authentication
+### Bid History
+- Maintains complete bid records
+- Allows users to track all bidding activities
 
-Creation of auction listings
+### Smart Contract Enforcement
+- Auction rules are enforced automatically through smart contracts
+- Prevents invalid or lower bids
+- Ensures fair winner selection
 
-Placing bids recorded on-chain
+## User Roles
+- Registered users can:
+  - Create auction listings
+  - Place bids
+  - View auction details
+  - View bid history
+  - Interact securely with the system
 
-Real-time updates of highest bids
+## Technologies Used
+- React.js
+- Spring Boot
+- Solidity
+- Ethereum-compatible network (Ganache/Testnet)
+- Web3.js or Ethers.js
+- Node.js and npm
+- PostgreSQL or MongoDB (optional)
 
-Bid history tracking
+## Database and Blockchain
 
-Secure backend REST API for off-chain operations
+### Backend Database
+- Stores user information
+- Stores auction details
+- Stores off-chain auction metadata
+- Manages auction status
 
-Smart contract logic enforcing auction rules
+### Blockchain (Ethereum)
+- Stores bid transactions
+- Executes smart contract logic
+- Ensures transparency and data immutability
 
-🛠️ Technology Stack
-Layer	Technology
-Frontend	React.js (JavaScript, HTML, CSS)
-Backend	Spring Boot (Java, REST API)
-Smart Contract	Solidity, Ethereum-compatible network
-Database (Optional)	PostgreSQL / MongoDB
-Tools	Node.js, npm, Web3.js or Ethers.js, Truffle or Hardhat, MetaMask
-#📁 Repository Structure
-blockchain-based-bidding-system/
-├── frontend/         # React application
-├── backend/          # Spring Boot application
-├── smart-contract/   # Solidity smart contracts
-└── README.md         # Project overview and setup
-⚙️ Getting Started
-#✅ Prerequisites
+## Application Workflow
+1. User registers or logs in
+2. User creates an auction listing
+3. Other users view auction details
+4. Users place bids through the smart contract
+5. Blockchain records and validates bids
+6. Highest bidder wins after auction deadline
+7. Auction status is updated
 
-Make sure you have installed:
+## Security
+- Secure authentication using backend services
+- Smart contract validation for bid integrity
+- Blockchain ensures tamper-proof records
+- Proper API security mechanisms
 
-Node.js & npm
+## Future Improvements
+- Real-time bid notifications
+- Wallet-based authentication (MetaMask login)
+- Auction countdown timer
+- Admin dashboard
+- Deployment to public Ethereum testnet
+- Integration with IPFS for decentralized storage
 
-Java 11+
-
-Maven
-
-Ethereum-compatible environment (Ganache or Testnet)
-
-MetaMask browser extension
-
-#🧩 Setup & Run
-1️⃣ Clone the Repository
-git clone https://github.com/Kavi-Z/blockchain-based-bidding-system.git
-cd blockchain-based-bidding-system
-🔧 Backend Setup (Spring Boot)
-cd backend
-mvn clean install
-mvn spring-boot:run
-
-Backend will start typically at:
-
-http://localhost:8080
-🎨 Frontend Setup (React)
-cd ../frontend
-npm install
-npm start
-
-Frontend will start at:
-
-http://localhost:3000
-#⛓️ Smart Contract Deployment
-Using Truffle
-cd ../smart-contract
-truffle migrate --network development
-OR Using Hardhat
-npx hardhat run scripts/deploy.js --network localhost
-#🔗 Connect Everything
-
-Configure React to use Web3.js or Ethers.js
-
-Update the deployed contract address in the frontend
-
-Ensure backend API URLs are correctly configured in the frontend
-
-Make sure MetaMask is connected to the correct network (Ganache/Testnet)
-
-#🔐 How It Works
-
-User registers/login via backend
-
-Auctions are created and stored (off-chain)
-
-Bids are placed through smart contracts (on-chain)
-
-Blockchain ensures transparency and tamper-proof bidding
-
-Frontend reflects real-time updates
+## License
+This project is developed for educational purposes and is free to use and modify.
