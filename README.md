@@ -136,6 +136,19 @@ The Blockchain-Based Bidding System is a decentralized auction platform designed
 - Node.js and npm
 - PostgreSQL or MongoDB (optional)
 
+##AI Chatbot (RAG-Based Assistant)
+
+-Developed using a Retrieval-Augmented Generation (RAG) architecture to provide intelligent and domain-specific responses.
+-Designed to answer user queries related to the Blockchain-Based Bidding System using internal knowledge files.
+-Built with Python and LangChain to manage document ingestion, chunking, embedding, and retrieval.
+-Uses Google Gemini (Generative AI API) as the Large Language Model (LLM) for response generation.
+-Stores document embeddings in ChromaDB to enable fast and accurate semantic search.
+-Splits large documents into smaller overlapping chunks for improved contextual understanding.
+-Retrieves the most relevant document chunks before generating responses to reduce hallucination.
+-Exposes REST API endpoints using FastAPI for seamless integration with the frontend.
+-Secures API keys and sensitive data using environment variables (.env).
+-Designed as a modular AI microservice that can be extended with PDF/DOCX support in the future.
+
 ## Database and Blockchain
 
 ### Backend Database
