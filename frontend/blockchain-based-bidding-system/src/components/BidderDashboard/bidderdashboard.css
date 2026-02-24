@@ -1,23 +1,23 @@
 /* ============================================
-   DARK PURPLE & BLACK THEME - Bidder Dashboard
+   DARK CYAN & BLACK THEME - Bidder Dashboard
    ============================================ */
 
 :root {
   --bg-primary: #0a0a0f;
-  --bg-secondary: #11111a;
-  --bg-card: #16161f;
-  --bg-card-hover: #1c1c28;
-  --bg-input: #1a1a26;
-  --purple-primary: #7c3aed;
-  --purple-secondary: #9d4edd;
-  --purple-light: #a855f7;
-  --purple-glow: rgba(124, 58, 237, 0.4);
-  --purple-subtle: rgba(124, 58, 237, 0.1);
-  --purple-border: rgba(124, 58, 237, 0.3);
-  --text-primary: #f0e6ff;
-  --text-secondary: #a78fc4;
-  --text-muted: #6b5a80;
-  --border-color: rgba(124, 58, 237, 0.2);
+  --bg-secondary: #0a0f11;
+  --bg-card: #0e1618;
+  --bg-card-hover: #121e21;
+  --bg-input: #0f1a1c;
+  --cyan-primary: #41E1E3;
+  --cyan-secondary: #2bc8ca;
+  --cyan-light: #6eeced;
+  --cyan-glow: rgba(65, 225, 227, 0.35);
+  --cyan-subtle: rgba(65, 225, 227, 0.08);
+  --cyan-border: rgba(65, 225, 227, 0.25);
+  --text-primary: #e0f7f7;
+  --text-secondary: #7ab8ba;
+  --text-muted: #456b6d;
+  --border-color: rgba(65, 225, 227, 0.15);
   --success: #22c55e;
   --success-glow: rgba(34, 197, 94, 0.3);
   --error-bg: rgba(239, 68, 68, 0.15);
@@ -31,7 +31,7 @@
 /* ===== CONTAINER ===== */
 .bidder-dashboard-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0a0f 0%, #110a1a 50%, #0d0a14 100%);
+  background: linear-gradient(135deg, #0a0a0f 0%, #080f10 50%, #0a0d0f 100%);
   padding: 40px 20px;
 }
 
@@ -47,12 +47,12 @@
   margin: 0;
   margin-bottom: 10px;
   font-weight: 700;
-  background: linear-gradient(135deg, #c084fc 0%, #a855f7 50%, #7c3aed 100%);
+  background: linear-gradient(135deg, #a8f5f6 0%, #41E1E3 50%, #2bc8ca 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-shadow: none;
-  filter: drop-shadow(0 0 20px var(--purple-glow));
+  filter: drop-shadow(0 0 20px var(--cyan-glow));
 }
 
 .bidder-dashboard-header p {
@@ -116,20 +116,22 @@
 
 .btn-connect-wallet {
   padding: 12px 30px;
-  background: linear-gradient(135deg, var(--purple-primary) 0%, var(--purple-secondary) 100%);
-  color: white;
-  border: none;
+  background: transparent;
+  color: var(--cyan-primary);
+  border: 2px solid var(--cyan-primary);
   border-radius: 10px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 0 20px var(--purple-glow);
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s, color 0.2s;
+  box-shadow: 0 0 16px var(--cyan-glow);
 }
 
 .btn-connect-wallet:hover {
+  background: var(--cyan-primary);
+  color: #0a0a0f;
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px var(--purple-glow);
+  box-shadow: 0 10px 30px var(--cyan-glow);
 }
 
 .btn-connect-wallet:active {
@@ -146,7 +148,7 @@
   color: var(--text-primary);
   font-size: 1.8rem;
   margin-bottom: 30px;
-  text-shadow: 0 0 20px var(--purple-glow);
+  text-shadow: 0 0 20px var(--cyan-glow);
 }
 
 .loading,
@@ -180,14 +182,14 @@
 
 .auction-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px var(--purple-glow);
-  border-color: var(--purple-primary);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px var(--cyan-glow);
+  border-color: var(--cyan-primary);
   background: var(--bg-card-hover);
 }
 
 .auction-card.selected {
-  border: 3px solid var(--purple-primary);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 40px var(--purple-glow);
+  border: 3px solid var(--cyan-primary);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 40px var(--cyan-glow);
 }
 
 /* ===== AUCTION IMAGE ===== */
@@ -210,12 +212,12 @@
   top: 10px;
   right: 10px;
   background-color: rgba(0, 0, 0, 0.8);
-  color: var(--purple-light);
+  color: var(--cyan-light);
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
-  border: 1px solid var(--purple-border);
+  border: 1px solid var(--cyan-border);
   backdrop-filter: blur(6px);
 }
 
@@ -260,7 +262,7 @@
 }
 
 .bid-row strong {
-  color: var(--purple-light);
+  color: var(--cyan-primary);
   font-weight: 700;
 }
 
@@ -275,7 +277,7 @@
 .bid-input {
   flex: 1;
   padding: 10px;
-  border: 2px solid var(--purple-border);
+  border: 2px solid var(--cyan-border);
   border-radius: 8px;
   font-size: 0.9rem;
   font-weight: 600;
@@ -290,8 +292,8 @@
 
 .bid-input:focus {
   outline: none;
-  border-color: var(--purple-primary);
-  box-shadow: 0 0 12px var(--purple-glow);
+  border-color: var(--cyan-primary);
+  box-shadow: 0 0 12px var(--cyan-glow);
 }
 
 .btn-place-bid {
@@ -313,7 +315,7 @@
 }
 
 .btn-place-bid:disabled {
-  background: #2a2a3a;
+  background: #111a1c;
   color: var(--text-muted);
   cursor: not-allowed;
 }
@@ -329,9 +331,9 @@
 
 .btn-secondary {
   padding: 12px 24px;
-  background-color: var(--purple-subtle);
-  color: var(--text-primary);
-  border: 2px solid var(--purple-border);
+  background-color: var(--cyan-subtle);
+  color: var(--cyan-primary);
+  border: 2px solid var(--cyan-border);
   border-radius: 10px;
   font-weight: 600;
   font-size: 1rem;
@@ -340,10 +342,10 @@
 }
 
 .btn-secondary:hover {
-  background-color: var(--purple-primary);
-  color: white;
-  border-color: var(--purple-primary);
-  box-shadow: 0 0 20px var(--purple-glow);
+  background-color: var(--cyan-primary);
+  color: #0a0a0f;
+  border-color: var(--cyan-primary);
+  box-shadow: 0 0 20px var(--cyan-glow);
 }
 
 /* ===== TAB NAVIGATION ===== */
@@ -357,8 +359,8 @@
 
 .tab-button {
   padding: 0.75rem 1.5rem;
-  border: 2px solid var(--purple-border);
-  background: var(--purple-subtle);
+  border: 2px solid var(--cyan-border);
+  background: var(--cyan-subtle);
   color: var(--text-secondary);
   border-radius: 0.5rem;
   font-size: 1rem;
@@ -368,16 +370,17 @@
 }
 
 .tab-button:hover {
-  background: rgba(124, 58, 237, 0.2);
-  border-color: var(--purple-secondary);
+  background: rgba(65, 225, 227, 0.15);
+  border-color: var(--cyan-secondary);
   color: var(--text-primary);
 }
 
 .tab-button.active {
-  background: linear-gradient(135deg, var(--purple-primary) 0%, var(--purple-secondary) 100%);
-  color: white;
-  border-color: var(--purple-primary);
-  box-shadow: 0 4px 20px var(--purple-glow);
+  background: var(--cyan-primary);
+  color: #0a0a0f;
+  border-color: var(--cyan-primary);
+  box-shadow: 0 4px 20px var(--cyan-glow);
+  font-weight: 700;
 }
 
 /* ===== OWNED NFTs SECTION ===== */
@@ -391,7 +394,7 @@
   font-size: 1.8rem;
   margin-bottom: 2rem;
   text-align: center;
-  text-shadow: 0 0 20px var(--purple-glow);
+  text-shadow: 0 0 20px var(--cyan-glow);
 }
 
 .nfts-grid {
@@ -411,8 +414,8 @@
 
 .nft-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px var(--purple-glow);
-  border-color: var(--purple-primary);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px var(--cyan-glow);
+  border-color: var(--cyan-primary);
 }
 
 .nft-image {
@@ -433,13 +436,13 @@
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: linear-gradient(135deg, var(--purple-primary) 0%, var(--purple-secondary) 100%);
-  color: white;
+  background: var(--cyan-primary);
+  color: #0a0a0f;
   padding: 0.5rem 1rem;
   border-radius: 2rem;
   font-size: 0.8rem;
-  font-weight: 600;
-  box-shadow: 0 4px 12px var(--purple-glow);
+  font-weight: 700;
+  box-shadow: 0 4px 12px var(--cyan-glow);
 }
 
 .nft-details {
@@ -487,23 +490,23 @@
 .info-row code {
   font-family: monospace;
   background: var(--bg-input);
-  color: var(--purple-light);
+  color: var(--cyan-primary);
   padding: 0.2rem 0.5rem;
   border-radius: 0.25rem;
   font-size: 0.85rem;
-  border: 1px solid var(--purple-border);
+  border: 1px solid var(--cyan-border);
 }
 
 .auction-link {
   cursor: pointer;
-  color: var(--purple-light);
+  color: var(--cyan-primary);
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .auction-link:hover {
-  color: #c084fc;
-  text-shadow: 0 0 8px var(--purple-glow);
+  color: var(--cyan-light);
+  text-shadow: 0 0 8px var(--cyan-glow);
 }
 
 .nft-actions {
@@ -524,18 +527,21 @@
 }
 
 .btn-view-details {
-  background: linear-gradient(135deg, var(--purple-primary) 0%, var(--purple-secondary) 100%);
-  color: white;
+  background: transparent;
+  color: var(--cyan-primary);
+  border: 2px solid var(--cyan-primary);
   box-shadow: 0 0 0 transparent;
 }
 
 .btn-view-details:hover {
+  background: var(--cyan-primary);
+  color: #0a0a0f;
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px var(--purple-glow);
+  box-shadow: 0 6px 18px var(--cyan-glow);
 }
 
 .btn-transfer-soon {
-  background: #1e1e2e;
+  background: #0e1618;
   color: var(--text-muted);
   border: 1px solid var(--border-color);
   cursor: not-allowed;
@@ -564,7 +570,7 @@
   border: 1px solid var(--border-color);
   padding: 30px;
   border-radius: 14px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 40px rgba(124, 58, 237, 0.05);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 40px rgba(65, 225, 227, 0.04);
 }
 
 .won-auctions-section h2 {
