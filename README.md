@@ -69,10 +69,11 @@ erDiagram
     USER ||--o{ AUCTION : "creates (seller_id)"
     USER ||--o{ AUCTION : "leads as highest bidder (highest_bidder_id)"
     USER ||--o{ BID : "places (bidder_id)"
+    AUCTION ||--o| NFT : "associated with (auction_id)"
     AUCTION ||--o{ BID : "receives (auction_id)"
     USER ||--o{ NFT : "currently owns (current_owner)"
     USER ||--o{ NFT : "previously owned (previous_owner)"
-    AUCTION ||--o| NFT : "associated with (auction_id)"
+  
 
 ```
 
