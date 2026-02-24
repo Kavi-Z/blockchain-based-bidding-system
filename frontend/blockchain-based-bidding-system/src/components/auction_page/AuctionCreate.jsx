@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
 import SecureAuction from "./SecureAuction.json";
-import imagenew from "../../assets/imagenew.jpg";
+import image11 from "../../assets/image11.jpg";
 import "./auction_create.css";
 
 const AuctionCreate = () => {
@@ -723,7 +723,7 @@ const AuctionCreate = () => {
 
         <div
           className="auction-create-image"
-          style={{ backgroundImage: `url(${imagenew})` }}
+          style={{ backgroundImage: `url(${image11})` }}
         ></div>
       </div>
     </div>
