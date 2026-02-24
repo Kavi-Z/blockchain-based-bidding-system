@@ -1,3 +1,90 @@
+
+erDiagram
+    USER {
+        String id PK
+        String email "Unique, Indexed"
+        String password
+        String role "bidder or seller"
+        String wallet_address "Unique, Indexed"
+        String username
+        String profile_image
+        LocalDateTime created_at
+        LocalDateTime updated_at
+        Boolean is_active
+    }
+
+    AUCTION {
+        String id PK
+        String item_name "3-100 chars"
+        String description "10-1000 chars"
+        String image_url
+        String seller_id FK "Indexed"
+        String seller_username
+        String owner_address "blockchain"
+        String contract_address "blockchain"
+        String transaction_hash "blockchain"
+        Long block_number "blockchain"
+        Integer bidding_time "minutes, 1-10080"
+        Double min_increment ">=0.01"
+        Integer extension_time "minutes, 0-120"
+        Double max_bid "optional"
+        Double starting_price ">=0.01"
+        Double current_highest_bid
+        String highest_bidder_id FK
+        String highest_bidder_username
+        LocalDateTime start_time
+        LocalDateTime end_time
+        String status "Indexed: ACTIVE/CLOSED/CANCELLED"
+    }
+
+    BID {
+        String id PK
+        String auction_id FK
+        String bidder_id FK
+        String bidder_username
+        String bidder_profile_image
+        String wallet_address
+        String bid_amount
+        String transaction_hash "blockchain"
+        Long block_number "blockchain"
+        LocalDateTime timestamp
+        LocalDateTime created_at
+    }
+
+    NFT {
+        String id PK
+        String name
+        String image_url
+        String current_owner FK
+        String previous_owner FK
+        String auction_id FK
+        String status "OWNED/IN_AUCTION/TRANSFERRED"
+        String token_id
+        String description
+        LocalDateTime created_at
+        LocalDateTime updated_at
+        LocalDateTime acquired_at
+    }
+
+    USER ||--o{ AUCTION : "creates (seller_id)"
+    USER ||--o{ AUCTION : "leads as highest bidder (highest_bidder_id)"
+    USER ||--o{ BID : "places (bidder_id)"
+    AUCTION ||--o{ BID : "receives (auction_id)"
+    USER ||--o{ NFT : "currently owns (current_owner)"
+    USER ||--o{ NFT : "previously owned (previous_owner)"
+    AUCTION ||--o| NFT : "associated with (auction_id)"
+
+
+
+
+
+
+
+
+
+
+
+
 Blockchain‑Based Bidding System
 Overview
 
