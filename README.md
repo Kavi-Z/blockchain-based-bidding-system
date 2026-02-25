@@ -147,6 +147,7 @@ The Blockchain-Based Bidding System is a decentralized auction platform designed
 -Retrieves the most relevant document chunks before generating responses to reduce hallucination.
 -Exposes REST API endpoints using FastAPI for seamless integration with the frontend.
 -Designed as a modular AI microservice that can be extended with PDF/DOCX support in the future.
+-Future enhancement - Blockchain Wallet Integration – Enable MetaMask-based authentication for secure, wallet-verified chatbot access,Live Smart Contract Interaction – Allow the chatbot to fetch real-time bidding data directly from deployed smart contracts.
 
 ## Database and Blockchain
 
