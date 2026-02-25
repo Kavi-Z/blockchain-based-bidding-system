@@ -136,7 +136,7 @@ The Blockchain-Based Bidding System is a decentralized auction platform designed
 - Node.js and npm
 - PostgreSQL or MongoDB (optional)
 
-##AI Chatbot (RAG-Based Assistant)
+## AI Chatbot (RAG-Based Assistant)
 
 -Developed using a Retrieval-Augmented Generation (RAG) architecture to provide intelligent and domain-specific responses.
 -Designed to answer user queries related to the Blockchain-Based Bidding System using internal knowledge files.
