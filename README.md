@@ -146,7 +146,6 @@ The Blockchain-Based Bidding System is a decentralized auction platform designed
 -Splits large documents into smaller overlapping chunks for improved contextual understanding.
 -Retrieves the most relevant document chunks before generating responses to reduce hallucination.
 -Exposes REST API endpoints using FastAPI for seamless integration with the frontend.
--Secures API keys and sensitive data using environment variables (.env).
 -Designed as a modular AI microservice that can be extended with PDF/DOCX support in the future.
 
 ## Database and Blockchain
