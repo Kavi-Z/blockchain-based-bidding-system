@@ -54,6 +54,7 @@
   transition: all 0.3s ease;
   text-align: left;
   width: 100%;
+  font-family: "Poppins", sans-serif;
 }
 
 .sidebar-link:hover {
@@ -96,6 +97,7 @@
 .header-subtitle {
   font-size: 1.2rem;
   color: rgba(255, 255, 255, 0.7);
+  font-family: "Poppins", sans-serif;
 }
 
 .support-section {
@@ -110,6 +112,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  font-family: "Poppins", sans-serif;
 }
 
 .intro-text {
@@ -117,6 +120,7 @@
   line-height: 1.8;
   color: rgba(255, 255, 255, 0.85);
   margin-bottom: 40px;
+  font-family: "Poppins", sans-serif;
 }
 
 /* Support Channels */
@@ -150,12 +154,14 @@
   font-size: 1.3rem;
   margin-bottom: 12px;
   color: #ffffff;
+  font-family: "Poppins", sans-serif;
 }
 
 .channel-card p {
   color: rgba(255, 255, 255, 0.7);
   margin-bottom: 16px;
   line-height: 1.6;
+  font-family: "Poppins", sans-serif;
 }
 
 .availability {
