@@ -75,7 +75,7 @@ select {
   opacity: 0.75;
   margin: 0;
   color: var(--text-secondary);
-  font-family: "MyFont1", sans-serif;
+  font-family: "Popins", sans-serif;
 }
 
 /* ===== ALERTS ===== */
@@ -166,7 +166,7 @@ select {
 .auctions-section h2 {
   color: var(--text-primary);
   font-size: 1.8rem;
-  font-family: "MyFont1", sans-serif;
+  font-family: "Poppins", sans-serif;
   margin-bottom: 30px;
   text-shadow: 0 0 20px var(--cyan-glow);
 }
@@ -180,7 +180,7 @@ select {
   border: 1px solid var(--border-color);
   border-radius: 14px;
   font-size: 1.1rem;
-  font-family: "MyFont1", sans-serif;
+  font-family: "Poppins", sans-serif;
   backdrop-filter: blur(8px);
 }
 
@@ -238,7 +238,7 @@ select {
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
-  font-family: "MyFont1", sans-serif;
+  font-family: "Poppins", sans-serif;
   border: 1px solid var(--cyan-border);
   backdrop-filter: blur(6px);
 }
@@ -256,14 +256,16 @@ select {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  
 }
 
 .description {
   color: var(--text-muted);
   font-size: 0.9rem;
-  font-family: "MyFont1", sans-serif;
+  font-family: "Poppins", sans-serif;
   margin: 0 0 15px;
   line-height: 1.4;
+  
 }
 
 .bid-info {
@@ -277,26 +279,29 @@ select {
   display: flex;
   justify-content: space-between;
   font-size: 0.9rem;
-  font-family: "MyFont1", sans-serif;
+  font-family: "Poppins", sans-serif;
   color: var(--text-secondary);
+  
 }
 
 .bid-row span:first-child {
   font-weight: 600;
-  color: var(--text-secondary);
+  color: black;
+  
 }
 
 .bid-row strong {
-  color: var(--cyan-primary);
+  color: black;
   font-weight: 700;
+  
 }
-
-/* ===== BID INPUT SECTION ===== */
+ 
 .bid-input-section {
   padding-top: 15px;
   border-top: 1px solid var(--border-color);
   display: flex;
   gap: 8px;
+  color: black;
 }
 
 .bid-input {
@@ -306,7 +311,7 @@ select {
   border-radius: 8px;
   font-size: 0.9rem;
   font-weight: 600;
-  font-family: "MyFont1", sans-serif;
+  font-family: "Poppins", sans-serif;
   background: var(--bg-input);
   color: var(--text-primary);
   transition: border-color 0.2s, box-shadow 0.2s;
@@ -314,7 +319,7 @@ select {
 
 .bid-input::placeholder {
   color: var(--text-muted);
-  font-family: "MyFont1", sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 .bid-input:focus {
@@ -447,6 +452,7 @@ select {
   transform: translateY(-8px);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px var(--cyan-glow);
   border-color: var(--cyan-primary);
+  
 }
 
 .nft-image {
@@ -479,6 +485,7 @@ select {
 
 .nft-details {
   padding: 1.5rem;
+  
 }
 
 .nft-details h3 {
@@ -724,7 +731,7 @@ select {
 }
 
 .bid-row strong {
-  color: var(--text-primary);
+  color: #1e40af;
   font-weight: 700;
 }
 
@@ -780,6 +787,7 @@ select {
 
   .auction-details {
     padding: 15px;
+    background-color: #080f10;
   }
 
   .dashboard-links {
