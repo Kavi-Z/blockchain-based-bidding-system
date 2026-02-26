@@ -37,6 +37,7 @@
   max-width: 700px;
   margin: 0 auto;
   line-height: 1.6;
+  font-family: "Poppins", sans-serif;
 }
 
 .documentation-layout {
@@ -84,7 +85,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 1rem;
-  font-family: inherit;
+  font-family: "Poppins", sans-serif;
   width: 100%;
 }
 
@@ -139,6 +140,7 @@
   color: rgb(200, 199, 197);
   font-size: 1.1rem;
   line-height: 1.8;
+  font-family: "Poppins", sans-serif;
 }
 
 .section-content p {
@@ -196,6 +198,7 @@
   color: rgb(180, 179, 177);
   font-size: 0.95rem;
   margin: 0;
+  font-family: "Poppins", sans-serif;
 }
 
 /* Lists */

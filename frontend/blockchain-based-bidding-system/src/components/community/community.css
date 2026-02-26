@@ -54,6 +54,7 @@
   transition: all 0.3s ease;
   text-align: left;
   width: 100%;
+  font-family: "Poppins", sans-serif;
 }
 
 .sidebar-link:hover {
@@ -98,6 +99,7 @@
   color: rgba(255, 255, 255, 0.7);
   max-width: 800px;
   margin: 0 auto;
+  font-family: "Poppins", sans-serif;
 }
 
 .community-section {
@@ -112,6 +114,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  font-family: "Poppins", sans-serif;
 }
 
 .section-intro {
@@ -119,6 +122,7 @@
   color: rgba(255, 255, 255, 0.8);
   margin-bottom: 32px;
   line-height: 1.6;
+  font-family: "Poppins", sans-serif;
 }
 
 /* Overview Section */
@@ -127,6 +131,7 @@
   line-height: 1.8;
   color: rgba(255, 255, 255, 0.85);
   margin-bottom: 40px;
+  font-family: "Poppins", sans-serif;
 }
 
 .stats-grid {
@@ -160,6 +165,7 @@
 .stat-label {
   font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.7);
+  font-family: "Poppins", sans-serif;
 }
 
 .community-values h3 {
@@ -197,6 +203,7 @@
   font-size: 1.2rem;
   margin-bottom: 12px;
   color: #ffffff;
+  font-family: "Poppins", sans-serif;
 }
 
 .value-item p {

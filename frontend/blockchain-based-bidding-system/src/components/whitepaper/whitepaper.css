@@ -37,6 +37,7 @@
   max-width: 800px;
   margin: 0 auto 30px;
   line-height: 1.6;
+  font-family: "Poppins", sans-serif;
 }
 
 .whitepaper-meta {
@@ -93,7 +94,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 1rem;
-  font-family: inherit;
+  font-family: "Poppins", sans-serif;
   width: 100%;
 }
 
@@ -148,6 +149,7 @@
   color: rgb(200, 199, 197);
   font-size: 1.15rem;
   line-height: 1.9;
+  font-family: "Poppins", sans-serif;
 }
 
 .section-content p {

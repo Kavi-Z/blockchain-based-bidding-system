@@ -54,6 +54,7 @@
   transition: all 0.3s ease;
   text-align: left;
   width: 100%;
+  font-family: "Poppins", sans-serif;
 }
 
 .sidebar-link:hover {
@@ -96,6 +97,7 @@
 .header-subtitle {
   font-size: 1.1rem;
   color: rgba(255, 255, 255, 0.6);
+  font-family: "Poppins", sans-serif;
 }
 
 .cookie-section {
@@ -110,6 +112,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  font-family: "Poppins", sans-serif;
 }
 
 .section-content {
@@ -120,6 +123,7 @@
   color: rgba(255, 255, 255, 0.85);
   margin-bottom: 20px;
   font-size: 1.05rem;
+  font-family: "Poppins", sans-serif;
 }
 
 .section-content a {
@@ -150,6 +154,7 @@
 .highlight-box ul {
   margin: 0 0 0 24px;
   color: rgba(255, 255, 255, 0.8);
+  font-family: "Poppins", sans-serif;
 }
 
 .highlight-box ul li {
@@ -187,12 +192,14 @@
   color: #ffffff;
   font-size: 1.2rem;
   margin-bottom: 12px;
+  font-family: "Poppins", sans-serif;
 }
 
 .cookie-type-card p {
   color: rgba(255, 255, 255, 0.7);
   margin: 0;
   line-height: 1.6;
+  font-family: "Poppins", sans-serif;
 }
 
 /* Cookie Categories */
