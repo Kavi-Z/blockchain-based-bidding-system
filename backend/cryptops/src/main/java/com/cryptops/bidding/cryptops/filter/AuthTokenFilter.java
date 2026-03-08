@@ -30,7 +30,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             if (userId != null && !userId.isEmpty()) {
                 request.setAttribute("userId", userId);
                 request.setAttribute("authenticated", true);
-                // Create a basic Authentication so Spring Security treats this request as authenticated
+             
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                         userId,
                         null,

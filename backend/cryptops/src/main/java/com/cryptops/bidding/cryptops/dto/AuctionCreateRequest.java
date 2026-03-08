@@ -19,7 +19,7 @@ public class AuctionCreateRequest {
     @NotNull(message = "Bidding time is required")
     @Min(value = 1, message = "Bidding time must be at least 1 minute")
     @Max(value = 10080, message = "Bidding time cannot exceed 7 days (10080 minutes)")
-    private Integer biddingTime; // in minutes
+    private Integer biddingTime; 
 
     @NotNull(message = "Minimum increment is required")
     @DecimalMin(value = "0.01", message = "Minimum increment must be greater than 0")
@@ -28,17 +28,16 @@ public class AuctionCreateRequest {
     @NotNull(message = "Extension time is required")
     @Min(value = 0, message = "Extension time cannot be negative")
     @Max(value = 120, message = "Extension time cannot exceed 120 minutes")
-    private Integer extensionTime; // in minutes
+    private Integer extensionTime;  
 
     @DecimalMin(value = "0.0", message = "Max bid cannot be negative")
-    private Double maxBid; // optional
+    private Double maxBid;  
 
     @NotBlank(message = "Seller ID is required")
     private String sellerId;
 
-    private String imageCID; // IPFS CID from Pinata
-
-    // Blockchain Info
+    private String imageCID;  
+ 
     private String sellerWalletAddress;
     private String contractAddress;
     private String transactionHash;

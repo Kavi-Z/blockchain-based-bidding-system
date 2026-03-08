@@ -608,8 +608,7 @@ const AuctionCreate = () => {
                 required
               />
             </div>
-
-            {/* Bidding Time */}
+ 
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="biddingTime">Bidding Duration (minutes) *</label>

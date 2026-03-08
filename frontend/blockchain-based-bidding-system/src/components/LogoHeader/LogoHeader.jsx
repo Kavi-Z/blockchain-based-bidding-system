@@ -13,7 +13,7 @@ const LogoHeader = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleLogoClick = () => {
+  const handleLogoClick = () => { //pr,finance,logis
     navigate('/');
   };
 
