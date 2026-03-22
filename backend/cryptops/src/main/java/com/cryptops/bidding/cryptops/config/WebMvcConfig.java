@@ -8,10 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * Web MVC configuration
- * Configures static resource handlers for serving uploaded images with CORS support
- */
+ 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 

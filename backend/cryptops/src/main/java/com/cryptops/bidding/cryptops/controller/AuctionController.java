@@ -135,21 +135,17 @@ public class AuctionController {
         }
     }
 
-    /**
-     * Get auctions by seller ID
-     */
+
     @GetMapping("/seller/{sellerId}")
     public ResponseEntity<?> getSellerAuctions(@PathVariable("sellerId") String sellerId,
                                                HttpServletRequest httpRequest) {
-        try {
-            // Optional: Verify the requesting user is the seller (for privacy)
+        try { 
             String userId = (String) httpRequest.getAttribute("userId");
             if (userId != null && !userId.equals(sellerId)) {
                 logger.warning("User " + userId + " tried to access seller " + sellerId + "'s auctions");
-                // Note: You can make this stricter if needed - for now allow it
+       
             }
-
-            // Validate sellerId format
+ 
             if (sellerId == null || sellerId.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of(
                         "success", false,
@@ -186,10 +182,7 @@ public class AuctionController {
             ));
         }
     }
-
-    /**
-     * Get auction by ID
-     */
+ 
     @GetMapping("/{auctionId}")
     public ResponseEntity<?> getAuctionById(@PathVariable("auctionId") String auctionId) {
         try {
@@ -213,10 +206,7 @@ public class AuctionController {
             ));
         }
     }
-
-    /**
-     * End an auction and transfer NFT to highest bidder
-     */
+ 
     @PostMapping("/{auctionId}/end")
     public ResponseEntity<?> endAuction(@PathVariable("auctionId") String auctionId, 
                                         HttpServletRequest httpRequest) {
@@ -241,16 +231,14 @@ public class AuctionController {
                         "error", "Auction has not ended yet. Ends at: " + auction.getEndTime()
                 ));
             }
-
-            // Check if already closed
+ 
             if ("CLOSED".equalsIgnoreCase(auction.getStatus())) {
                 return ResponseEntity.badRequest().body(Map.of(
                         "success", false,
                         "error", "Auction is already closed"
                 ));
             }
-
-            // Update auction status
+ 
             auction.setStatus("CLOSED");
             auctionService.updateAuctionDirect(auction);
 
@@ -341,7 +329,7 @@ public class AuctionController {
                         "nftTransferred", true
                 ));
             } else {
-                // No NFT found for this auction
+             
                 logger.warning("No NFT found for auction: " + auctionId);
                 return ResponseEntity.ok(Map.of(
                         "success", true,
@@ -367,11 +355,7 @@ public class AuctionController {
             ));
         }
     }
-
-    /**
-     * Get auction with live bidding information
-     * Shows current state including highest bidder and bid history
-     */
+ 
     @GetMapping("/{auctionId}/details")
     public ResponseEntity<?> getAuctionDetails(@PathVariable("auctionId") String auctionId) {
         try {
@@ -402,10 +386,7 @@ public class AuctionController {
             ));
         }
     }
-
-    /**
-     * Convert Auction to AuctionResponse
-     */
+ 
     private AuctionResponse convertToResponse(Auction auction) {
         AuctionResponse response = new AuctionResponse();
         response.setId(auction.getId());

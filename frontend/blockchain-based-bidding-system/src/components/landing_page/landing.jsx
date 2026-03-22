@@ -170,9 +170,7 @@ const Landing = () => {
   
 
 
-
-
-      {/* Collage */}
+ 
 <div className="collage">
   <div className="col col1">
     <motion.img 

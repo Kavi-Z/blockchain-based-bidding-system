@@ -13,8 +13,9 @@ html, body {
 .login-container {
   height: 100vh;
   width: 100vw;
+  
   background-image: url("../../assets/login.png");
-  background-size: 100% 100%;
+  background-size: 100%;
   background-position: center;
   background-repeat: no-repeat;
   display: flex;
@@ -106,6 +107,7 @@ html, body {
 
 .login-input {
   flex: 1;
+  font-family: 'Poppins', sans-serif;
   border: none;
   outline: none;
   background: transparent;
