@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import loginBg from "../../assets/login.png";
+import loginBg from "../../assets/back.png";
 import logo from "../../assets/cryptops.png";
 import googleIcon from "../../assets/google.png"; 
 import userIcon from "../../assets/user.png";
 import lockIcon from "../../assets/lock.png";
+import { motion } from 'framer-motion';
+import eth from "../../assets/eth2.png";
+import eth1 from "../../assets/eth.png";
+
 import "./seller_login.css";
 import axios from "axios";
 
@@ -50,8 +54,7 @@ const SellerLogin = () => {
       localStorage.setItem("user", JSON.stringify(res.data));
 
       console.log("✅ Seller logged in successfully!");
-
-      // Navigate to seller dashboard
+ 
       navigate("/seller_dashboard");
 
     } catch (err) {
@@ -116,7 +119,7 @@ const SellerLogin = () => {
 
           <button 
             type="submit" 
-            className="seller-login-btn"
+            className="login-btn"
             disabled={isLoading}
           >
             {isLoading ? "Logging in..." : "Login"}
@@ -132,6 +135,17 @@ const SellerLogin = () => {
           Don't have an account? <Link to="/seller-signup">Sign Up</Link>
         </div>
       </div>
+        <div className="hero-right">
+    <motion.img
+      src={eth}
+      alt="Ethereum"
+      className="hero-eth"
+      animate={{ y: [0, -15, 0] }}
+      transition={{ repeat: Infinity, duration: 4 }}
+    />
+    
+  </div>
+ 
     </div>
   );
 };

@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import loginBg from "../../assets/login.png";
+import { Link, useNavigate } from "react-router-dom";
+import loginBg from "../../assets/back.png";
 import logo from "../../assets/cryptops.png";
 import googleIcon from "../../assets/google.png"; 
 import userIcon from "../../assets/user.png";
 import lockIcon from "../../assets/lock.png";
+import { motion } from 'framer-motion';
+import eth from "../../assets/eth2.png";
 import "./bidder_login.css";
 import axios from "axios";
 
@@ -31,19 +33,17 @@ const Login = () => {
         setError("Login failed: No user data returned");
         return;
       }
-
-      // Save user info
+ 
       localStorage.setItem("userId", id);
       localStorage.setItem("token", token);
       localStorage.setItem("role", role);
-      // Also store a `user` object for components that expect a single user JSON
+ 
       try {
         localStorage.setItem("user", JSON.stringify(res.data));
       } catch (e) {
         console.warn("Failed to store user object in localStorage", e);
       }
-
-      // Navigate to bidder dashboard or NFTs page
+ 
       navigate("/bidder-dashboard");
     } catch (err) {
       console.error(err);
@@ -59,6 +59,7 @@ const Login = () => {
     <div className="login-container" style={{ backgroundImage: `url(${loginBg})` }}>
       <div className="logo-container">
         <img src={logo} alt="Logo" className="logo" />
+        <Link to="/" className="logo-text">CryptOps</Link>
       </div>
 
       <div className="login-box">
@@ -104,6 +105,16 @@ const Login = () => {
           Don't have an account? <a href="/signup">Sign Up</a>
         </div>
       </div>
+              <div className="hero-right">
+          <motion.img
+            src={eth}
+            alt="Ethereum"
+            className="hero-eth"
+            animate={{ y: [0, -15, 0] }}
+            transition={{ repeat: Infinity, duration: 4 }}
+          />
+          
+        </div>
     </div>
   );
 };

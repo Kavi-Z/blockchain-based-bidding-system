@@ -25,11 +25,7 @@ public class AuctionUploadController {
 
     @Autowired
     private LocalImageService localImageService;
-
-    /**
-     * Upload auction item image to Pinata IPFS
-     * Optional authentication (can upload without token but with sellerId verification)
-     */
+ 
     @PostMapping("/image")
     public ResponseEntity<?> uploadAuctionImage(@RequestParam("image") MultipartFile image,
                                                  @RequestParam(value = "sellerId", required = false) String sellerId,
@@ -45,8 +41,7 @@ public class AuctionUploadController {
                         "error", "Image file is required"
                 ));
             }
-
-            // Validate file size (max 10MB)
+ 
             if (image.getSize() > 10 * 1024 * 1024) {
                 return ResponseEntity.badRequest().body(Map.of(
                         "success", false,
@@ -54,7 +49,7 @@ public class AuctionUploadController {
                 ));
             }
 
-            // Validate file type
+          
             String contentType = image.getContentType();
             if (contentType == null || !isValidImageType(contentType)) {
                 return ResponseEntity.badRequest().body(Map.of(

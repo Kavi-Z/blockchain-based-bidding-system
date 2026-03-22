@@ -5,6 +5,7 @@ html, body {
   padding: 0;
   height: 100%;
   width: 100%;
+ 
 }
 
 #root {
@@ -12,11 +13,17 @@ html, body {
   width: 100%;
 }
 
+
+.hero-eth {
+  width: 500px;
+ 
+  filter: drop-shadow(0 0 25px rgba(7, 238, 255, 0.6));
+}
 .seller-login-container {
-  height: 100vh;
-  width: 100vw;
-  background-image: url("../../assets/login.png");
-  background-size: 100% 100%;
+  height: 100%;
+  width: 100%;
+  background-image: url("../../assets/background.png");
+  background-size: 100%;
   background-position: center;
   background-repeat: no-repeat;
   display: flex;
@@ -42,7 +49,7 @@ html, body {
 }
 
 .logo-text {
-  font-family: 'MyFont1', Georgia, 'Times New Roman', serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 24px;
   color: white;
   font-weight: bold;
@@ -50,6 +57,7 @@ html, body {
 }
 
 .seller-login-box {
+  
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -111,6 +119,7 @@ html, body {
 
 .seller-input-group {
   display: flex;
+  
   align-items: center;
   background-color: transparent;
   border: 1px solid #ccc;
@@ -166,12 +175,28 @@ html, body {
 
 .seller-login-form {
   display: flex;
+  
   flex-direction: column;
   gap: 20px;
   width: 500px;
 }
 
+
+.login-btn {
+  padding: 12px 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: #41e1e3;
+  color: white;
+  font-size: 18px;
+  font-family: sans-serif, "MyFont1";
+  cursor: pointer;
+  transition: background 0.3s ease;
+  width: 100px;
+}
+
 .seller-login-input {
+    font-family: 'Poppins', sans-serif;
   padding: 12px 15px;
   border-radius: 8px;
   font-size: 16px;
