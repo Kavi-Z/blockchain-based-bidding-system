@@ -331,14 +331,14 @@
 .bids-table {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1.8rem;
   overflow-x: auto;
 }
 
 .bids-header {
   display: grid;
   grid-template-columns: 80px 1fr 140px 200px 200px;
-  gap: 1rem;
+  gap: 7.2rem;
   padding: 1rem;
   background: #f8f9fa;
   border-radius: 0.5rem;

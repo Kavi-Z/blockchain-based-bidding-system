@@ -21,9 +21,6 @@ export default function AuctionDetails() {
       return;
     }
     fetchAuctionDetails();
- 
-    const interval = setInterval(fetchAuctionDetails, 5000);
-    return () => clearInterval(interval);
   }, [auctionId]);
 
   const fetchAuctionDetails = async () => {
