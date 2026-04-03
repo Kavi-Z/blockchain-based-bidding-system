@@ -1,25 +1,26 @@
-# Master QA Test Plan: Blockchain Bidding System
+# Master QA Test Plan & Runbook: Blockchain Bidding System
 
 ## 1. Scope
 The objective of this testing phase is to ensure the functional correctness, security, and stability of the Blockchain Bidding System. 
 This includes the Java Spring Boot Backend (Cryptops), Node.js Chatbot Backend, React Frontend, and Solidity Smart Contracts.
 
-## 2. Testing Methodology
-- **Smoke Testing:** Verify critical services start and components communicate.
-- **Unit Testing:** Validate individual functions in isolation (Java JUnit, Node/Jest).
-- **Smart Contract Testing:** Validate blockchain logic, bidding rules, and money transfers (Truffle).
-- **API Testing:** Validate REST endpoints for Authentication, Bidding, and Auctions (Postman).
-- **E2E / UI Testing:** Simulate real user behavior on the frontend (Selenium/Cypress).
+## 2. Prerequisites & Environment Setup
+Before executing any tests, ensure you have the following installed on your machine:
+- **Node.js & npm** (v18+ recommended)
+- **Java JDK 17+** (Required for Spring Boot backend)
+- **Git** (For version control)
+- **Ganache / Truffle** (For local blockchain emulation)
+- **Postman** (For manual API endpoint testing)
 
-## 3. Test Cases (Summary)
+---
 
-| Test ID | Module | Feature | Scenario | Status |
-|---------|--------|---------|----------|--------|
-| TC-001 | Backend | Auth | Register a new Bidder successfully | Pending |
-| TC-002 | Backend | Auth | Login with invalid credentials returns 401 | Pending |
-| TC-003 | Contract| Bidding | Reject a bid lower than the current highest bid | Pending |
-| TC-004 | Chatbot | AI | Chatbot returns default message for unknown inputs | PASS |
-| TC-005 | UI      | Bidding | Prevent form submission with empty bid amount | Pending |
+## 3. Test Execution Guide (Step-by-Step)
 
-## 4. Defect Management
-All bugs discovered during testing are documented in GitHub Issues and linked to the `qa-testing-phase-1` pull request.
+### Phase 1: Local Environment Spin-Up (Smoke Testing)
+*Verify all critical services start and components communicate successfully before deep testing.*
+
+**1. Start the Java Backend (Cryptops)**
+- **Terminal 1:**
+  ```bash
+  cd backend/cryptops
+  ./mvnw spring-boot:run
