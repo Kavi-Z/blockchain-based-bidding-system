@@ -29,6 +29,13 @@ export default function Chatbot() {
 
     const userMessage = { sender: "user", text: input };
     setMessages(prev => [...prev, userMessage]);
+    setTimeout(() => {
+      const botReply = {
+        sender: "bot",
+        text: "Wait for a perfect answer!"
+      };
+      setMessages(prev => [...prev, botReply]);
+    }, 500);
     setInput("");
     setIsLoading(true);
 

@@ -1,0 +1,28 @@
+API Documentation Overview
+
+Authentication API
+Used for user login, registration, and token management.
+
+Auction API
+Provides endpoints to create, retrieve, update, and close auctions.
+
+Bid API
+Allows users to submit bids and retrieve bid history for auctions.
+
+Blockchain API
+Handles interaction with smart contracts including bid submission and auction finalization.
+
+AI Query API
+Accepts natural language questions and returns AI-generated answers using RAG.
+
+Request Format
+All API requests use JSON format and follow RESTful principles.
+
+Response Format
+Responses include status codes, messages, and relevant data payloads.
+
+Error Handling
+Standard HTTP error codes are used to indicate failures such as unauthorized access or invalid requests.
+
+Security
+APIs are protected using authentication tokens and role-based access control.

@@ -13,8 +13,15 @@ from config import GEMINI_API_KEY
 # Print API key status
 print(f"API Key loaded: {GEMINI_API_KEY[:10]}..." if GEMINI_API_KEY else "API Key is MISSING!")
 
-# Configure Gemini API
-client = genai.Client(api_key=GEMINI_API_KEY)
+# Clear proxy environment variables to bypass system proxy
+for proxy_var in ['HTTP_PROXY', 'HTTPS_PROXY', 'http_proxy', 'https_proxy', 'ALL_PROXY', 'all_proxy', 'NO_PROXY', 'no_proxy']:
+    os.environ.pop(proxy_var, None)
+
+# Set NO_PROXY to bypass proxy for Google APIs
+os.environ['NO_PROXY'] = 'generativelanguage.googleapis.com,*.googleapis.com'
+
+# Configure Gemini API client with increased timeout
+client = genai.Client(api_key=GEMINI_API_KEY, http_options={"timeout": 120000})
 
 # Initialize FastAPI app
 app = FastAPI(title="Blockchain Bidding Chatbot API")

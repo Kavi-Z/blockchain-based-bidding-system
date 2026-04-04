@@ -1,8 +1,7 @@
 from google import genai
 import os
 from dotenv import load_dotenv
-
-# Load .env
+ 
 load_dotenv(os.path.join(os.path.dirname(__file__), "app", ".env"))
 
 API_KEY = os.getenv("GEMINI_API_KEY")
