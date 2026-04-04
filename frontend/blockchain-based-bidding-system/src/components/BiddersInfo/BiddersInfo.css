@@ -1,6 +1,6 @@
 .bidders-info-container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -8,10 +8,11 @@
 
 /* Header */
 .bidders-header {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.5);
   padding: 2rem;
   color: white;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 2px solid rgba(65, 225, 227, 0.3);
+  backdrop-filter: blur(10px);
 }
 
 .bidders-header .header-content {
@@ -41,9 +42,9 @@
 }
 
 .btn-dashboard {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 2px solid white;
+  background: transparent;
+  color: #41e1e3;
+  border: 2px solid #41e1e3;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   cursor: pointer;
@@ -52,20 +53,23 @@
 }
 
 .btn-dashboard:hover {
-  background: white;
-  color: #667eea;
+  background: #41e1e3;
+  color: #0a0a0a;
   transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(65, 225, 227, 0.4);
 }
 
 /* Filters Section */
 .filters-section {
-  background: white;
+  background: rgba(15, 15, 15, 0.8);
   padding: 2rem;
   max-width: 1400px;
   margin: 2rem auto;
   border-radius: 12px;
   width: calc(100% - 4rem);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(65, 225, 227, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 /* Main Tab Switcher */
@@ -73,7 +77,7 @@
   display: flex;
   gap: 1rem;
   margin-bottom: 2rem;
-  border-bottom: 2px solid #e0e0e0;
+  border-bottom: 2px solid rgba(65, 225, 227, 0.2);
   padding-bottom: 1rem;
 }
 
@@ -84,7 +88,7 @@
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  color: #999;
+  color: rgba(255, 255, 255, 0.6);
   transition: all 0.3s ease;
   border-bottom: 3px solid transparent;
   margin-bottom: -1rem;
@@ -92,12 +96,12 @@
 }
 
 .main-tab:hover {
-  color: #667eea;
+  color: #41e1e3;
 }
 
 .main-tab.active {
-  color: #667eea;
-  border-bottom-color: #667eea;
+  color: #41e1e3;
+  border-bottom-color: #41e1e3;
 }
 
 .filter-group {
@@ -108,15 +112,21 @@
   width: 100%;
   padding: 12px 16px;
   font-size: 1rem;
-  border: 2px solid #e0e0e0;
+  border: 2px solid rgba(65, 225, 227, 0.3);
   border-radius: 8px;
   transition: all 0.3s ease;
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #41e1e3;
+  box-shadow: 0 0 0 3px rgba(65, 225, 227, 0.2);
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .filter-tabs {
@@ -127,24 +137,25 @@
 
 .filter-tab {
   padding: 0.75rem 1.5rem;
-  border: 2px solid #e0e0e0;
-  background: white;
+  border: 2px solid rgba(65, 225, 227, 0.3);
+  background: transparent;
   border-radius: 8px;
   cursor: pointer;
   font-size: 1rem;
   font-weight: 500;
   transition: all 0.3s ease;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .filter-tab:hover {
-  border-color: #667eea;
-  color: #667eea;
+  border-color: #41e1e3;
+  color: #41e1e3;
 }
 
 .filter-tab.active {
-  background: #667eea;
-  color: white;
-  border-color: #667eea;
+  background: #41e1e3;
+  color: #0a0a0a;
+  border-color: #41e1e3;
 }
 
 /* Loading Spinner */
@@ -199,8 +210,8 @@
 }
 
 .btn-primary {
-  background: white;
-  color: #667eea;
+  background: linear-gradient(135deg, #41E1E3 0%, #247C7D 100%);
+  color: white;
   border: none;
   padding: 1rem 2rem;
   border-radius: 8px;
@@ -212,7 +223,7 @@
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 24px rgba(65, 225, 227, 0.4);
 }
 
 /* NFTs Section */
@@ -232,18 +243,20 @@
 
 /* NFT Card */
 .nft-card {
-  background: white;
+  background: rgba(15, 15, 15, 0.9);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
+  border: 1px solid rgba(65, 225, 227, 0.2);
 }
 
 .nft-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 16px 48px rgba(65, 225, 227, 0.3);
+  border-color: #41e1e3;
 }
 
 /* NFT Image */
@@ -308,12 +321,12 @@
 .nft-content h3 {
   font-size: 1.3rem;
   margin: 0 0 0.5rem;
-  color: #1f2937;
+  color: #41e1e3;
   font-weight: bold;
 }
 
 .nft-content .description {
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.95rem;
   margin-bottom: 1rem;
   line-height: 1.5;
@@ -321,11 +334,12 @@
 
 /* Details */
 .nft-details {
-  background: #f9fafb;
+  background: rgba(0, 0, 0, 0.3);
   padding: 1rem;
   border-radius: 8px;
   margin-bottom: 1rem;
   flex-grow: 1;
+  border: 1px solid rgba(65, 225, 227, 0.1);
 }
 
 .detail-row {
@@ -333,7 +347,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 0;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid rgba(65, 225, 227, 0.1);
 }
 
 .detail-row:last-child {
@@ -341,18 +355,18 @@
 }
 
 .detail-row .label {
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 0.9rem;
   font-weight: 500;
 }
 
 .detail-row .value {
-  color: #1f2937;
+  color: rgba(255, 255, 255, 0.9);
   font-weight: 600;
 }
 
 .detail-row .price {
-  color: #667eea;
+  color: #41e1e3;
   font-size: 1.1rem;
 }
 
@@ -398,12 +412,14 @@
 }
 
 .btn-details {
-  background: #667eea;
-  color: white;
+  background: transparent;
+  color: #41e1e3;
+  border: 2px solid #41e1e3;
 }
 
 .btn-details:hover {
-  background: #5568d3;
+  background: #41e1e3;
+  color: #0a0a0a;
   transform: translateY(-2px);
 }
 
@@ -425,12 +441,13 @@
 
 /* Footer */
 .bidders-footer {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.5);
   color: white;
   text-align: center;
   padding: 2rem;
   margin-top: auto;
-  border-top: 2px solid rgba(255, 255, 255, 0.2);
+  border-top: 2px solid rgba(65, 225, 227, 0.3);
+  backdrop-filter: blur(10px);
 }
 
 .bidders-footer p {
@@ -446,10 +463,11 @@
 }
 
 .bid-history-table {
-  background: white;
+  background: rgba(15, 15, 15, 0.9);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(65, 225, 227, 0.2);
 }
 
 .table-header {
@@ -457,10 +475,10 @@
   grid-template-columns: 2fr 1.5fr 1.5fr 1fr 1.5fr;
   gap: 1rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #41E1E3 0%, #247C7D 100%);
   color: white;
   font-weight: 600;
-  border-bottom: 2px solid #e0e0e0;
+  border-bottom: 2px solid rgba(65, 225, 227, 0.3);
 }
 
 .table-row {
@@ -468,13 +486,14 @@
   grid-template-columns: 2fr 1.5fr 1.5fr 1fr 1.5fr;
   gap: 1rem;
   padding: 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid rgba(65, 225, 227, 0.1);
   align-items: center;
   transition: all 0.3s ease;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .table-row:hover {
-  background-color: #f9f9f9;
+  background-color: rgba(65, 225, 227, 0.05);
 }
 
 .table-row:last-child {
@@ -507,7 +526,7 @@
 }
 
 .col-amount strong {
-  color: #667eea;
+  color: #41e1e3;
   font-size: 1.1rem;
 }
 

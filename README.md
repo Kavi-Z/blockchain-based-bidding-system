@@ -136,6 +136,7 @@ The Blockchain-Based Bidding System is a decentralized auction platform designed
 - Node.js and npm
 - PostgreSQL or MongoDB (optional)
 
+ 
 ## AI Chatbot (RAG-Based Assistant)
 
 -Developed using a Retrieval-Augmented Generation (RAG) architecture to provide intelligent and domain-specific responses.
@@ -148,6 +149,77 @@ The Blockchain-Based Bidding System is a decentralized auction platform designed
 -Exposes REST API endpoints using FastAPI for seamless integration with the frontend.
 -Designed as a modular AI microservice that can be extended with PDF/DOCX support in the future.
 -Future enhancement - Blockchain Wallet Integration – Enable MetaMask-based authentication for secure, wallet-verified chatbot access,Live Smart Contract Interaction – Allow the chatbot to fetch real-time bidding data directly from deployed smart contracts.
+ 
+## AI Chatbot (Node.js Intent Engine)
+
+> **Note:** the frontend currently interacts with a lightweight Node/Express chatbot service. Make sure this service
+> is running when you test the UI or the chat box will appear to be unresponsive.
+
+### Backend setup
+1. `cd chatbot/backend`
+2. `npm install` (or `yarn`)
+3. `npm run dev` (starts on port 5000 by default)
+
+The server exposes a POST endpoint at `/api/chat/message` and a GET at `/api/chat/auction-status`.
+CORS is enabled so the frontend can call from a different port.
+
+You can verify the Node service with curl:
+
+```bash
+curl -X POST http://localhost:5000/api/chat/message \
+  -H 'Content-Type: application/json' \
+  -d '{"message":"hello"}'
+```
+
+(if you switch to the Python backend, use `curl -X POST http://localhost:8000/ask` and
+send `{ "question": "hello" }` instead).
+
+### Frontend configuration
+The React component uses a couple of environment variables to decide where
+it should send chat messages:
+
+* `VITE_CHAT_URL` – full HTTP URL for the POST endpoint. Example:
+  `http://localhost:5000/api/chat/message` or
+  `http://localhost:8000/ask`.
+  When this variable is set it takes absolute precedence.
+* `VITE_API_BASE` – base host+port (no path). The component will append
+  `/api/chat/message` to this value if `VITE_CHAT_URL` is not provided.
+  The default is `http://localhost:5000`.
+
+You can put either variable in a `.env` file at
+`frontend/blockchain-based-bidding-system/.env`. For example:
+
+```
+VITE_API_BASE=http://localhost:5000
+# or, if pointing at the Python service:
+# VITE_CHAT_URL=http://localhost:8000/ask
+```
+
+The component logs the URL it is using to the browser console, so you can
+inspect the output when debugging connectivity problems.
+
+### How it works
+- User messages are posted to the configured endpoint.
+- The server (Node intent engine or Python RAG) replies with JSON.
+- The frontend appends the reply to the message list and scrolls down.
+
+(Previous documentation assumed a Python/RAG service; the default
+implementation now is the Node.js microservice described above.)
+
+---
+
+### Optional Python RAG backend
+A separate FastAPI service lives under `ai-services/` and drives a retrieval‑augmented chatbot using
+LangChain. It is **not required** for the basic intent bot, but you can run it if you want
+semantic search/AI responses:
+
+1. Activate a virtualenv in `ai-services/` and install packages (`pip install -r requirements.txt`).
+2. Start with `uvicorn app.main:app --reload --port 8000`.
+3. Point `VITE_API_BASE` to `http://localhost:8000` instead of port 5000.
+
+If you encounter `ModuleNotFoundError: No module named 'langchain.chains'`, reinstall the dependencies
+inside the venv; the README in `ai-services/` contains full setup steps.
+ 
 
 ## Database and Blockchain
 

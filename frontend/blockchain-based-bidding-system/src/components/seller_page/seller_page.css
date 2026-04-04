@@ -4,6 +4,7 @@
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
   display: flex;
   flex-direction: column;
+  
 }
 
 /* Header */
@@ -142,6 +143,7 @@
   color: #ccc;
   font-size: 16px;
   margin: 0;
+  font-family: "Poppins", sans-serif;
 }
 
 /* Empty State */
@@ -164,12 +166,14 @@
   color: #41E1E3;
   font-size: 2rem;
   margin: 0 0 10px;
+  font-family: "Poppins", sans-serif;
 }
 
 .empty-state p {
   color: #ccc;
   font-size: 16px;
   margin: 0 0 30px;
+  font-family: "Poppins", sans-serif;
 }
 
 .btn-primary {
@@ -209,6 +213,7 @@
   color: #41E1E3;
   font-size: 1.8rem;
   margin: 0;
+  font-family: "Poppins", sans-serif;
 }
 
 /* Auctions Grid */
@@ -299,6 +304,7 @@
   line-height: 1.5;
   margin: 0 0 15px;
   min-height: 42px;
+  font-family: "Poppins", sans-serif;
 }
 
 /* Price Section */
@@ -322,12 +328,14 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 5px;
+  font-family: "Poppins", sans-serif;
 }
 
 .price-item .price {
   font-size: 1.4rem;
   font-weight: 700;
   color: #41E1E3;
+  font-family: "Poppins", sans-serif;
 }
 
 /* Bidder Info */
@@ -344,12 +352,14 @@
   letter-spacing: 0.5px;
   margin-bottom: 5px;
   display: block;
+  font-family: "Poppins", sans-serif;
 }
 
 .bidder-info p {
   color: #fff;
   margin: 0;
   font-weight: 600;
+  font-family: "Poppins", sans-serif;
 }
 
 /* Countdown */
@@ -366,6 +376,7 @@
   letter-spacing: 0.5px;
   display: block;
   margin-bottom: 5px;
+  font-family: "Poppins", sans-serif;
 }
 
 .countdown p {
@@ -373,6 +384,7 @@
   margin: 0;
   font-weight: 600;
   font-size: 1.1rem;
+  font-family: "Poppins", sans-serif;
 }
 
 .countdown p.active {
@@ -396,11 +408,13 @@
 .detail-item {
   font-size: 13px;
   color: #ccc;
+  font-family: "Poppins", sans-serif;
 }
 
 .detail-item span {
   font-weight: 600;
   color: #fff;
+  font-family: "Poppins", sans-serif;
 }
 
 /* Button */

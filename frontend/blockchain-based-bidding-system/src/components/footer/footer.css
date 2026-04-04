@@ -58,6 +58,7 @@
   color: rgba(255, 255, 255, 0.7);
   line-height: 1.6;
   margin-bottom: 20px;
+  font-family: "Poppins", sans-serif;
 }
  
 .social-icons {
@@ -114,6 +115,7 @@
   transition: all 0.3s ease;
   cursor: pointer;
   display: inline-block;
+  font-family: "Poppins", sans-serif;
 }
 
 .footer-links li a:hover {
@@ -136,6 +138,7 @@
   font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.6);
   margin: 0;
+  font-family: "Poppins", sans-serif;
 }
 
 .built-with {

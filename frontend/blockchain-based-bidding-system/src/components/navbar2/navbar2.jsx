@@ -14,8 +14,7 @@ const Navbar2 = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    // Handle scrolling to section when landing page loads with hash
+  useEffect(() => { 
     if (location.pathname === '/' && location.hash) {
       const sectionId = location.hash.substring(1);
       setTimeout(() => {
@@ -28,14 +27,14 @@ const Navbar2 = () => {
   }, [location]);
 
   const scrollToSection = (sectionId) => {
-    // If we're on the landing page, scroll directly
+    
     if (location.pathname === '/') {
       const element = document.getElementById(sectionId);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
       }
     } else {
-      // If we're on another page, navigate to landing page with hash
+       
       navigate(`/#${sectionId}`);
     }
   };

@@ -4,6 +4,7 @@ body {
  
   background-attachment: scroll;  
   min-height: 100vh;
+  
 }
 
 .landing-container {
@@ -22,6 +23,86 @@ body {
   font-family: 'Arial', sans-serif;
   color: #41e1e3;
 }
+
+
+
+.hero{
+  width:70%;
+  max-width:1300px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:120px;
+}
+
+.hero-left{
+  width:100%;
+  text-align:left;
+}
+
+.hero-right{  
+  width:100%;
+  margin-left: 100px;
+  display:flex;
+  justify-content:center;
+}
+
+.hero-small{
+  letter-spacing:2px;
+ 
+  color:#9aa5b1;
+  font-size:0.9rem;
+}
+
+.hero-title{
+  font-size:4.5rem;
+  font-family:"Arial", sans-serif;
+  line-height:1.1;
+  margin:20px 0;
+  background: linear-gradient(90deg, #41E1E3, #0b5270);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-title span{
+  color:#41E1E3;
+}
+
+.hero-sub{
+  font-size:1.3rem;
+    font-family: 'arial', sans-serif;
+  margin-bottom:30px;
+  color:#ccc;
+}
+
+.hero-btn{
+  padding:14px 34px;
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: transparent;
+  border-color: #3BBFC1;
+  color:#3BBFC1;
+  border-radius:30px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.hero-eth{
+  width:620px;
+  filter: drop-shadow(0 0 20px #41E1E3);
+}
+.protocols {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  font-family: "MyFont1", sans-serif;
+  font-size: 3rem;
+  font-weight: 100;
+  margin: 20px 0 10px;
+  color: #41e1e3;
+}
+
+
 
 .Head-landing {
   font-family: "MyFont1", sans-serif;
@@ -43,6 +124,7 @@ body {
   margin: 10px 0 30px;
   color: white;
   padding-bottom: 100px;
+  font-family: "Poppins", sans-serif;
 }
 
 .protocols {
@@ -61,6 +143,7 @@ body {
   line-height: 1.4;
   margin: 0 auto;
   color: white;
+  font-family: "Poppins", sans-serif;
 }
 
 .about {
@@ -87,7 +170,8 @@ body {
   font-size: 1.3rem;
   line-height: 1.8;
   color: rgb(200, 199, 197); 
-  text-align: center;   
+  text-align: center;
+  font-family: "Poppins", sans-serif;
 }
 .vismis {
   width: 90%;
@@ -112,7 +196,8 @@ body {
   font-size: 1.3rem;
   line-height: 1.8;
   color: white;
-  margin-bottom: 30px;  
+  margin-bottom: 30px;
+  font-family: "Poppins", sans-serif;
 }
 .introduction {
   width: 90%;
@@ -140,6 +225,7 @@ body {
   font-weight: bold;
   line-height: 1.8;
   color: white;
+  font-family: "Poppins", sans-serif;
 }.collage {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr; /* 3 columns */
@@ -175,6 +261,7 @@ body {
   color: rgba(255, 255, 255, 0.7);
   text-align: center;
   margin-bottom: 40px;
+  font-family: "Poppins", sans-serif;
 }
 
 .contact-form {
@@ -203,6 +290,7 @@ body {
   text-align: right;
   margin-top: -5px;
   font-style: italic;
+  font-family: "Poppins", sans-serif;
 }
 
 .form-group input,
@@ -216,12 +304,13 @@ body {
   border-radius: 12px;
   outline: none;
   transition: all 0.3s ease;
-  font-family: inherit;
+  font-family: "Poppins", sans-serif;
 }
 
 .form-group input::placeholder,
 .form-group textarea::placeholder {
   color: rgba(255, 255, 255, 0.4);
+  font-family: "Poppins", sans-serif;
 }
 
 .form-group input:focus,
@@ -263,6 +352,7 @@ body {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   margin-top: 10px;
   box-shadow: 0 4px 15px rgba(65, 225, 227, 0.3);
+  font-family: "Poppins", sans-serif;
 }
 
 .submit-btn:hover {
@@ -301,6 +391,7 @@ body {
   font-size: 1.1rem;
   text-align: center;
   animation: slideIn 0.3s ease-out;
+  font-family: "Poppins", sans-serif;
 }
 
 .submit-status.success {
@@ -445,6 +536,7 @@ body {
     font-family: "MyFont1", sans-serif;
     font-size: 3.8rem;
     font-weight: 100;
+    margin-top: 100px;
     margin-bottom: 20px;
     background: linear-gradient(135deg, #41E1E3, #32AEB0, #247C7D);
     -webkit-background-clip: text;
@@ -502,6 +594,7 @@ body {
   opacity: 0;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0 10px;
+  font-family: "Poppins", sans-serif;
 }
 
 .answer.open {

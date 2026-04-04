@@ -1,0 +1,34 @@
+{
+	"info": {
+		"_postman_id": "c5570fe5-9790-468d-9e00-c66cccbad4a8",
+		"name": "Blockchain Bidding System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41266934"
+	},
+	"item": [
+		{
+			"name": "TC-001: Register Bidder",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "TC-002: Login Failure",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "TC-003: Get Auctions",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}

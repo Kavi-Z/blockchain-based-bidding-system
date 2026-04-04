@@ -1,70 +1,68 @@
 import React, { useState, useRef, useEffect } from "react";
+import axios from "axios";
 import "./chatbot.css";
 import MessageBubble from "./MessageBubble";
 import { sendMessageToBot } from "../../services/chatbotService";
 
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
+const CHAT_URL = import.meta.env.VITE_CHAT_URL || `${API_BASE}/api/chat/message`;
+
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { 
-      sender: "bot", 
-      text: "👋 Hi! I'm your AI assistant for the blockchain bidding system. Ask me about:\n\n• Auction rules & how to bid\n• Live auction status\n• Wallet & MetaMask help\n• Refunds & transactions\n• Account setup" 
+    {
+      sender: "bot",
+      text:
+        "👋 Hi! I'm your AI assistant for the blockchain bidding system."
     }
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
   const messagesEndRef = useRef(null);
 
-  // Auto-scroll to bottom when new messages arrive
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input.trim()) return;
 
     const userMessage = { sender: "user", text: input };
     setMessages(prev => [...prev, userMessage]);
-    setTimeout(() => {
-      const botReply = {
-        sender: "bot",
-        text: "Wait for a perfect answer!"
-      };
-      setMessages(prev => [...prev, botReply]);
-    }, 500);
     setInput("");
     setIsLoading(true);
 
     try {
-      const botReply = await sendMessageToBot(input);
-      setMessages(prev => [...prev, { sender: "bot", text: botReply }]);
-    } catch (error) {
-      setMessages(prev => [...prev, { 
-        sender: "bot", 
-        text: "Sorry, I'm having trouble connecting. Please try again later." 
-      }]);
+      const resp = await axios.post(CHAT_URL, { message: input });
+      const botText = resp.data?.reply || "(no response)";
+
+      setMessages(prev => [...prev, { sender: "bot", text: botText }]);
+    } catch (err) {
+      const errMsg = err.response
+        ? `Server error ${err.response.status}`
+        : `Network error: ${err.message}`;
+
+      setMessages(prev => [...prev, { sender: "bot", text: errMsg }]);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleQuickAction = async (action) => {
-    const userMessage = { sender: "user", text: action };
-    setMessages(prev => [...prev, userMessage]);
+    setMessages(prev => [...prev, { sender: "user", text: action }]);
     setIsLoading(true);
 
     try {
-      const botReply = await sendMessageToBot(action);
-      setMessages(prev => [...prev, { sender: "bot", text: botReply }]);
+      const resp = await axios.post(CHAT_URL, { message: action });
+      const botText = resp.data?.reply || "(no response)";
+
+      setMessages(prev => [...prev, { sender: "bot", text: botText }]);
     } catch (error) {
-      setMessages(prev => [...prev, { 
-        sender: "bot", 
-        text: "Sorry, I'm having trouble connecting. Please try again later." 
-      }]);
+      setMessages(prev => [
+        ...prev,
+        { sender: "bot", text: "Connection error" }
+      ]);
     } finally {
       setIsLoading(false);
     }
@@ -72,70 +70,35 @@ export default function Chatbot() {
 
   return (
     <>
-      {/* Floating Chat Icon */}
-      <div 
-        className={`chatbot-toggle ${isOpen ? 'active' : ''}`} 
+      <div
+        className={`chatbot-toggle ${isOpen ? "active" : ""}`}
         onClick={() => setIsOpen(!isOpen)}
-        title="Chat with AI Assistant"
       >
-        {isOpen ? '✕' : '💬'}
+        {isOpen ? "✕" : "💬"}
       </div>
 
-      {/* Chat Window */}
       {isOpen && (
         <div className="chatbot-window">
           <div className="chatbot-header">
-            <div className="header-content">
-              <span className="header-icon">🤖</span>
-              <div className="header-text">
-                <span className="header-title">AI Assistant</span>
-                <span className="header-status">
-                  <span className="status-dot"></span>
-                  Online
-                </span>
-              </div>
-            </div>
-            <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
+            <span>AI Assistant</span>
+            <button onClick={() => setIsOpen(false)}>✕</button>
           </div>
 
           <div className="chatbot-messages">
-            {messages.map((msg, index) => (
-              <MessageBubble key={index} sender={msg.sender} text={msg.text} />
+            {messages.map((msg, i) => (
+              <MessageBubble key={i} sender={msg.sender} text={msg.text} />
             ))}
-            {isLoading && (
-              <div className="message bot typing">
-                <span className="typing-indicator">
-                  <span></span><span></span><span></span>
-                </span>
-              </div>
-            )}
             <div ref={messagesEndRef} />
-          </div>
-
-          {/* Quick Actions */}
-          <div className="quick-actions">
-            <button onClick={() => handleQuickAction("How do I place a bid?")}>
-              🎯 How to Bid
-            </button>
-            <button onClick={() => handleQuickAction("What is the current auction status?")}>
-              📊 Auction Status
-            </button>
-            <button onClick={() => handleQuickAction("How do I connect my wallet?")}>
-              💳 Wallet Help
-            </button>
           </div>
 
           <div className="chatbot-input">
             <input
-              type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about blockchain bidding..."
               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-              disabled={isLoading}
             />
-            <button onClick={sendMessage} disabled={isLoading}>
-              {isLoading ? '...' : '➤'}
+            <button onClick={sendMessage}>
+              {isLoading ? "..." : "➤"}
             </button>
           </div>
         </div>
@@ -143,4 +106,3 @@ export default function Chatbot() {
     </>
   );
 }
-

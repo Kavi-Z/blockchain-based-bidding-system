@@ -720,6 +720,7 @@ const BidderDashboard = () => {
                           placeholder={`Min: $${minNextBid}`}
                           value={bidAmount}
                           onChange={(e) => setBidAmount(e.target.value)}
+                          onClick={(e) => e.stopPropagation()}
                           step="0.01"
                           min={minNextBid}
                           className="bid-input"
@@ -869,12 +870,7 @@ const BidderDashboard = () => {
 
       {/* Links to Profile and Dashboard */}
       <div className="dashboard-links">
-        <button onClick={() => navigate("/profile")} className="btn-secondary">
-          👤 My Profile (NFTs)
-        </button>
-        <button onClick={() => navigate("/bidders-info")} className="btn-secondary">
-          🏆 My Auction Victories & Bids
-        </button>
+
       </div>
     </div>
   );

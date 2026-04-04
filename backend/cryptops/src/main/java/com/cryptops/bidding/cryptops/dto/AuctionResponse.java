@@ -25,8 +25,7 @@ public class AuctionResponse {
     private String contractAddress;
     private String transactionHash;
     private Long blockNumber;
-
-    // ================= GETTERS & SETTERS =================
+ 
 
     public String getId() {
         return id;
