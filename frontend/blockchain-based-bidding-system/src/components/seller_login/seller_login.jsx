@@ -77,7 +77,7 @@ const SellerLogin = () => {
   return (
     <div
       className="seller-login-container"
-      style={{ backgroundImage: `url(${loginBg})` }}
+    
     >
       <div className="logo-container">
         <img src={logo} alt="Logo" className="logo" />
