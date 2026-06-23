@@ -9,8 +9,18 @@ Steps to Reproduce:
 Expected Result: Validation error should appear saying "Bid amount must be positive."
 Actual Result: Bid is accepted, breaking expected behavior.
 Severity: Medium
-Screenshots:
-- screenshots/BUG_002/frontend_view.png
-- screenshots/BUG_002/console_error.png
-Notes:
-- Screenshots and further details can be added later.
+
+
+## Evidence
+
+### Auction Details
+
+(screenshots/BUG_002/BUG_002_Auction_Details.png)
+
+### Invalid Date Display
+
+(screenshots/BUG_002/BUG_002_Invalid_Date.png)
+
+### Observation
+
+During testing, bidding history displayed "INVALID DATE" values instead of valid timestamps. The auction details page correctly displayed bid information but failed to render bid dates.
