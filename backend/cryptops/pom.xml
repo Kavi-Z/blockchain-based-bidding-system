@@ -148,6 +148,7 @@
                 <version>${spring-boot.version}</version>
                 <configuration>
                     <mainClass>com.cryptops.bidding.cryptops.CryptopsApplication</mainClass>
+                    <classifier>exec</classifier>
                 </configuration>
                 <executions>
                     <execution>
