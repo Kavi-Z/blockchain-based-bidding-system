@@ -10,6 +10,8 @@ import eth from "../../assets/eth2.png";
 import "./bidder_login.css";
 import axios from "axios";
 
+import { apiUrl } from "../../config/env";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,7 +24,7 @@ const Login = () => {
     setError("");
 
     try {
-      const res = await axios.post("http://localhost:8080/api/auth/login", {
+      const res = await axios.post(apiUrl("/api/auth/login"), {
         email,
         password,
       });

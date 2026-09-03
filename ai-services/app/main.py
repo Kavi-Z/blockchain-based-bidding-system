@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from app.rag_chain import get_chain
+from .rag_chain import get_chain
 
 app = FastAPI()
 qa_chain = get_chain()

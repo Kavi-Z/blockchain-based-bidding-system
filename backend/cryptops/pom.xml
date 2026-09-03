@@ -75,6 +75,13 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Load secrets from .env for local development -->
+        <dependency>
+            <groupId>me.paulschwarz</groupId>
+            <artifactId>spring-dotenv</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+
         <!-- File Upload -->
         <dependency>
             <groupId>commons-fileupload</groupId>

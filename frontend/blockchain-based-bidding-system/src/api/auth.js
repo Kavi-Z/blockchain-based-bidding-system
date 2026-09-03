@@ -1,7 +1,8 @@
+import { apiUrl } from "../config/env";
  
 export const registerUser = async (userData) => {
   try {
-    const response = await fetch("http://localhost:8080/api/auth/register", {
+    const response = await fetch(apiUrl("/api/auth/register"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),
@@ -24,7 +25,7 @@ export const registerUser = async (userData) => {
 
 export const loginUser = async (credentials) => {
   try {
-    const response = await fetch("http://localhost:8080/api/auth/login", {
+    const response = await fetch(apiUrl("/api/auth/login"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),

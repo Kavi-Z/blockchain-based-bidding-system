@@ -2,8 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ethers } from "ethers";
 import SecureAuction from "./SecureAuction.json";
+import {
+  ensureSepoliaNetwork,
+  getConfiguredContractAddress,
+} from "../../services/contractService";
 import image11 from "../../assets/image11.jpg";
 import "./auction_create.css";
+
+import { apiUrl } from "../../config/env";
 
 const AuctionCreate = () => {
   const navigate = useNavigate();
@@ -29,7 +35,6 @@ const AuctionCreate = () => {
 
   // Blockchain state
   const [walletAddress, setWalletAddress] = useState("");
-  const [contractAddress] = useState("0x55286Ac3A309c90918CDa8B0093ED5ECb5aF07fD");
 
   // Check if user is logged in
   useEffect(() => {
@@ -89,7 +94,7 @@ const AuctionCreate = () => {
       formDataObj.append("image", selectedImage);
       formDataObj.append("sellerId", user.id);
 
-      const response = await fetch("http://localhost:8080/api/auction/upload/image", {
+      const response = await fetch(apiUrl("/api/auction/upload/image"), {
         method: "POST",
         headers: {
           Authorization: `Bearer ${user?.token || ""}`,
@@ -232,6 +237,15 @@ const AuctionCreate = () => {
     }
 
     try {
+      await ensureSepoliaNetwork();
+
+      const contractAddress = getConfiguredContractAddress();
+      if (!contractAddress) {
+        throw new Error(
+          "Contract address missing. Set VITE_CONTRACT_ADDRESS in frontend/.env and restart npm run dev."
+        );
+      }
+
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(contractAddress, SecureAuction.abi, signer);
@@ -468,7 +482,7 @@ const AuctionCreate = () => {
         blockNumber: blockchainData.blockNumber,
       };
 
-      const response = await fetch("http://localhost:8080/api/auctions", {
+      const response = await fetch(apiUrl("/api/auctions"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -633,7 +647,7 @@ const AuctionCreate = () => {
                   name="minIncrement"
                   value={formData.minIncrement}
                   onChange={handleInputChange}
-                  placeholder="0.00"
+                  placeholder="0.000"
                   step="0.01"
                   min="0.01"
                   required

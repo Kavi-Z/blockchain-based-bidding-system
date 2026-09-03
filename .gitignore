@@ -1,4 +1,136 @@
-ai-services/app/.env
-backend/cryptops/.env
-ai-services/venv
+# =========================
+# Secrets / local env
+# =========================
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
 
+# =========================
+# Dependencies
+# =========================
+node_modules/
+**/node_modules/
+
+# =========================
+# Build / compile outputs
+# =========================
+dist/
+dist-ssr/
+build/
+**/build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+target/
+**/target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+out/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+
+# Truffle / Hardhat artifacts
+smart-contract/build/
+smart-contract/cache/
+artifacts/
+cache/
+coverage/
+coverage.json
+typechain/
+typechain-types/
+
+# =========================
+# Python / AI services
+# =========================
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+.venv/
+venv/
+**/venv/
+.env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+ai-services/vector_store/
+ai-services/**/vector_store/
+
+# =========================
+# Uploads / runtime data
+# =========================
+uploads/
+**/uploads/
+backend/cryptops/uploads/
+*.tmp
+*.temp
+
+# =========================
+# Logs / OS / editors
+# =========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*~
+
+# =========================
+# Maven / Java extras
+# =========================
+.mvn/wrapper/maven-wrapper.jar
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+*.iws
+*.iml
+*.ipr
+
+# =========================
+# Frontend extras
+# =========================
+*.local
+.vite/
+.turbo/
+.cache/
+.parcel-cache/
+.vercel/
+.netlify/
+cypress/videos/
+cypress/screenshots/
+
+# =========================
+# Misc
+# =========================
+*.bak
+*.orig
+*.old
+*.pem
+*.p12
+*.jks
+secrets/

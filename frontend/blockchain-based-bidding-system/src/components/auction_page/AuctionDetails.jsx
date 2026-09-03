@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./auction_details.css";
 
+import { apiUrl } from "../../config/env";
+
 export default function AuctionDetails() {
   const navigate = useNavigate();
   const { auctionId } = useParams();
@@ -28,7 +30,7 @@ export default function AuctionDetails() {
       setLoading(true);
       setError("");
  
-      const auctionResponse = await fetch(`http://localhost:8080/api/auctions/${auctionId}`, {
+      const auctionResponse = await fetch(apiUrl(`/api/auctions/${auctionId}`), {
         headers: {
           Authorization: `Bearer ${user.token || ""}`,
           "X-User-ID": user.id,
@@ -47,7 +49,7 @@ export default function AuctionDetails() {
       // Fetch bids with comprehensive error handling
       console.log("Fetching bids for auction:", auctionId);
       const bidsResponse = await fetch(
-        `http://localhost:8080/api/bids/auction/${auctionId}/bids-with-details`,
+        apiUrl(`/api/bids/auction/${auctionId}/bids-with-details`),
         {
           headers: {
             Authorization: `Bearer ${user.token || ""}`,
@@ -122,7 +124,7 @@ export default function AuctionDetails() {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/auctions/${auctionId}/end`,
+        apiUrl(`/api/auctions/${auctionId}/end`),
         {
           method: "POST",
           headers: {
@@ -161,7 +163,7 @@ export default function AuctionDetails() {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/auctions/${auctionId}/finalize`,
+        apiUrl(`/api/auctions/${auctionId}/finalize`),
         {
           method: "POST",
           headers: {

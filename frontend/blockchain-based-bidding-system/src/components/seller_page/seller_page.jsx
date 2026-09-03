@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./seller_page.css";
 
+import { apiUrl } from "../../config/env";
+
 export default function SellerPage() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -53,7 +55,7 @@ export default function SellerPage() {
 
       console.log("fetchSellerAuctions -> user:", user);
 
-      const response = await fetch(`http://localhost:8080/api/auctions/seller/${user.id}`, {
+      const response = await fetch(apiUrl(`/api/auctions/seller/${user.id}`), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -170,7 +172,7 @@ export default function SellerPage() {
         return;
       }
 
-      const response = await fetch(`http://localhost:8080/api/auctions/${auctionId}/end`, {
+      const response = await fetch(apiUrl(`/api/auctions/${auctionId}/end`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

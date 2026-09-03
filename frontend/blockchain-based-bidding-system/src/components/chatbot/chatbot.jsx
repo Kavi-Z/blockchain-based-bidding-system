@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./chatbot.css";
 import MessageBubble from "./MessageBubble"; // Keep exact casing
+import { chatApiUrl } from "../../config/env";
 
-// base URL for chatbot backend; can be overridden with VITE_API_BASE
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
-// full endpoint (can include path). env var VITE_CHAT_URL takes precedence.
-const CHAT_URL = import.meta.env.VITE_CHAT_URL || `${API_BASE}/api/chat/message`;
+const CHAT_URL =
+  import.meta.env.VITE_CHAT_URL || chatApiUrl("/api/chat/message");
 
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);

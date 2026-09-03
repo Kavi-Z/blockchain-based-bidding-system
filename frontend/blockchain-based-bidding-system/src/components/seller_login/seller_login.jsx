@@ -12,6 +12,8 @@ import eth1 from "../../assets/eth.png";
 import "./seller_login.css";
 import axios from "axios";
 
+import { apiUrl } from "../../config/env";
+
 const SellerLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,7 +28,7 @@ const SellerLogin = () => {
     setIsLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:8080/api/auth/seller-login", {
+      const res = await axios.post(apiUrl("/api/auth/seller-login"), {
         email,
         password,
       });

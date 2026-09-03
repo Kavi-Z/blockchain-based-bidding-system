@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Web3 from "web3";
 import SecureAuction from "./SecureAuction.json";
+import { getConfiguredContractAddress } from "../../services/contractService";
 import loginBg from "../../assets/login.png";
 import "./upload.css";
+
+import { apiUrl } from "../../config/env";
 
 const Upload = () => {
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -21,7 +24,7 @@ const Upload = () => {
     maxBid: "",
   });
 
-  const CONTRACT_ADDRESS = "0x55286Ac3A309c90918CDa8B0093ED5ECb5aF07fD";
+  const CONTRACT_ADDRESS = getConfiguredContractAddress();
 
   // Initialize Web3 and contract when walletAddress is set
   useEffect(() => {
@@ -89,7 +92,7 @@ const Upload = () => {
       headers["X-User-ID"] = user.id;
     }
 
-    const response = await fetch("http://localhost:8080/api/nft/upload", {
+    const response = await fetch(apiUrl("/api/nft/upload"), {
       method: "POST",
       headers: headers,
       body: data,
@@ -160,7 +163,7 @@ const Upload = () => {
         transactionHash: receipt.transactionHash,
       };
 
-      const backendResp = await fetch("http://localhost:8080/api/seller/auction", {
+      const backendResp = await fetch(apiUrl("/api/seller/auction"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

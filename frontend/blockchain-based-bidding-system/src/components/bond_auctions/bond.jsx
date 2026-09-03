@@ -5,6 +5,8 @@ import SealedBidAuction from "./SealedBidAuction.json";
 import image11 from "../../assets/image11.jpg";
 import "./bond.css";
 
+import { apiUrl } from "../../config/env";
+
 const BondAuctionCreate = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -89,7 +91,7 @@ const BondAuctionCreate = () => {
       formDataObj.append("image", selectedImage);
       formDataObj.append("sellerId", user.id);
 
-      const response = await fetch("http://localhost:8080/api/auction/upload/image", {
+      const response = await fetch(apiUrl("/api/auction/upload/image"), {
         method: "POST",
         headers: {
           Authorization: `Bearer ${user?.token || ""}`,
@@ -356,7 +358,7 @@ const BondAuctionCreate = () => {
         blockNumber: blockchainData.blockNumber,
       };
 
-      const response = await fetch("http://localhost:8080/api/bond-auctions", {
+      const response = await fetch(apiUrl("/api/bond-auctions"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,8 +1,8 @@
 from langchain_community.vectorstores import Chroma
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 
-from config import VECTOR_DB_PATH, GEMINI_API_KEY
+from .config import VECTOR_DB_PATH, GEMINI_API_KEY
 
 
 class DummyChain:
@@ -44,9 +44,10 @@ def get_chain():
 
     retriever = vectordb.as_retriever(search_kwargs={"k": 3})
 
-    llm = ChatOpenAI(
-        model_name="models/text-bison-001",
-        temperature=0
+    llm = ChatGoogleGenerativeAI(
+        model="models/gemini-pro",
+        temperature=0,
+        api_key=GEMINI_API_KEY
     )
 
     qa_chain = RetrievalQA(
