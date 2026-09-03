@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './Landing.css';
+import './landing.css';
 import { motion } from 'framer-motion';
 import Navbar2 from '../navbar2/navbar2';
 import img1 from '../../assets/img1.jpg';
