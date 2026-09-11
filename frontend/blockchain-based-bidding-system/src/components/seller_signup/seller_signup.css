@@ -58,7 +58,7 @@ html, body {
 }
 
 .seller-signup-main-text {
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   color: #41e1e3;
   font-size: 36px;
   font-weight: 100;
@@ -68,7 +68,7 @@ html, body {
 
 .seller-signup-form {
   display: flex;
-  font-family: 'MyFont1', sans-serif;
+  font-family: ''Poppins', sans-serif', sans-serif;
   flex-direction: column;
   gap: 15px;
   width: 500px;
@@ -78,7 +78,7 @@ html, body {
   padding: 12px 15px;
   border-radius: 8px;
   border: 1px solid #ccc;
-  font-family: sans-serif, "MyFont1";
+  font-family: sans-serif, "'Poppins', sans-serif";
   font-size: 16px;
   outline: none;
   background-color: transparent;
@@ -101,7 +101,7 @@ html, body {
   background-color: #41e1e3;
   color: black;
   font-size: 18px;
-  font-family: sans-serif, "MyFont1";
+  font-family: sans-serif, "'Poppins', sans-serif";
   font-weight: bold;
   cursor: pointer;
   transition: background 0.3s ease;

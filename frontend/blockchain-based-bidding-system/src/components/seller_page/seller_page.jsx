@@ -1,26 +1,29 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "@asgardeo/auth-react";
+import { ensureSepoliaNetwork } from "../../services/contractService";
+import DashboardNavbar from '../DashboardNavbar/DashboardNavbar';
 import "./seller_page.css";
 
 import { apiUrl } from "../../config/env";
 
 export default function SellerPage() {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const { getIDToken } = useAuthContext();
+  const internalUserId = localStorage.getItem("internalUserId");
+  const userRole = localStorage.getItem("userRole");
 
   const [auctions, setAuctions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [countdowns, setCountdowns] = useState({});
-  const [autoRefreshInterval, setAutoRefreshInterval] = useState(5000); // 5 seconds
   const fetchOnce = useRef(false);
-  const pollIntervalRef = useRef(null);
 
   // Check authentication
   useEffect(() => {
-    if (!user || user.role !== "SELLER") {
+    if (userRole !== "SELLER") {
       alert("You must be logged in as a seller to access this page");
-      navigate("/seller-login");
+      navigate("/");
       return;
     }
     // Prevent double-fetch in React StrictMode (dev) or duplicate mounts
@@ -28,18 +31,7 @@ export default function SellerPage() {
       fetchOnce.current = true;
       fetchSellerAuctions();
     }
-
-    // Set up polling for real-time updates
-    pollIntervalRef.current = setInterval(() => {
-      fetchSellerAuctions();
-    }, autoRefreshInterval);
-
-    return () => {
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current);
-      }
-    };
-  }, [user, navigate, autoRefreshInterval]);
+  }, [userRole, navigate]);
 
   // Fetch seller's auctions from database
   const fetchSellerAuctions = async () => {
@@ -47,20 +39,21 @@ export default function SellerPage() {
       setLoading(true);
       setError("");
 
-      if (!user || !user.id) {
+      if (!internalUserId) {
         setError("User not loaded");
         setLoading(false);
         return;
       }
 
-      console.log("fetchSellerAuctions -> user:", user);
+      console.log("fetchSellerAuctions -> user ID:", internalUserId);
+      const token = await getIDToken();
 
-      const response = await fetch(apiUrl(`/api/auctions/seller/${user.id}`), {
+      const response = await fetch(apiUrl(`/api/auctions/seller/${internalUserId}`), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token || ""}`,
-          "X-User-ID": user.id,
+          Authorization: `Bearer ${token || ""}`,
+          "X-User-ID": internalUserId,
         },
       });
  
@@ -172,12 +165,14 @@ export default function SellerPage() {
         return;
       }
 
+      const token = await getIDToken();
+
       const response = await fetch(apiUrl(`/api/auctions/${auctionId}/end`), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token || ""}`,
-          "X-User-ID": user.id,
+          Authorization: `Bearer ${token || ""}`,
+          "X-User-ID": internalUserId,
         },
       });
 
@@ -222,23 +217,7 @@ export default function SellerPage() {
 
   return (
     <div className="seller-dashboard-container">
-      {/* Header */}
-      <div className="seller-header">
-        <div className="header-content">
-          <div className="header-left">
-            <h1>📦 Seller Dashboard</h1>
-            <p>Welcome, {user?.username || user?.email}</p>
-          </div>
-          <div className="header-right">
-            <button className="btn-refresh" onClick={handleRefresh}>
-              🔄 Refresh
-            </button>
-            <button className="btn-create-auction" onClick={handleCreateAuction}>
-              ➕ Create New Auction
-            </button>
-          </div>
-        </div>
-      </div>
+      <DashboardNavbar activePage="dashboard" />
 
       {/* Main Content */}
       <div className="seller-content">

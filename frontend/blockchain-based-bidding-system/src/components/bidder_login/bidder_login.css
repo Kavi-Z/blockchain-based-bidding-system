@@ -40,7 +40,7 @@ html, body {
 }
 
 .logo-text {
-  font-family: 'MyFont1', Georgia, 'Times New Roman', serif;
+  font-family: ''Poppins', sans-serif', Georgia, 'Times New Roman', serif;
   font-size: 24px;
   color: white;
   font-weight: bold;
@@ -156,14 +156,14 @@ font-family: "Poppins", sans-serif;
 }
 
 .login-main-text {
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   color: #41e1e3;
   font-size: 66px;
   font-weight: 100;
 }
 
 .login-sub-text {
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   color: #41e1e3;
   font-size: 20px;
   font-weight: 100;
@@ -205,7 +205,7 @@ font-family: "Poppins", sans-serif;
   background-color: #41e1e3;
   color: black;
   font-size: 18px;
-  font-family: sans-serif, "MyFont1";
+  font-family: sans-serif, "'Poppins', sans-serif";
   cursor: pointer;
   transition: background 0.3s ease;
   width: 100px;

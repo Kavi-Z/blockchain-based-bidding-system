@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "@asgardeo/auth-react";
 import { ethers } from "ethers";
 import SecureAuction from "./SecureAuction.json";
 import {
@@ -10,35 +11,16 @@ import {
   getRequiredBidWei,
   getWalletBalance,
 } from "../../services/contractService";
+import DashboardNavbar from '../DashboardNavbar/DashboardNavbar';
 import "./bidderdashboard.css";
 
 import { apiUrl } from "../../config/env";
 
 const BidderDashboard = () => {
   const navigate = useNavigate();
- 
-  const getStoredUser = () => {
-    const raw = localStorage.getItem("user");
-    if (raw) {
-      try {
-        return JSON.parse(raw);
-      } catch (e) {
-        console.warn("Invalid JSON in localStorage.user", e);
-      }
-    }
- 
-    const id = localStorage.getItem("userId") || localStorage.getItem("id");
-    const token = localStorage.getItem("token") || localStorage.getItem("authToken");
-    const role = localStorage.getItem("role") || localStorage.getItem("userRole");
-
-    if (id || token || role) {
-      return { id, token, role };
-    }
-
-    return null;
-  };
-
-  const [user, setUser] = useState(getStoredUser());
+  const { getIDToken } = useAuthContext();
+  const internalUserId = localStorage.getItem("internalUserId");
+  const userRole = localStorage.getItem("userRole");
 
   // Wallet & Contract state
   const [walletAddress, setWalletAddress] = useState("");
@@ -63,11 +45,11 @@ const BidderDashboard = () => {
   const CONTRACT_ADDRESS = getConfiguredContractAddress();
  
   useEffect(() => {
-    if (!user || user.role !== "BIDDER") {
+    if (userRole !== "BIDDER") {
       alert("You must be logged in as a bidder to access this dashboard");
-      navigate("/bidder-dashboard");
+      navigate("/");
     }
-  }, [user, navigate]);
+  }, [userRole, navigate]);
  
   useEffect(() => {
     if (fetchOnce.current) return;
@@ -101,10 +83,11 @@ const BidderDashboard = () => {
  
   const fetchActiveAuctions = async () => {
     try {
+      const token = await getIDToken();
       const response = await fetch(apiUrl("/api/auctions"), {
         headers: {
-          "Authorization": `Bearer ${user.token}`,
-          "X-User-ID": user.id,
+          "Authorization": `Bearer ${token}`,
+          "X-User-ID": internalUserId,
         },
       });
 
@@ -136,10 +119,11 @@ const BidderDashboard = () => {
   const fetchOwnedNFTs = async () => {
     try {
       setLoadingNFTs(true);
+      const token = await getIDToken();
       const response = await fetch(apiUrl("/api/nft/owned"), {
         headers: {
-          "Authorization": `Bearer ${user.token}`,
-          "X-User-ID": user.id,
+          "Authorization": `Bearer ${token}`,
+          "X-User-ID": internalUserId,
         },
       });
 
@@ -163,13 +147,14 @@ const BidderDashboard = () => {
   const fetchWonAuctions = async () => {
     try {
       setLoadingWonAuctions(true);
-      console.log("Fetching won auctions for user ID:", user.id);
+      console.log("Fetching won auctions for user ID:", internalUserId);
       
+      const token = await getIDToken();
       // Use dedicated backend endpoint for won auctions
       const response = await fetch(apiUrl("/api/auctions/won"), {
         headers: {
-          "Authorization": `Bearer ${user.token}`,
-          "X-User-ID": user.id,
+          "Authorization": `Bearer ${token}`,
+          "X-User-ID": internalUserId,
         },
       });
 
@@ -587,12 +572,13 @@ const BidderDashboard = () => {
 
       console.log("Saving bid to backend:", bidData);
       
+      const token = await getIDToken();
       const backendResponse = await fetch(apiUrl("/api/bids"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${user.token}`,
-          "X-User-ID": user.id,
+          "Authorization": `Bearer ${token}`,
+          "X-User-ID": internalUserId,
         },
         body: JSON.stringify(bidData),
       });
@@ -635,6 +621,7 @@ const BidderDashboard = () => {
 
   return (
     <div className="bidder-dashboard-container">
+      <DashboardNavbar activePage="dashboard" />
       <div className="bidder-dashboard-header">
         <h1>🛒 Bidder Dashboard</h1>
         <p>Browse and bid on active auctions</p>

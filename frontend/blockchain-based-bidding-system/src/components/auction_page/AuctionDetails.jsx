@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useAuthContext } from "@asgardeo/auth-react";
 import "./auction_details.css";
 
 import { apiUrl } from "../../config/env";
@@ -7,7 +8,9 @@ import { apiUrl } from "../../config/env";
 export default function AuctionDetails() {
   const navigate = useNavigate();
   const { auctionId } = useParams();
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const { getIDToken } = useAuthContext();
+  const internalUserId = localStorage.getItem("internalUserId");
+  const userRole = localStorage.getItem("userRole");
 
   const [auction, setAuction] = useState(null);
   const [bids, setBids] = useState([]);
@@ -17,9 +20,9 @@ export default function AuctionDetails() {
   const [finalizing, setFinalizing] = useState(false);
 
   useEffect(() => {
-    if (!user || user.role !== "SELLER") {
+    if (userRole !== "SELLER") {
       alert("You must be logged in as a seller to view auction details");
-      navigate("/seller-login");
+      navigate("/");
       return;
     }
     fetchAuctionDetails();
@@ -29,11 +32,11 @@ export default function AuctionDetails() {
     try {
       setLoading(true);
       setError("");
- 
+      const token = await getIDToken();
       const auctionResponse = await fetch(apiUrl(`/api/auctions/${auctionId}`), {
         headers: {
-          Authorization: `Bearer ${user.token || ""}`,
-          "X-User-ID": user.id,
+          Authorization: `Bearer ${token || ""}`,
+          "X-User-ID": internalUserId,
         },
       });
 
@@ -52,8 +55,8 @@ export default function AuctionDetails() {
         apiUrl(`/api/bids/auction/${auctionId}/bids-with-details`),
         {
           headers: {
-            Authorization: `Bearer ${user.token || ""}`,
-            "X-User-ID": user.id,
+            Authorization: `Bearer ${token || ""}`,
+            "X-User-ID": internalUserId,
           },
         }
       );
@@ -123,13 +126,14 @@ export default function AuctionDetails() {
     setSuccess("");
 
     try {
+      const token = await getIDToken();
       const response = await fetch(
         apiUrl(`/api/auctions/${auctionId}/end`),
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${user.token || ""}`,
-            "X-User-ID": user.id,
+            Authorization: `Bearer ${token || ""}`,
+            "X-User-ID": internalUserId,
           },
         }
       );
@@ -162,13 +166,14 @@ export default function AuctionDetails() {
     setSuccess("");
 
     try {
+      const token = await getIDToken();
       const response = await fetch(
         apiUrl(`/api/auctions/${auctionId}/finalize`),
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${user.token || ""}`,
-            "X-User-ID": user.id,
+            Authorization: `Bearer ${token || ""}`,
+            "X-User-ID": internalUserId,
           },
         }
       );

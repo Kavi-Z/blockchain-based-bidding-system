@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "@asgardeo/auth-react";
 import { ethers } from "ethers";
 import SecureAuction from "./SecureAuction.json";
 import {
@@ -7,13 +8,15 @@ import {
   getConfiguredContractAddress,
 } from "../../services/contractService";
 import image11 from "../../assets/image11.jpg";
+import DashboardNavbar from '../DashboardNavbar/DashboardNavbar';
 import "./auction_create.css";
-
 import { apiUrl } from "../../config/env";
 
 const AuctionCreate = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const { getIDToken } = useAuthContext();
+  const internalUserId = localStorage.getItem("internalUserId");
+  const userRole = localStorage.getItem("userRole");
 
   const [formData, setFormData] = useState({
     itemName: "",
@@ -38,11 +41,11 @@ const AuctionCreate = () => {
 
   // Check if user is logged in
   useEffect(() => {
-    if (!user || user.role !== "SELLER") {
+    if (userRole !== "SELLER") {
       alert("You must be logged in as a seller to create an auction");
-      navigate("/seller-login");
+      navigate("/");
     }
-  }, [user, navigate]);
+  }, [userRole, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -92,13 +95,14 @@ const AuctionCreate = () => {
     try {
       const formDataObj = new FormData();
       formDataObj.append("image", selectedImage);
-      formDataObj.append("sellerId", user.id);
+      formDataObj.append("sellerId", internalUserId);
 
+      const token = await getIDToken();
       const response = await fetch(apiUrl("/api/auction/upload/image"), {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${user?.token || ""}`,
-          "X-User-ID": user?.id || "",
+          Authorization: `Bearer ${token || ""}`,
+          "X-User-ID": internalUserId || "",
         },
         body: formDataObj,
       });
@@ -474,7 +478,7 @@ const AuctionCreate = () => {
         minIncrement: parseFloat(formData.minIncrement),
         extensionTime: parseInt(formData.extensionTime), // Backend expects minutes
         maxBid: formData.maxBid ? parseFloat(formData.maxBid) : null,
-        sellerId: user.id,
+        sellerId: internalUserId,
         imageCID: uploadedImageCID,
         sellerWalletAddress: walletAddress,
         contractAddress: blockchainData.contractAddress,
@@ -482,12 +486,13 @@ const AuctionCreate = () => {
         blockNumber: blockchainData.blockNumber,
       };
 
+      const token = await getIDToken();
       const response = await fetch(apiUrl("/api/auctions"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-          "X-User-ID": user.id,
+          Authorization: `Bearer ${token}`,
+          "X-User-ID": internalUserId,
         },
         body: JSON.stringify(auctionData),
       });
@@ -520,10 +525,12 @@ const AuctionCreate = () => {
   };
 
   return (
-    <div className="auction-create-container">
-      <div className="auction-create-wrapper">
-        <div className="auction-create-content">
-          <h1>Create New Auction</h1>
+    <>
+      <DashboardNavbar activePage="create-auction" />
+      <div className="auction-create-container">
+        <div className="auction-create-wrapper">
+          <div className="auction-create-content">
+            <h1>Create New Auction</h1>
 
           {error && <div className="alert alert-error">{error}</div>}
           {success && <div className="alert alert-success">{success}</div>}
@@ -740,6 +747,7 @@ const AuctionCreate = () => {
         ></div>
       </div>
     </div>
+  </>
   );
 };
 

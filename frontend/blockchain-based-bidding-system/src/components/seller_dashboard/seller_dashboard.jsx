@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useAuthContext } from "@asgardeo/auth-react";
 import Web3 from "web3";
 import SecureAuction from "./SecureAuction.json";
 import { getConfiguredContractAddress } from "../../services/contractService";
@@ -8,8 +9,9 @@ import "../items-upload/upload.css";
 import { apiUrl } from "../../config/env";
 
 const Upload = () => {
-
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const { getIDToken } = useAuthContext();
+  const internalUserId = localStorage.getItem("internalUserId");
+  const userRole = localStorage.getItem("userRole");
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -94,11 +96,11 @@ const Upload = () => {
     formDataObj.append("file", selectedFile);
     formDataObj.append("walletAddress", walletAddress);
 
-   
     const headers = {};
-    if (user && user.token) {
-      headers["Authorization"] = `Bearer ${user.token}`;
-      headers["X-User-ID"] = user.id;
+    const token = await getIDToken();
+    if (token && internalUserId) {
+      headers["Authorization"] = `Bearer ${token}`;
+      headers["X-User-ID"] = internalUserId;
     }
 
     try {
@@ -128,7 +130,7 @@ const Upload = () => {
   const handleCreateAuction = async (event) => {
     event.preventDefault();
 
-    if (!user || user.role !== "SELLER") {
+    if (userRole !== "SELLER") {
       alert("Only sellers can create auctions");
       return;
     }
@@ -179,11 +181,12 @@ const Upload = () => {
         });
 
       
+      const token = await getIDToken();
       const auctionData = {
         itemName: formData.itemName,
         imageUrl: imageUrl,
-        sellerId: user.id,
-        sellerUsername: user.username,
+        sellerId: internalUserId,
+        sellerUsername: localStorage.getItem("userEmail"),
         ownerAddress: walletAddress,
         biddingTime: parseInt(formData.biddingTime),
         minIncrement: parseFloat(formData.minIncrement),
@@ -199,9 +202,9 @@ const Upload = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            ...(user && user.token && {
-              "Authorization": `Bearer ${user.token}`,
-              "X-User-ID": user.id
+            ...(token && {
+              "Authorization": `Bearer ${token}`,
+              "X-User-ID": internalUserId
             })
           },
           body: JSON.stringify(auctionData),

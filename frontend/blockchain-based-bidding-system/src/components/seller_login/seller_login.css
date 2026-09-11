@@ -159,14 +159,14 @@ html, body {
 }
 
 .seller-login-main-text {
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   color: #41e1e3;
   font-size: 66px;
   font-weight: 100;
 }
 
 .seller-login-sub-text {
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   color: #41e1e3;
   font-size: 20px;
   font-weight: 100;
@@ -189,7 +189,7 @@ html, body {
   background-color: #41e1e3;
   color: white;
   font-size: 18px;
-  font-family: sans-serif, "MyFont1";
+  font-family: sans-serif, "'Poppins', sans-serif";
   cursor: pointer;
   transition: background 0.3s ease;
   width: 100px;
@@ -222,7 +222,7 @@ html, body {
   background-color: #41e1e3;
   color: black;
   font-size: 18px;
-  font-family: sans-serif, "MyFont1";
+  font-family: sans-serif, "'Poppins', sans-serif";
   cursor: pointer;
   transition: background 0.3s ease;
   width: 100px;

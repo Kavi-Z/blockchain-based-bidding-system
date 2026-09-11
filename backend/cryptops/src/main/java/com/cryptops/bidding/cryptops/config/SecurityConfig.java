@@ -1,13 +1,11 @@
 package com.cryptops.bidding.cryptops.config;
 
-import com.cryptops.bidding.cryptops.filter.AuthTokenFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -19,9 +17,6 @@ import java.util.stream.Collectors;
 @Configuration
 public class SecurityConfig {
 
-    @Autowired
-    private AuthTokenFilter authTokenFilter;
-
     @Value("${app.cors.allowed-origins:http://localhost:3000,http://localhost:5173,http://localhost:5174}")
     private String allowedOrigins;
 
@@ -30,7 +25,6 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .cors(cors -> {})
-            .addFilterBefore(authTokenFilter, BasicAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/nft/**").permitAll()
@@ -39,7 +33,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/seller/**").authenticated()
                 .anyRequest().authenticated()
             )
-            .httpBasic(basic -> basic.realmName("Auction API"));
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
 
         return http.build();
     }
