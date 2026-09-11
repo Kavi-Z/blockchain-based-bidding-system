@@ -56,7 +56,8 @@ const AuthSync = () => {
                     });
                     
                     // Call the backend to sync the user via JIT Provisioning
-                    const response = await fetch('http://localhost:8080/api/auth/sync', {
+                    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+                    const response = await fetch(`${API_BASE_URL}/api/auth/sync`, {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${rawIdToken}`,
