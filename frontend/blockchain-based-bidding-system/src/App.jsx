@@ -26,28 +26,30 @@ import CookiePolicy from "./components/cookie-policy/cookie-policy";
 import Disclaimer from "./components/disclaimer/disclaimer";
 import Seller_Page from "./components/seller_page/seller_page";
 import AuctionDetails from "./components/auction_page/AuctionDetails";
-
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import AuthSync from "./components/auth/AuthSync";
 
 function App() {
   return (
     <Router>
+      <AuthSync />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/bidder_login" element={<Bidder_Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/my-nft" element={<NFTGallery />} />
+        <Route path="/my-nft" element={<ProtectedRoute><NFTGallery /></ProtectedRoute>} />
         <Route path="/main-login" element={<Main_Login />} />
         <Route path="/nft/:id" element={<NFTDetail />} />
-        <Route path="/create-auction" element={<Seller_dashboard />} />
-        <Route path="/auction-create" element={<AuctionCreate />} />
-        <Route path="/profile" element={<Update_profile />} />
+        <Route path="/create-auction" element={<ProtectedRoute allowedRole="SELLER"><Seller_dashboard /></ProtectedRoute>} />
+        <Route path="/auction-create" element={<ProtectedRoute allowedRole="SELLER"><AuctionCreate /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Update_profile /></ProtectedRoute>} />
         <Route path="/auctions" element={<AuctionPage />} />
         <Route path="/auctions/:id" element={<AuctionPage />} />
         <Route path="/auction/:auctionId" element={<AuctionDetails />} />
         <Route path="/seller-login" element={<SellerLogin />} />
         <Route path="/seller-signup" element={<SellerSignup />} />
-        <Route path="/seller-dashboard" element={<Seller_Page />} />
-        <Route path="/bidder-dashboard" element={<BiddersDashboard />} />
+        <Route path="/seller-dashboard" element={<ProtectedRoute allowedRole="SELLER"><Seller_Page /></ProtectedRoute>} />
+        <Route path="/bidder-dashboard" element={<ProtectedRoute allowedRole="BIDDER"><BiddersDashboard /></ProtectedRoute>} />
         <Route path="/bidders-info" element={<BiddersInfo />} />
         <Route path="/documentation" element={<Documentation />} />
         <Route path="/whitepaper" element={<Whitepaper />} />
@@ -57,7 +59,7 @@ function App() {
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/cookie-policy" element={<CookiePolicy />} />
         <Route path="/disclaimer" element={<Disclaimer />} />
-        <Route path="/Seller_dashboard" element={<Seller_Page />} />
+        <Route path="/Seller_dashboard" element={<ProtectedRoute allowedRole="SELLER"><Seller_Page /></ProtectedRoute>} />
       </Routes>
  
       <Chatbot />

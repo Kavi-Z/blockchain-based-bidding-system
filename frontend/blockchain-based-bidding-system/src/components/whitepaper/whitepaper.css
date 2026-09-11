@@ -21,7 +21,7 @@
 }
 
 .whitepaper-title {
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   font-size: 4.5rem;
   font-weight: 100;
   margin-bottom: 20px;
@@ -70,7 +70,7 @@
 }
 
 .sidebar-title {
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   font-size: 1.5rem;
   color: #41e1e3;
   margin-bottom: 20px;
@@ -130,7 +130,7 @@
 }
 
 .section-title {
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   font-size: 2.8rem;
   color: #41e1e3;
   margin-bottom: 30px;

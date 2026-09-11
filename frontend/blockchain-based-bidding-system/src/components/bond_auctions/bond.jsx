@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "@asgardeo/auth-react";
 import { ethers } from "ethers";
 import SealedBidAuction from "./SealedBidAuction.json";
 import image11 from "../../assets/image11.jpg";
@@ -9,7 +10,9 @@ import { apiUrl } from "../../config/env";
 
 const BondAuctionCreate = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const { getIDToken } = useAuthContext();
+  const internalUserId = localStorage.getItem("internalUserId");
+  const userRole = localStorage.getItem("userRole");
 
   const [formData, setFormData] = useState({
     itemName: "",
@@ -35,11 +38,11 @@ const BondAuctionCreate = () => {
 
   // Check if user is logged in
   useEffect(() => {
-    if (!user || user.role !== "SELLER") {
+    if (userRole !== "SELLER") {
       alert("You must be logged in as a seller to create an auction");
-      navigate("/seller-login");
+      navigate("/");
     }
-  }, [user, navigate]);
+  }, [userRole, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -89,13 +92,14 @@ const BondAuctionCreate = () => {
     try {
       const formDataObj = new FormData();
       formDataObj.append("image", selectedImage);
-      formDataObj.append("sellerId", user.id);
+      formDataObj.append("sellerId", internalUserId);
 
+      const token = await getIDToken();
       const response = await fetch(apiUrl("/api/auction/upload/image"), {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${user?.token || ""}`,
-          "X-User-ID": user?.id || "",
+          Authorization: `Bearer ${token || ""}`,
+          "X-User-ID": internalUserId || "",
         },
         body: formDataObj,
       });
@@ -350,7 +354,7 @@ const BondAuctionCreate = () => {
         minIncrement: parseFloat(formData.minIncrement),
         extensionTime: parseInt(formData.extensionTime),
         maxBid: formData.maxBid ? parseFloat(formData.maxBid) : null,
-        sellerId: user.id,
+        sellerId: internalUserId,
         imageCID: uploadedImageCID,
         sellerWalletAddress: blockchainData.walletAddress,
         contractAddress: blockchainData.contractAddress,
@@ -358,12 +362,13 @@ const BondAuctionCreate = () => {
         blockNumber: blockchainData.blockNumber,
       };
 
+      const token = await getIDToken();
       const response = await fetch(apiUrl("/api/bond-auctions"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-          "X-User-ID": user.id,
+          Authorization: `Bearer ${token}`,
+          "X-User-ID": internalUserId,
         },
         body: JSON.stringify(auctionData),
       });

@@ -75,6 +75,12 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- OAuth2 Resource Server (Asgardeo) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+
         <!-- Load secrets from .env for local development -->
         <dependency>
             <groupId>me.paulschwarz</groupId>

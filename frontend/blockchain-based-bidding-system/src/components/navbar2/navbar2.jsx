@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuthContext } from "@asgardeo/auth-react";
 import './navbar2.css';
 import logo from "../../assets/cryptops.png";
 
@@ -7,6 +8,7 @@ const Navbar2 = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { state, signIn, signOut } = useAuthContext();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -39,10 +41,6 @@ const Navbar2 = () => {
     }
   };
 
-  const handleLoginRedirect = () => {
-    navigate('/main-login');
-  };
-
   return (
     <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
       <div className='navbar-container'>
@@ -66,9 +64,18 @@ const Navbar2 = () => {
           </li>
         </ul>
 
-        <button className='connect-wallet-btn' onClick={handleLoginRedirect}>
-          Login
-        </button>
+        {state.isAuthenticated ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <span style={{ color: 'white' }}>{state.displayName || state.username || "User"}</span>
+            <button className='connect-wallet-btn' onClick={() => signOut()}>
+              Logout
+            </button>
+          </div>
+        ) : (
+          <button className='connect-wallet-btn' onClick={() => signIn()}>
+            Sign In with Asgardeo
+          </button>
+        )}
       </div>
     </nav>
   );

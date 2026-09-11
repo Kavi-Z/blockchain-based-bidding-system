@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "@asgardeo/auth-react";
 import "./BiddersInfo.css";
 
 import { apiUrl } from "../../config/env";
 
 export default function BiddersInfo() {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const { getIDToken } = useAuthContext();
+  const internalUserId = localStorage.getItem("internalUserId");
+  const userRole = localStorage.getItem("userRole");
   
   const [ownedNFTs, setOwnedNFTs] = useState([]);
   const [bidHistory, setBidHistory] = useState([]);
@@ -19,9 +22,9 @@ export default function BiddersInfo() {
 
   // Check authentication
   useEffect(() => {
-    if (!user || user.role !== "BIDDER") {
+    if (userRole !== "BIDDER") {
       alert("You must be logged in as a bidder to access this page");
-      navigate("/bidder-login");
+      navigate("/");
       return;
     }
     
@@ -30,27 +33,28 @@ export default function BiddersInfo() {
       fetchBiddersNFTs();
       fetchBidHistory();
     }
-  }, [user, navigate]);
+  }, [userRole, navigate]);
  
   const fetchBiddersNFTs = async () => {
     try {
       setLoading(true);
       setError("");
 
-      if (!user || !user.id) {
+      if (!internalUserId) {
         setError("User not loaded");
         setLoading(false);
         return;
       }
 
-      console.log("Fetching NFTs for bidder:", user.id);
+      console.log("Fetching NFTs for bidder:", internalUserId);
  
+      const token = await getIDToken();
       const response = await fetch(apiUrl("/api/auctions"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token || ""}`,
-          "X-User-ID": user.id,
+          Authorization: `Bearer ${token || ""}`,
+          "X-User-ID": internalUserId,
         },
       });
 
@@ -66,9 +70,9 @@ export default function BiddersInfo() {
       const nfts = allAuctions.filter(auction => {
        
         const isHighestBidder = 
-          auction.highestBidderId === user.id || 
-          auction.highestBidderUsername === user.username ||
-          auction.highestBidderUsername === user.email;
+          auction.highestBidderId === internalUserId || 
+          auction.highestBidderUsername === localStorage.getItem("userEmail") ||
+          auction.highestBidderUsername === localStorage.getItem("userEmail");
         
         return isHighestBidder;
       });
@@ -85,19 +89,20 @@ export default function BiddersInfo() {
   
   const fetchBidHistory = async () => {
     try {
-      if (!user || !user.id) {
+      if (!internalUserId) {
         console.warn("User not loaded, cannot fetch bid history");
         return;
       }
 
-      console.log("Fetching bid history for user:", user.id);
+      console.log("Fetching bid history for user:", internalUserId);
  
+      const token = await getIDToken();
       const response = await fetch(apiUrl("/api/bids/user/history"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token || ""}`,
-          "X-User-ID": user.id,
+          Authorization: `Bearer ${token || ""}`,
+          "X-User-ID": internalUserId,
         },
       });
 

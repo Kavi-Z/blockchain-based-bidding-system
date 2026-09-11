@@ -1,39 +1,24 @@
 from langchain_community.vectorstores import Chroma
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import PromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
 
 from .config import VECTOR_DB_PATH, GEMINI_API_KEY
 
 
-class DummyChain:
-    """Fallback object used when langchain is not installed.
-
-    The FastAPI app can still start, but any request will receive a helpful
-    message instructing the developer to install the required packages.
-    """
+class ChainWrapper:
+    def __init__(self, chain):
+        self.chain = chain
+        
     def run(self, question: str) -> str:
-        return (
-            "⚠️ LangChain is not available in the Python environment. "
-            "Please activate the `ai-services/venv` and run ``pip install -r "
-            "requirements.txt`` (or upgrade LangChain to a compatible version)."
-        )
+        return self.chain.invoke(question)
 
 
 def get_chain():
-    """Return a RetrievalQA chain or a dummy stub.
-
-    Imports the necessary classes lazily so that the module can be loaded even
-    if langchain is missing.  If the import fails, a DummyChain instance is
-    returned and the error is logged.
-    """
-    try:
-        from langchain.chains import RetrievalQA
-    except ModuleNotFoundError as err:
-        # logging here isn't available; raise a message will be returned later
-        return DummyChain()
-
     embeddings = GoogleGenerativeAIEmbeddings(
-        model="models/embedding-001",
+        model="models/gemini-embedding-2",
         api_key=GEMINI_API_KEY
     )
 
@@ -45,15 +30,28 @@ def get_chain():
     retriever = vectordb.as_retriever(search_kwargs={"k": 3})
 
     llm = ChatGoogleGenerativeAI(
-        model="models/gemini-pro",
+        model="models/gemini-2.5-flash",
         temperature=0,
         api_key=GEMINI_API_KEY
     )
 
-    qa_chain = RetrievalQA(
-        llm=llm,
-        retriever=retriever,
-        return_source_documents=False
+    template = """Use the following pieces of context to answer the question at the end.
+If you don't know the answer, just say that you don't know, don't try to make up an answer.
+
+{context}
+
+Question: {question}
+Answer:"""
+    prompt = PromptTemplate.from_template(template)
+
+    def format_docs(docs):
+        return "\n\n".join(doc.page_content for doc in docs)
+
+    qa_chain = (
+        {"context": retriever | format_docs, "question": RunnablePassthrough()}
+        | prompt
+        | llm
+        | StrOutputParser()
     )
 
-    return qa_chain
+    return ChainWrapper(qa_chain)

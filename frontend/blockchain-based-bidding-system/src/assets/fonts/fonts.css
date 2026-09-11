@@ -1,5 +1,5 @@
 @font-face {
-  font-family: 'MyFont1';
+  font-family: ''Poppins', sans-serif';
   /* The CSS file is located in src/assets/fonts/, so the font file is in the same folder.
      Use a relative path that points to the same folder (./MetalMania-Regular.ttf).
      Vite/webpack will correctly resolve this import when the stylesheet is imported. */

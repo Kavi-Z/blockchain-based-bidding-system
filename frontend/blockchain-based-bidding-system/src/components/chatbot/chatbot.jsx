@@ -27,8 +27,9 @@ export default function Chatbot() {
     setMessages(prev => [...prev, userMessage]);
 
     try {
-      console.log("chatbot: sending message to", CHAT_URL);
-      const resp = await axios.post(CHAT_URL, { message: input });
+      const AI_URL = "http://localhost:8000/api/chat/message";
+      console.log("chatbot: sending message to", AI_URL);
+      const resp = await axios.post(AI_URL, { message: input });
       const botText = resp.data?.reply || resp.data?.answer || "(no response)";
       setMessages(prev => [...prev, { sender: "bot", text: botText }]);
     } catch (err) {

@@ -95,7 +95,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 15px;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   font-size: 3rem;
   font-weight: 100;
   margin: 20px 0 10px;
@@ -105,7 +105,7 @@ body {
 
 
 .Head-landing {
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   font-size: 5.8rem;
   font-weight: 100;
   margin: 40px ;
@@ -128,7 +128,7 @@ body {
 }
 
 .protocols {
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   font-size: 3rem;
   font-weight: 100;
   margin: 20px 0 10px;
@@ -155,7 +155,7 @@ body {
 }
 
 .About-head {
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   font-size: 2.8rem;
   font-weight: 100;
   margin-bottom: 20px;
@@ -188,7 +188,7 @@ body {
   font-weight: 100;
   margin-bottom: 10px;  
   color: #41E1E3;
-    font-family: "MyFont1", sans-serif;
+    font-family: "'Poppins', sans-serif", sans-serif;
 }
 
 .vision-content,
@@ -217,7 +217,7 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   color: transparent; 
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
 }
 
 .intro-sub {
@@ -246,7 +246,7 @@ body {
 }
 
 .contact-head {
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   font-size: 3rem;
   font-weight: 100;
   text-align: center;
@@ -528,12 +528,12 @@ body {
   color: white;
   font-weight: 100;
   text-align: center;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   animation: glow 2s ease-in-out infinite alternate, fadeIn 1s ease-out;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
 }
 .title-faq{
-    font-family: "MyFont1", sans-serif;
+    font-family: "'Poppins', sans-serif", sans-serif;
     font-size: 3.8rem;
     font-weight: 100;
     margin-top: 100px;
@@ -589,10 +589,7 @@ body {
   color: white;
   line-height: 1.6;
   margin-left: 10px;
-  max-height: 0;
   overflow: hidden;
-  opacity: 0;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0 10px;
   font-family: "Poppins", sans-serif;
 }
