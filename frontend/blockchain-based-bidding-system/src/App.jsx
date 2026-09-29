@@ -1,5 +1,5 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Bidder_Login from "./components/bidder_login/bidder_login";
 import Signup from "./components/bidder_signup/signup";
 import Landing from "./components/landing_page/landing";
@@ -30,10 +30,21 @@ import AuctionDetails from "./components/auction_page/AuctionDetails";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AuthSync from "./components/auth/AuthSync";
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 function App() {
   return (
     <Router>
       <AuthSync />
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/explore" element={<Explore />} />
