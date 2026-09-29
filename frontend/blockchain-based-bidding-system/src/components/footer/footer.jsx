@@ -49,7 +49,6 @@ const Footer = () => {
             <h3 className='footer-title'>Quick Links</h3>
             <ul className='footer-links'>
               <li><a onClick={() => scrollToSection('home')}>Home</a></li>
-              <li><a onClick={() => scrollToSection('about')}>About Us</a></li>
               <li><a href='#faq'>FAQ</a></li>
               <li><a onClick={() => scrollToSection('contact')}>Contact</a></li>
             </ul>
