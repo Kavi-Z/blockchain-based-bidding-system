@@ -1,15 +1,20 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './footer.css';
 import logo from '../../assets/cryptops.png';
 
 const Footer = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const scrollToSection = (sectionId) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    if (location.pathname === '/') {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      navigate(`/#${sectionId}`);
     }
   };
 
@@ -49,7 +54,7 @@ const Footer = () => {
             <h3 className='footer-title'>Quick Links</h3>
             <ul className='footer-links'>
               <li><a onClick={() => scrollToSection('home')}>Home</a></li>
-              <li><a href='#faq'>FAQ</a></li>
+              <li><a onClick={() => scrollToSection('faq')}>FAQ</a></li>
               <li><a onClick={() => scrollToSection('contact')}>Contact</a></li>
             </ul>
           </div>
