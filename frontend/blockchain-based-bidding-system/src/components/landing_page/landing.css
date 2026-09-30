@@ -1,22 +1,15 @@
-html, body {
+body {
   margin: 0;
   padding: 0;
-  width: 100%;
-  overflow-x: hidden;
-  box-sizing: border-box;
+ 
   background-attachment: scroll;  
   min-height: 100vh;
-}
-
-*, *::before, *::after {
-  box-sizing: inherit;
+  
 }
 
 .landing-container {
   min-height: 100vh;
   width: 100%;
-  max-width: 100vw;
-  overflow-x: hidden;
   padding: 50px 20px;
   box-sizing: border-box;
  
@@ -93,10 +86,8 @@ html, body {
   cursor:pointer;
 }
 
-.hero-eth {
-  width: 100%;
-  max-width: 620px;
-  height: auto;
+.hero-eth{
+  width:620px;
   filter: drop-shadow(0 0 20px #41E1E3);
 }
 .protocols {
@@ -427,30 +418,6 @@ html, body {
 }
  
 @media (max-width: 768px) {
-  .hero {
-    width: 95%;
-    flex-direction: column;
-    margin-top: 40px;
-    gap: 30px;
-  }
-
-  .hero-left {
-    text-align: center;
-  }
-
-  .hero-right {
-    margin-left: 0;
-    width: 100%;
-  }
-
-  .hero-title {
-    font-size: 2.6rem;
-  }
-
-  .hero-eth {
-    max-width: 280px;
-  }
-
   .Contactus {
     padding: 40px 25px;
   }
