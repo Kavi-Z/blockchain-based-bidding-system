@@ -9,6 +9,8 @@ import lockIcon from "../../assets/lock.png";
 import "./seller_signup.css";
 import axios from "axios";
 
+import { apiUrl } from "../../config/env";
+
 const SellerSignup = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState(""); 
@@ -40,7 +42,7 @@ const SellerSignup = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:8080/api/auth/register/seller",
+        apiUrl("/api/auth/register/seller"),
         { username, email, password },
         { headers: { "Content-Type": "application/json" } }
       );

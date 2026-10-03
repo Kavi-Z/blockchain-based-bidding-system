@@ -23,7 +23,7 @@ public class User {
     @Field("role")
     private String role;
 
-    @Indexed(unique = true)
+    @Indexed(unique = true, sparse = true)
     @Field("wallet_address")
     private String walletAddress;
 

@@ -1,34 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "@asgardeo/auth-react";
 import { ethers } from "ethers";
 import SecureAuction from "./SecureAuction.json";
+import {
+  decodeContractError,
+  ensureSepoliaNetwork,
+  formatEthAmount,
+  getConfiguredContractAddress,
+  getRequiredBidWei,
+  getWalletBalance,
+} from "../../services/contractService";
+import DashboardNavbar from '../DashboardNavbar/DashboardNavbar';
 import "./bidderdashboard.css";
+
+import { apiUrl } from "../../config/env";
 
 const BidderDashboard = () => {
   const navigate = useNavigate();
- 
-  const getStoredUser = () => {
-    const raw = localStorage.getItem("user");
-    if (raw) {
-      try {
-        return JSON.parse(raw);
-      } catch (e) {
-        console.warn("Invalid JSON in localStorage.user", e);
-      }
-    }
- 
-    const id = localStorage.getItem("userId") || localStorage.getItem("id");
-    const token = localStorage.getItem("token") || localStorage.getItem("authToken");
-    const role = localStorage.getItem("role") || localStorage.getItem("userRole");
-
-    if (id || token || role) {
-      return { id, token, role };
-    }
-
-    return null;
-  };
-
-  const [user, setUser] = useState(getStoredUser());
+  const { getIDToken } = useAuthContext();
+  const internalUserId = localStorage.getItem("internalUserId");
+  const userRole = localStorage.getItem("userRole");
 
   // Wallet & Contract state
   const [walletAddress, setWalletAddress] = useState("");
@@ -50,17 +42,14 @@ const BidderDashboard = () => {
   // Fetching control
   const fetchOnce = useRef(false);
 
-  const CONTRACT_ADDRESS =
-    (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_CONTRACT_ADDRESS) ||
-    (typeof process !== "undefined" && process.env && (process.env.REACT_APP_CONTRACT_ADDRESS || process.env.VITE_CONTRACT_ADDRESS)) ||
-    "0x55286Ac3A309c90918CDa8B0093ED5ECb5aF07fD";
+  const CONTRACT_ADDRESS = getConfiguredContractAddress();
  
   useEffect(() => {
-    if (!user || user.role !== "BIDDER") {
+    if (userRole !== "BIDDER") {
       alert("You must be logged in as a bidder to access this dashboard");
-      navigate("/bidder-dashboard");
+      navigate("/");
     }
-  }, [user, navigate]);
+  }, [userRole, navigate]);
  
   useEffect(() => {
     if (fetchOnce.current) return;
@@ -94,10 +83,11 @@ const BidderDashboard = () => {
  
   const fetchActiveAuctions = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/auctions", {
+      const token = await getIDToken();
+      const response = await fetch(apiUrl("/api/auctions"), {
         headers: {
-          "Authorization": `Bearer ${user.token}`,
-          "X-User-ID": user.id,
+          "Authorization": `Bearer ${token}`,
+          "X-User-ID": internalUserId,
         },
       });
 
@@ -129,10 +119,11 @@ const BidderDashboard = () => {
   const fetchOwnedNFTs = async () => {
     try {
       setLoadingNFTs(true);
-      const response = await fetch("http://localhost:8080/api/nft/owned", {
+      const token = await getIDToken();
+      const response = await fetch(apiUrl("/api/nft/owned"), {
         headers: {
-          "Authorization": `Bearer ${user.token}`,
-          "X-User-ID": user.id,
+          "Authorization": `Bearer ${token}`,
+          "X-User-ID": internalUserId,
         },
       });
 
@@ -156,13 +147,14 @@ const BidderDashboard = () => {
   const fetchWonAuctions = async () => {
     try {
       setLoadingWonAuctions(true);
-      console.log("Fetching won auctions for user ID:", user.id);
+      console.log("Fetching won auctions for user ID:", internalUserId);
       
+      const token = await getIDToken();
       // Use dedicated backend endpoint for won auctions
-      const response = await fetch("http://localhost:8080/api/auctions/won", {
+      const response = await fetch(apiUrl("/api/auctions/won"), {
         headers: {
-          "Authorization": `Bearer ${user.token}`,
-          "X-User-ID": user.id,
+          "Authorization": `Bearer ${token}`,
+          "X-User-ID": internalUserId,
         },
       });
 
@@ -461,65 +453,96 @@ const BidderDashboard = () => {
         if (!connected) return;
       }
 
-      // Check minimum bid (highest current bid + minimum increment, or starting price if no bids)
-      const highestBidEth = parseFloat(ethers.formatEther(highestBid));
-      const minIncrementEth = parseFloat(ethers.formatEther(minIncrement));
-      const startingPrice = parseFloat(frontendAuction.startingPrice || 0);
-      const minBid = highestBidEth > 0 ? highestBidEth + minIncrementEth : startingPrice;
+      // Contract rule: msg.value >= highestBid + minIncrement (first bid needs minIncrement)
+      const requiredBidWei = getRequiredBidWei(highestBid, minIncrement);
+      const requiredBidEth = formatEthAmount(requiredBidWei);
+
+      let value;
+      try {
+        value = ethers.parseEther(bidAmount.toString());
+      } catch {
+        throw new Error("Enter a valid bid amount in ETH (e.g. 0.15)");
+      }
 
       console.log("Bid validation:");
-      console.log("  highestBidEth:", highestBidEth);
-      console.log("  minIncrementEth:", minIncrementEth);
-      console.log("  startingPrice:", startingPrice);
-      console.log("  required minBid:", minBid);
-      console.log("  userBidAmount:", parseFloat(bidAmount));
+      console.log("  highestBid (ETH):", formatEthAmount(highestBid));
+      console.log("  minIncrement (ETH):", formatEthAmount(minIncrement));
+      console.log("  required min bid (ETH):", requiredBidEth);
+      console.log("  user bid (ETH):", bidAmount);
 
-      if (parseFloat(bidAmount) < minBid) {
-        throw new Error(`Your bid ($${parseFloat(bidAmount).toFixed(2)}) is below minimum ($${minBid.toFixed(2)}). Current bid: $${highestBidEth.toFixed(2)} + increment: $${minIncrementEth.toFixed(2)}`);
+      if (value < requiredBidWei) {
+        throw new Error(
+          `Bid too low. Minimum is ${requiredBidEth} ETH on-chain` +
+            (highestBid > 0n
+              ? ` (current ${formatEthAmount(highestBid)} + increment ${formatEthAmount(minIncrement)})`
+              : ` (min increment for first bid)`)
+        );
       }
 
-      // Check max bid if set
-      if (maxBid && maxBid > 0n) {
-        const maxBidEth = parseFloat(ethers.formatEther(maxBid));
-        if (parseFloat(bidAmount) > maxBidEth) {
-          throw new Error(`Your bid ($${parseFloat(bidAmount).toFixed(2)}) exceeds maximum allowed ($${maxBidEth.toFixed(2)})`);
-        }
+      if (maxBid > 0n && value > maxBid) {
+        throw new Error(
+          `Bid exceeds maximum allowed: ${formatEthAmount(maxBid)} ETH`
+        );
       }
 
+      // Check wallet balance before attempting bid
+      const walletBalance = await getWalletBalance(walletAddress);
+      if (walletBalance === null) {
+        throw new Error("Could not fetch wallet balance. Check your connection.");
+      }
+
+      console.log("Wallet balance check:");
+      console.log("  wallet balance (ETH):", formatEthAmount(walletBalance));
+      console.log("  bid amount (ETH):", bidAmount);
+
+      if (walletBalance < value) {
+  throw new Error(
+    `Insufficient balance. You need ${formatEthAmount(value)} ETH bid, but only have ${formatEthAmount(walletBalance)} ETH.`
+  );
+}
+
+      await ensureSepoliaNetwork();
       setSuccess("Confirming bid in MetaMask...");
 
-      // Send bid transaction to blockchain
-      const value = ethers.parseEther(bidAmount.toString());
-      
       console.log("Sending bid transaction:");
       console.log("  auctionId:", blockchainAuctionId.toString());
-      console.log("  bidAmount (ETH):", bidAmount);
       console.log("  value (wei):", value.toString());
-      
+
+      // Try to simulate the call first to catch revert reasons
+      try {
+        await contract.bid.staticCall(blockchainAuctionId, { value });
+      } catch (simErr) {
+        console.error("Simulation failed, attempting to decode revert reason...", simErr);
+        
+        // Try to get more details by making a direct call
+        try {
+          const provider = new ethers.BrowserProvider(window.ethereum);
+          const signerAddress = await contract.runner.getAddress();
+          const populated = {
+            to: contract.target,
+            from: signerAddress,
+            data: contract.interface.encodeFunctionData("bid", [blockchainAuctionId]),
+            value: value.toString(),
+          };
+          
+          const callResult = await provider.call(populated);
+          if (callResult && callResult !== "0x") {
+            console.error("Raw call result:", callResult);
+          }
+        } catch (callErr) {
+          console.warn("Could not decode revert from direct call:", callErr.message);
+        }
+        
+        throw new Error(decodeContractError(simErr));
+      }
+
       let tx;
       try {
         tx = await contract.bid(blockchainAuctionId, { value });
         console.log("Bid transaction sent, hash:", tx.hash);
       } catch (err) {
         console.error("Bid transaction failed:", err);
-        console.error("Full error object:", JSON.stringify(err, null, 2));
-        
-        // Try to extract revert reason from the error
-        let revertMsg = "Transaction reverted on smart contract";
-        if (err?.reason) {
-          revertMsg = err.reason;
-        } else if (err?.message) {
-          if (err.message.includes("reverted")) {
-            revertMsg = "Smart contract rejected the bid. Check console logs for auction state.";
-          } else {
-            revertMsg = err.message;
-          }
-        }
-
-        // Don't retry - if it reverted, retrying won't help
-        throw new Error(
-          `Blockchain bid failed: ${revertMsg}\n\nCheck browser console (F12) for detailed auction state logs above.`
-        );
+        throw new Error(`Blockchain bid failed: ${decodeContractError(err)}`);
       }
 
       setSuccess("Bid submitted! Waiting for blockchain confirmation...");
@@ -549,12 +572,13 @@ const BidderDashboard = () => {
 
       console.log("Saving bid to backend:", bidData);
       
-      const backendResponse = await fetch("http://localhost:8080/api/bids", {
+      const token = await getIDToken();
+      const backendResponse = await fetch(apiUrl("/api/bids"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${user.token}`,
-          "X-User-ID": user.id,
+          "Authorization": `Bearer ${token}`,
+          "X-User-ID": internalUserId,
         },
         body: JSON.stringify(bidData),
       });
@@ -597,6 +621,7 @@ const BidderDashboard = () => {
 
   return (
     <div className="bidder-dashboard-container">
+      <DashboardNavbar activePage="dashboard" />
       <div className="bidder-dashboard-header">
         <h1>🛒 Bidder Dashboard</h1>
         <p>Browse and bid on active auctions</p>
@@ -655,12 +680,12 @@ const BidderDashboard = () => {
             {auctions.map((auction) => {
               const isSelected = selectedAuctionId === auction.id;
               const timeRemaining = getTimeRemaining(auction.endTime);
-              const minNextBid =
-                Math.max(
-                  parseFloat(auction.currentHighestBid || auction.startingPrice) +
-                  parseFloat(auction.minIncrement),
-                  parseFloat(auction.startingPrice)
-                ).toFixed(2);
+              const currentBid = parseFloat(auction.currentHighestBid || 0);
+              const increment = parseFloat(auction.minIncrement || 0);
+              const minNextBid = (currentBid > 0
+                ? currentBid + increment
+                : increment
+              ).toFixed(4);
 
               return (
                 <div
@@ -690,11 +715,11 @@ const BidderDashboard = () => {
                     <div className="bid-info">
                       <div className="bid-row">
                         <span>Starting Price:</span>
-                        <strong>${auction.startingPrice}</strong>
+                        <strong>{auction.startingPrice ?? 0} ETH</strong>
                       </div>
                       <div className="bid-row">
                         <span>Current Highest:</span>
-                        <strong>${auction.currentHighestBid || auction.startingPrice}</strong>
+                        <strong>{auction.currentHighestBid || 0} ETH</strong>
                       </div>
                       {auction.highestBidderUsername && (
                         <div className="bid-row">
@@ -704,7 +729,7 @@ const BidderDashboard = () => {
                       )}
                       <div className="bid-row">
                         <span>Min Next Bid:</span>
-                        <strong>${minNextBid}</strong>
+                        <strong>{minNextBid} ETH</strong>
                       </div>
                       <div className="bid-row">
                         <span>Seller:</span>
@@ -717,7 +742,7 @@ const BidderDashboard = () => {
                       <div className="bid-input-section">
                         <input
                           type="number"
-                          placeholder={`Min: $${minNextBid}`}
+                          placeholder={`Min: ${minNextBid} ETH`}
                           value={bidAmount}
                           onChange={(e) => setBidAmount(e.target.value)}
                           onClick={(e) => e.stopPropagation()}

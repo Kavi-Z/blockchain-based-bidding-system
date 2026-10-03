@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "@asgardeo/auth-react";
 import { ethers } from "ethers";
 import SecureAuction from "./SecureAuction.json";
+import {
+  ensureSepoliaNetwork,
+  getConfiguredContractAddress,
+} from "../../services/contractService";
 import image11 from "../../assets/image11.jpg";
+import DashboardNavbar from '../DashboardNavbar/DashboardNavbar';
 import "./auction_create.css";
+import { apiUrl } from "../../config/env";
 
 const AuctionCreate = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const { getIDToken } = useAuthContext();
+  const internalUserId = localStorage.getItem("internalUserId");
+  const userRole = localStorage.getItem("userRole");
 
   const [formData, setFormData] = useState({
     itemName: "",
@@ -29,15 +38,14 @@ const AuctionCreate = () => {
 
   // Blockchain state
   const [walletAddress, setWalletAddress] = useState("");
-  const [contractAddress] = useState("0x55286Ac3A309c90918CDa8B0093ED5ECb5aF07fD");
 
   // Check if user is logged in
   useEffect(() => {
-    if (!user || user.role !== "SELLER") {
+    if (userRole !== "SELLER") {
       alert("You must be logged in as a seller to create an auction");
-      navigate("/seller-login");
+      navigate("/");
     }
-  }, [user, navigate]);
+  }, [userRole, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -87,13 +95,14 @@ const AuctionCreate = () => {
     try {
       const formDataObj = new FormData();
       formDataObj.append("image", selectedImage);
-      formDataObj.append("sellerId", user.id);
+      formDataObj.append("sellerId", internalUserId);
 
-      const response = await fetch("http://localhost:8080/api/auction/upload/image", {
+      const token = await getIDToken();
+      const response = await fetch(apiUrl("/api/auction/upload/image"), {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${user?.token || ""}`,
-          "X-User-ID": user?.id || "",
+          Authorization: `Bearer ${token || ""}`,
+          "X-User-ID": internalUserId || "",
         },
         body: formDataObj,
       });
@@ -232,6 +241,15 @@ const AuctionCreate = () => {
     }
 
     try {
+      await ensureSepoliaNetwork();
+
+      const contractAddress = getConfiguredContractAddress();
+      if (!contractAddress) {
+        throw new Error(
+          "Contract address missing. Set VITE_CONTRACT_ADDRESS in frontend/.env and restart npm run dev."
+        );
+      }
+
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const contract = new ethers.Contract(contractAddress, SecureAuction.abi, signer);
@@ -460,7 +478,7 @@ const AuctionCreate = () => {
         minIncrement: parseFloat(formData.minIncrement),
         extensionTime: parseInt(formData.extensionTime), // Backend expects minutes
         maxBid: formData.maxBid ? parseFloat(formData.maxBid) : null,
-        sellerId: user.id,
+        sellerId: internalUserId,
         imageCID: uploadedImageCID,
         sellerWalletAddress: walletAddress,
         contractAddress: blockchainData.contractAddress,
@@ -468,12 +486,13 @@ const AuctionCreate = () => {
         blockNumber: blockchainData.blockNumber,
       };
 
-      const response = await fetch("http://localhost:8080/api/auctions", {
+      const token = await getIDToken();
+      const response = await fetch(apiUrl("/api/auctions"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${user.token}`,
-          "X-User-ID": user.id,
+          Authorization: `Bearer ${token}`,
+          "X-User-ID": internalUserId,
         },
         body: JSON.stringify(auctionData),
       });
@@ -506,10 +525,12 @@ const AuctionCreate = () => {
   };
 
   return (
-    <div className="auction-create-container">
-      <div className="auction-create-wrapper">
-        <div className="auction-create-content">
-          <h1>Create New Auction</h1>
+    <>
+      <DashboardNavbar activePage="create-auction" />
+      <div className="auction-create-container">
+        <div className="auction-create-wrapper">
+          <div className="auction-create-content">
+            <h1>Create New Auction</h1>
 
           {error && <div className="alert alert-error">{error}</div>}
           {success && <div className="alert alert-success">{success}</div>}
@@ -633,7 +654,7 @@ const AuctionCreate = () => {
                   name="minIncrement"
                   value={formData.minIncrement}
                   onChange={handleInputChange}
-                  placeholder="0.00"
+                  placeholder="0.000"
                   step="0.01"
                   min="0.01"
                   required
@@ -726,6 +747,7 @@ const AuctionCreate = () => {
         ></div>
       </div>
     </div>
+  </>
   );
 };
 

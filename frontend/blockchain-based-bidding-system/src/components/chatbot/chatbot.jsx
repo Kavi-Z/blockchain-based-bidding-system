@@ -2,10 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import "./chatbot.css";
 import MessageBubble from "./MessageBubble";
-import { sendMessageToBot } from "../../services/chatbotService";
+import { chatApiUrl } from "../../config/env";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:5000";
-const CHAT_URL = import.meta.env.VITE_CHAT_URL || `${API_BASE}/api/chat/message`;
+const CHAT_URL =
+  import.meta.env.VITE_CHAT_URL || chatApiUrl("/api/chat/message");
 
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,7 +35,7 @@ export default function Chatbot() {
 
     try {
       const resp = await axios.post(CHAT_URL, { message: input });
-      const botText = resp.data?.reply || "(no response)";
+      const botText = resp.data?.reply || resp.data?.answer || "(no response)";
 
       setMessages(prev => [...prev, { sender: "bot", text: botText }]);
     } catch (err) {
@@ -55,7 +55,7 @@ export default function Chatbot() {
 
     try {
       const resp = await axios.post(CHAT_URL, { message: action });
-      const botText = resp.data?.reply || "(no response)";
+      const botText = resp.data?.reply || resp.data?.answer || "(no response)";
 
       setMessages(prev => [...prev, { sender: "bot", text: botText }]);
     } catch (error) {

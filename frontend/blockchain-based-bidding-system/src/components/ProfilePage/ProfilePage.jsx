@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useState } from "react";
 
+import { apiUrl } from "../../config/env";
+
 const ProfilePage = () => {
   const [email, setEmail] = useState("");
 
@@ -14,7 +16,7 @@ const ProfilePage = () => {
 
     try {
       const res = await axios.put(
-        `http://localhost:8080/api/auth/users/${userId}/update-email`,
+        apiUrl(`/api/auth/users/${userId}/update-email`),
         { email }
       );
 

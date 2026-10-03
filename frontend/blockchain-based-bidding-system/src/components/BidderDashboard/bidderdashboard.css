@@ -32,14 +32,14 @@
 *,
 *::before,
 *::after {
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
 }
 
 input,
 button,
 textarea,
 select {
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
 }
 
 /* ===== CONTAINER ===== */
@@ -61,7 +61,7 @@ select {
   margin: 0;
   margin-bottom: 10px;
   font-weight: 700;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   background: linear-gradient(135deg, #a8f5f6 0%, #41E1E3 50%, #2bc8ca 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -84,7 +84,7 @@ select {
   border-radius: 10px;
   margin-bottom: 20px;
   font-weight: 600;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   animation: slideIn 0.3s ease-out;
   backdrop-filter: blur(8px);
 }
@@ -127,7 +127,7 @@ select {
   border-radius: 10px;
   border: 2px solid var(--success-border);
   font-weight: 600;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   word-break: break-all;
   box-shadow: 0 0 16px var(--success-glow);
 }
@@ -140,7 +140,7 @@ select {
   border-radius: 10px;
   font-size: 1rem;
   font-weight: 600;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s, background 0.2s, color 0.2s;
   box-shadow: 0 0 16px var(--cyan-glow);
@@ -301,7 +301,7 @@ select {
   margin: 0 0 6px;
   color: var(--text-primary);
   font-size: 1.1rem;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
@@ -351,7 +351,7 @@ select {
   color: var(--cyan-primary);
   font-size: 1.25rem;
   font-weight: 800;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   letter-spacing: -0.5px;
   text-shadow: 0 0 16px rgba(65, 225, 227, 0.45);
 }
@@ -372,7 +372,7 @@ select {
   border-radius: 99px;
   font-size: 0.8rem;
   font-weight: 700;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   letter-spacing: -0.2px;
 }
 
@@ -434,7 +434,7 @@ select {
   border-radius: 10px;
   font-weight: 700;
   font-size: 0.88rem;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   cursor: pointer;
   transition: opacity 0.2s, box-shadow 0.2s, transform 0.15s;
   white-space: nowrap;
@@ -474,7 +474,7 @@ select {
   border-radius: 10px;
   font-weight: 600;
   font-size: 1rem;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -503,7 +503,7 @@ select {
   border-radius: 0.5rem;
   font-size: 1rem;
   font-weight: 600;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -530,7 +530,7 @@ select {
 .owned-nfts-section h2 {
   color: var(--text-primary);
   font-size: 1.8rem;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   margin-bottom: 2rem;
   text-align: center;
   text-shadow: 0 0 20px var(--cyan-glow);
@@ -581,7 +581,7 @@ select {
   border-radius: 2rem;
   font-size: 0.8rem;
   font-weight: 700;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   box-shadow: 0 4px 12px var(--cyan-glow);
 }
 
@@ -593,13 +593,13 @@ select {
   margin: 0 0 0.5rem 0;
   color: var(--text-primary);
   font-size: 1.3rem;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
 }
 
 .nft-details .description {
   color: var(--text-muted);
   font-size: 0.9rem;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   margin-bottom: 1rem;
 }
 
@@ -617,7 +617,7 @@ select {
   justify-content: space-between;
   align-items: center;
   font-size: 0.9rem;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
 }
 
 .info-row span {
@@ -644,7 +644,7 @@ select {
   cursor: pointer;
   color: var(--cyan-primary);
   text-decoration: none;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   transition: color 0.2s;
 }
 
@@ -665,7 +665,7 @@ select {
   border: none;
   border-radius: 0.5rem;
   font-weight: 600;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 0.9rem;
@@ -699,7 +699,7 @@ select {
   padding: 4rem 2rem;
   border-radius: 1rem;
   color: var(--text-secondary);
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
 }
 
 .no-items p {
@@ -723,7 +723,7 @@ select {
   margin-top: 0;
   color: var(--text-primary);
   font-size: 1.8rem;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   margin-bottom: 30px;
   display: flex;
   align-items: center;
@@ -763,7 +763,7 @@ select {
   border-radius: 50px;
   font-weight: 700;
   font-size: 0.9rem;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   z-index: 10;
   box-shadow: 0 4px 14px var(--success-glow);
 }
@@ -794,14 +794,14 @@ select {
   margin: 0 0 10px 0;
   color: var(--text-primary);
   font-size: 1.3rem;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   word-wrap: break-word;
 }
 
 .won-auction-card .description {
   color: var(--text-muted);
   font-size: 0.95rem;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   margin: 0 0 15px 0;
   line-height: 1.4;
 }
@@ -847,7 +847,7 @@ color: rgba(0, 47, 48, 0.8);
   padding: 12px 15px;
   border-radius: 10px;
   font-weight: 600;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
   font-size: 0.95rem;

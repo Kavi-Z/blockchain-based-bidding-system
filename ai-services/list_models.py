@@ -2,7 +2,7 @@ from google import genai
 import os
 from dotenv import load_dotenv
  
-load_dotenv(os.path.join(os.path.dirname(__file__), "app", ".env"))
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 API_KEY = os.getenv("GEMINI_API_KEY")
 print(f"API Key: {API_KEY[:15]}..." if API_KEY else "NO API KEY FOUND!")

@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Web3 from "web3";
 import AuctionContract from "./SecureAuction.json";
+import { getConfiguredContractAddress } from "../../services/contractService";
 import "./auction_page.css";
 
-const CONTRACT_ADDRESS = "0x55286Ac3A309c90918CDa8B0093ED5ECb5aF07fD";
+const CONTRACT_ADDRESS = getConfiguredContractAddress();
 
 const AuctionPage = () => {
   const [auctions, setAuctions] = useState([]);

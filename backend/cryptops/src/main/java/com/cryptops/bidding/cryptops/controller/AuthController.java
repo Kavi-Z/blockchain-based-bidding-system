@@ -16,7 +16,80 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
- 
+    @Autowired
+    private com.cryptops.bidding.cryptops.repository.UserRepository userRepository;
+
+    // ==================== JIT USER SYNC (ASGARDEO) ====================
+    @PostMapping("/sync")
+    public ResponseEntity<?> syncUser(@org.springframework.security.core.annotation.AuthenticationPrincipal org.springframework.security.oauth2.jwt.Jwt jwt, @RequestBody Map<String, String> payload) {
+        System.out.println("---- /api/auth/sync CALLED ----");
+        try {
+            if (jwt == null) {
+                System.out.println("ERROR: JWT is null. Token was not provided, not parsed, or rejected by Spring Security.");
+                return ResponseEntity.status(401).body(Map.of("error", "Unauthorized: No JWT found"));
+            }
+
+            System.out.println("JWT Sub (User ID): " + jwt.getSubject());
+            System.out.println("Payload received: " + payload);
+
+            String email = payload.get("email");
+            if (email == null || email.isEmpty()) {
+                System.out.println("ERROR: Email is missing in the payload");
+                return ResponseEntity.badRequest().body(Map.of("error", "Email is required in payload"));
+            }
+
+            // Check if user exists in MongoDB
+            java.util.Optional<User> existingUserOpt = userRepository.findByEmail(email);
+
+            if (existingUserOpt.isPresent()) {
+                System.out.println("User " + email + " already exists in MongoDB. Returning success.");
+                User user = existingUserOpt.get();
+                return ResponseEntity.ok(Map.of(
+                        "id", user.getId(),
+                        "email", user.getEmail(),
+                        "role", user.getRole(),
+                        "username", user.getUsername() != null ? user.getUsername() : user.getEmail(),
+                        "name", user.getUsername() != null ? user.getUsername() : user.getEmail(),
+                        "message", "User already synced"
+                ));
+            } else {
+                System.out.println("User " + email + " does NOT exist. Creating new user in MongoDB...");
+                User newUser = new User();
+                newUser.setEmail(email);
+                
+                String name = payload.get("name");
+                if (name == null || name.isEmpty()) name = email.split("@")[0];
+                newUser.setUsername(name);
+                
+                String role = payload.get("role");
+                if (role == null || role.isEmpty()) role = "BIDDER";
+                System.out.println("Assigned role: " + role);
+                newUser.setRole(role); 
+                
+                newUser.setIsActive(true);
+                newUser.setCreatedAt(java.time.LocalDateTime.now());
+                newUser.setUpdatedAt(java.time.LocalDateTime.now());
+                newUser.setWalletAddress(null); // Must be null, not "", to avoid sparse unique index collision
+
+                User savedUser = userRepository.save(newUser);
+                System.out.println("SUCCESS: User saved to MongoDB with ID: " + savedUser.getId());
+                
+                return ResponseEntity.ok(Map.of(
+                        "id", savedUser.getId(),
+                        "email", savedUser.getEmail(),
+                        "role", savedUser.getRole(),
+                        "username", savedUser.getUsername() != null ? savedUser.getUsername() : savedUser.getEmail(),
+                        "name", savedUser.getUsername() != null ? savedUser.getUsername() : savedUser.getEmail(),
+                        "message", "User created and synced successfully"
+                ));
+            }
+        } catch (Exception e) {
+            System.out.println("CRITICAL ERROR in /sync: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("error", "Sync failed: " + e.getMessage()));
+        }
+    }
+
     @PostMapping("/register/bidder")
     public ResponseEntity<?> registerBidder(@RequestBody RegisterRequest request) {
         try {

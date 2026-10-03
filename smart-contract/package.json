@@ -3,13 +3,24 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "truffle compile",
+    "check:sepolia": "node scripts/check-deploy.js",
+    "deploy:sepolia": "npm run compile && node scripts/check-deploy.js && node scripts/deploy-sepolia.js",
+    "migrate:local": "truffle migrate --network development",
+    "migrate:sepolia": "truffle migrate --network sepolia",
+    "test": "truffle test"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.9.3"
+    "@openzeppelin/contracts": "^4.9.3",
+    "@truffle/hdwallet-provider": "^1.7.0",
+    "dotenv": "^16.4.7",
+    "ethers": "^6.13.5"
+  },
+  "devDependencies": {
+    "truffle": "^5.11.5"
   }
 }

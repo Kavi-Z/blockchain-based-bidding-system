@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import './Landing.css';
+import { useNavigate } from 'react-router-dom';
+import './landing.css';
 import { motion } from 'framer-motion';
 import Navbar2 from '../navbar2/navbar2';
 import img1 from '../../assets/img1.jpg';
@@ -12,6 +13,7 @@ import eth from '../../assets/eth.png';
 import background from '../../assets/back.png';
 
 const Landing = () => {
+  const navigate = useNavigate();
   const [openIndex, setOpenIndex] = useState(null);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -139,6 +141,7 @@ const Landing = () => {
 
     <motion.button
       className="hero-btn"
+      onClick={() => navigate('/explore')}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
     >

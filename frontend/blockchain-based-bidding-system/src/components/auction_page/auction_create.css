@@ -39,7 +39,7 @@ body {
   margin-bottom: 30px;
   font-size: 2.2rem;
   font-weight: 700;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
   background: linear-gradient(135deg, #41E1E3, #32AEB0, #247C7D);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -63,7 +63,7 @@ body {
   font-weight: 600;
   font-size: 14px;
   color: white;
-  font-family: "MyFont1", sans-serif;
+  font-family: "'Poppins', sans-serif", sans-serif;
 }
 
 .form-group input,

@@ -43,6 +43,8 @@ to use `/ask` instead of the Node/Express intent engine.**
 
    ```bash
    uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+   npm star  #incd c:\Users\Kza\Desktop\Projects\blockchain-based-bidding-system\chatbot\backend location
+
    ```
 
 ## Common error
