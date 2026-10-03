@@ -39,6 +39,10 @@ const BidderDashboard = () => {
   const [selectedAuctionId, setSelectedAuctionId] = useState(null);
   const [bidAmount, setBidAmount] = useState("");
 
+  // Refund state (ETH owed to this wallet in the contract's pendingReturns after being outbid)
+  const [pendingRefund, setPendingRefund] = useState(0n);
+  const [withdrawing, setWithdrawing] = useState(false);
+
   // Fetching control
   const fetchOnce = useRef(false);
 
@@ -346,11 +350,86 @@ const BidderDashboard = () => {
         signer
       );
       setContract(contractInstance);
+      await fetchPendingRefund(contractInstance, accounts[0]);
 
       return true;
     } catch (err) {
       setError(`Wallet connection failed: ${err.message}`);
       return false;
+    }
+  };
+
+  /**
+   * Read how much ETH the contract owes this wallet (bids that were outbid
+   * or auctions that were cancelled). Covers all auctions, not just one.
+   */
+  const fetchPendingRefund = async (contractInstance = contract, address = walletAddress) => {
+    if (!contractInstance || !address) return;
+    try {
+      const amount = await contractInstance.pendingReturns(address);
+      setPendingRefund(amount);
+    } catch (err) {
+      console.warn("Could not read pending refund (wrong network?):", err.message);
+      setPendingRefund(0n);
+    }
+  };
+
+  /**
+   * Withdraw all refundable ETH from the contract back to the connected wallet
+   */
+  const withdrawRefund = async () => {
+    if (!contract) {
+      setError("Contract not initialized. Please connect wallet first.");
+      return;
+    }
+
+    setWithdrawing(true);
+    setError("");
+
+    try {
+      await ensureSepoliaNetwork();
+
+      // Simulate first so revert reasons ("No funds") show up before MetaMask opens
+      try {
+        await contract.withdraw.staticCall();
+      } catch (simErr) {
+        throw new Error(decodeContractError(simErr));
+      }
+
+      setSuccess("Confirm the refund withdrawal in MetaMask...");
+      const tx = await contract.withdraw();
+
+      setSuccess("Withdrawal submitted! Waiting for blockchain confirmation...");
+      const receipt = await tx.wait();
+
+      if (!receipt || receipt.status === 0) {
+        throw new Error("Withdrawal transaction failed on blockchain.");
+      }
+
+      // withdraw() returns false (instead of reverting) when the transfer fails
+      const withdrawn = receipt.logs
+        .map((log) => {
+          try {
+            return contract.interface.parseLog(log);
+          } catch {
+            return null;
+          }
+        })
+        .find((parsed) => parsed?.name === "Withdrawn");
+
+      if (!withdrawn) {
+        throw new Error("Withdrawal was not completed. Your refund is still available — please try again.");
+      }
+
+      setSuccess(`✅ Refunded ${formatEthAmount(withdrawn.args.amount)} ETH to your wallet!`);
+      setTimeout(() => setSuccess(""), 5000);
+    } catch (err) {
+      console.error("Withdraw error:", err);
+      setSuccess("");
+      setError(err.message || "Failed to withdraw refund");
+    } finally {
+      await fetchPendingRefund();
+      setWithdrawing(false);
     }
   };
 
@@ -591,8 +670,9 @@ const BidderDashboard = () => {
       setBidAmount("");
       setSelectedAuctionId(null);
 
-      // Refresh auctions
+      // Refresh auctions (and refund, in case the bidder outbid their own earlier bid)
       await fetchActiveAuctions();
+      await fetchPendingRefund();
       setTimeout(() => setSuccess(""), 3000);
     } catch (err) {
       setError(err.message || "Failed to place bid");
@@ -663,6 +743,27 @@ const BidderDashboard = () => {
           <button onClick={connectWallet} className="btn-connect-wallet">
             🔗 Connect MetaMask Wallet
           </button>
+        )}
+
+        {walletAddress && (
+          <div className="refund-section">
+            {pendingRefund > 0n ? (
+              <>
+                <span className="refund-amount">
+                  💰 Refund available: <strong>{formatEthAmount(pendingRefund)} ETH</strong>
+                </span>
+                <button
+                  onClick={withdrawRefund}
+                  disabled={withdrawing}
+                  className="btn-withdraw-refund"
+                >
+                  {withdrawing ? "Withdrawing..." : "Withdraw Refund"}
+                </button>
+              </>
+            ) : (
+              <span className="refund-none">No refunds pending — outbid amounts will appear here.</span>
+            )}
+          </div>
         )}
       </div>
 

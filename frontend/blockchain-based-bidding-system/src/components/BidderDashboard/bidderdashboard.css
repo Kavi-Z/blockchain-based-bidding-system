@@ -157,6 +157,51 @@ select {
   transform: translateY(0);
 }
 
+/* ===== REFUND (pendingReturns) ===== */
+.refund-section {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-family: "'Poppins', sans-serif", sans-serif;
+}
+
+.refund-amount {
+  color: var(--cyan-primary);
+  font-weight: 500;
+}
+
+.refund-none {
+  color: #8a8a99;
+  font-size: 0.9rem;
+}
+
+.btn-withdraw-refund {
+  padding: 10px 24px;
+  background: var(--cyan-primary);
+  color: #0a0a0f;
+  border: 2px solid var(--cyan-primary);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: "'Poppins', sans-serif", sans-serif;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 16px var(--cyan-glow);
+}
+
+.btn-withdraw-refund:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px var(--cyan-glow);
+}
+
+.btn-withdraw-refund:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* ===== AUCTIONS SECTION ===== */
 .auctions-section {
   max-width: 1200px;
