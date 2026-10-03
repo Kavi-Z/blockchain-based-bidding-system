@@ -134,3 +134,7 @@ cypress/screenshots/
 *.p12
 *.jks
 secrets/
+
+# Local extras (from feature/irasha)
+venv*/
+*.env

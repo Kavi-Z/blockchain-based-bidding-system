@@ -259,3 +259,30 @@ inside the venv; the README in `ai-services/` contains full setup steps.
 
 ## License
 This project is developed for educational purposes and is free to use and modify.
+
+
+ Blockchain-Based Bidding System with AI Chatbot
+
+![Status](https://img.shields.io/badge/status-active-success)
+![Frontend](https://img.shields.io/badge/frontend-React-blue)
+![Backend](https://img.shields.io/badge/backend-FastAPI-green)
+![AI](https://img.shields.io/badge/AI-Gemini-orange)
+
+A full-stack web application that integrates a **Blockchain-Based Bidding System** with an **AI-powered chatbot** using Google Gemini.
+
+
+
+ QUICK START (COPY & RUN)
+
+ Open 2 terminals and copy-paste:
+
+ Terminal 1 (Backend)
+
+```powershell
+& "D:\project 5th sem\software\blockchain-based-bidding-system\venv311\Scripts\Activate.ps1"
+cd "D:\project 5th sem\software\blockchain-based-bidding-system\ai-services"
+uvicorn app.main:app --reload --host 127.0.0.1 --port 5000
+
+Terminal 2 (Frontend)
+cd "D:\project 5th sem\software\blockchain-based-bidding-system\frontend\blockchain-based-bidding-system"
+npm run dev

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import "./chatbot.css";
-import MessageBubble from "./MessageBubble"; // Keep exact casing
+import MessageBubble from "./MessageBubble";
 import { chatApiUrl } from "../../config/env";
 
 const CHAT_URL =
@@ -10,14 +10,19 @@ const CHAT_URL =
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { sender: "bot", text: "Hi! Ask me about our blockchain bidding system." }
+    {
+      sender: "bot",
+      text:
+        "👋 Hi! I'm your AI assistant for the blockchain bidding system."
+    }
   ]);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  // ref to scroll chat window down when new messages arrive
-  const messagesEndRef = React.useRef(null);
-  React.useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const sendMessage = async () => {
@@ -25,51 +30,100 @@ export default function Chatbot() {
 
     const userMessage = { sender: "user", text: input };
     setMessages(prev => [...prev, userMessage]);
+    setInput("");
+    setIsLoading(true);
 
     try {
-      const AI_URL = "http://localhost:8000/api/chat/message";
-      console.log("chatbot: sending message to", AI_URL);
-      const resp = await axios.post(AI_URL, { message: input });
+      const resp = await axios.post(CHAT_URL, { message: input });
       const botText = resp.data?.reply || resp.data?.answer || "(no response)";
+
       setMessages(prev => [...prev, { sender: "bot", text: botText }]);
     } catch (err) {
-      console.error("chatbot request failed", err);
-      // show error details so user knows if it's a network vs. server issue
-      const errMsg = err.response ?
-        `⚠️ Server error ${err.response.status}: ${err.response.statusText}` :
-        `⚠️ Network error: ${err.message}`;
-      setMessages(prev => [...prev, { sender: "bot", text: errMsg }]);
-    }
+      const errMsg = err.response
+        ? `Server error ${err.response.status}`
+        : `Network error: ${err.message}`;
 
-    setInput("");
+      setMessages(prev => [...prev, { sender: "bot", text: errMsg }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleQuickAction = async (action) => {
+    setMessages(prev => [...prev, { sender: "user", text: action }]);
+    setIsLoading(true);
+
+    try {
+      const resp = await axios.post(CHAT_URL, { message: action });
+      const botText = resp.data?.reply || resp.data?.answer || "(no response)";
+
+      setMessages(prev => [...prev, { sender: "bot", text: botText }]);
+    } catch (error) {
+      setMessages(prev => [
+        ...prev,
+        { sender: "bot", text: "Connection error" }
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <>
-      <div className="chatbot-toggle" onClick={() => setIsOpen(!isOpen)}>
-        💬
+      <div
+        className={`chatbot-toggle ${isOpen ? "active" : ""}`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        {isOpen ? "✕" : "💬"}
       </div>
 
       {isOpen && (
         <div className="chatbot-window">
-          <div className="chatbot-header">AI Assistant</div>
+          <div className="chatbot-header">
+            <div className="header-content">
+              <div className="header-icon">🤖</div>
+              <div className="header-text">
+                <span className="header-title">BidBot Support</span>
+                <span className="header-status">
+                  <div className="status-dot"></div>
+                  Online
+                </span>
+              </div>
+            </div>
+            <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
+          </div>
 
           <div className="chatbot-messages">
-            {messages.map((msg, index) => (
-              <MessageBubble key={index} sender={msg.sender} text={msg.text} />
+            {messages.map((msg, i) => (
+              <MessageBubble key={i} sender={msg.sender} text={msg.text} />
             ))}
+            {isLoading && (
+              <div className="message bot typing">
+                <div className="typing-indicator">
+                  <span></span><span></span><span></span>
+                </div>
+              </div>
+            )}
             <div ref={messagesEndRef} />
+          </div>
+
+          <div className="quick-actions">
+            <button onClick={() => handleQuickAction("How do I place a bid?")}>How to bid?</button>
+            <button onClick={() => handleQuickAction("Is my data secure?")}>Is my data secure?</button>
+            <button onClick={() => handleQuickAction("How do smart contracts work here?")}>Smart Contracts?</button>
           </div>
 
           <div className="chatbot-input">
             <input
-              type="text"
               value={input}
+              placeholder="Type your message..."
+              disabled={isLoading}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about blockchain bidding..."
               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             />
-            <button onClick={sendMessage}>Send</button>
+            <button onClick={sendMessage} disabled={isLoading || !input.trim()}>
+              ➤
+            </button>
           </div>
         </div>
       )}
