@@ -80,25 +80,49 @@ export default function Chatbot() {
       {isOpen && (
         <div className="chatbot-window">
           <div className="chatbot-header">
-            <span>AI Assistant</span>
-            <button onClick={() => setIsOpen(false)}>✕</button>
+            <div className="header-content">
+              <div className="header-icon">🤖</div>
+              <div className="header-text">
+                <span className="header-title">BidBot Support</span>
+                <span className="header-status">
+                  <div className="status-dot"></div>
+                  Online
+                </span>
+              </div>
+            </div>
+            <button className="close-btn" onClick={() => setIsOpen(false)}>✕</button>
           </div>
 
           <div className="chatbot-messages">
             {messages.map((msg, i) => (
               <MessageBubble key={i} sender={msg.sender} text={msg.text} />
             ))}
+            {isLoading && (
+              <div className="message bot typing">
+                <div className="typing-indicator">
+                  <span></span><span></span><span></span>
+                </div>
+              </div>
+            )}
             <div ref={messagesEndRef} />
+          </div>
+
+          <div className="quick-actions">
+            <button onClick={() => handleQuickAction("How do I place a bid?")}>How to bid?</button>
+            <button onClick={() => handleQuickAction("Is my data secure?")}>Is my data secure?</button>
+            <button onClick={() => handleQuickAction("How do smart contracts work here?")}>Smart Contracts?</button>
           </div>
 
           <div className="chatbot-input">
             <input
               value={input}
+              placeholder="Type your message..."
+              disabled={isLoading}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             />
-            <button onClick={sendMessage}>
-              {isLoading ? "..." : "➤"}
+            <button onClick={sendMessage} disabled={isLoading || !input.trim()}>
+              ➤
             </button>
           </div>
         </div>

@@ -1,20 +1,10 @@
 import os
- 
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.schema import Document
-from langchain.vectorstores import Chroma
-from langchain.embeddings import GoogleGenerativeAIEmbeddings
- 
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
-from langchain.text_splitters import RecursiveCharacterTextSplitter
-from langchain.schema import Document
-from langchain.vectorstores import Chroma
-from langchain.embeddings import GoogleGenerativeAIEmbeddings
 
 
 
@@ -50,8 +40,8 @@ def main():
 
     print("🧠 Creating Gemini embeddings...")
     embeddings = GoogleGenerativeAIEmbeddings(
-        model="models/embedding-001",
-        api_key=GEMINI_API_KEY
+        model="models/text-embedding-004",
+        google_api_key=GEMINI_API_KEY
     )
 
     print("💾 Saving to Chroma DB...")

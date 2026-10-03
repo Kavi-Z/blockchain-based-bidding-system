@@ -4,9 +4,13 @@ import traceback
 
 sys.path.append(os.path.dirname(__file__))
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import List, Optional
+import threading
+import uuid
+from datetime import datetime
 from google import genai
 from config import GEMINI_API_KEY
 
@@ -29,8 +33,8 @@ app = FastAPI(title="Blockchain Bidding Chatbot API")
 # Enable CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -96,10 +100,56 @@ async def chat_message(request: MessageRequest):
         if not request.message.strip():
             return MessageResponse(reply="Please enter a message.")
 
-        full_prompt = f"{SYSTEM_PROMPT}\n\nUser Question: {request.message}\n\nAssistant:"
+        user_text = request.message.strip()
+        lower = user_text.lower()
+
+        # Detect whether the user is asking about auctions so we can include live data
+        auction_triggers = [
+            "auction", "bid", "current price", "highest bidder", "highest bid",
+            "list auctions", "show auctions", "what is the current price", "who is the highest"
+        ]
+
+        auction_context = ""
+        if any(t in lower for t in auction_triggers):
+            # Try to find a matching auction by ID or title keywords
+            matched = []
+            with auctions_lock:
+                # direct id match (if user pasted an id-like token)
+                for aid, a in auctions.items():
+                    if aid in lower:
+                        matched = [a]
+                        break
+
+                # if no direct id match, try title substring match
+                if not matched:
+                    for aid, a in auctions.items():
+                        title = (a.get("title") or "").lower()
+                        # match if any significant word appears
+                        for w in title.split():
+                            if w and w in lower:
+                                matched.append(a)
+                                break
+
+                # fallback: include up to 5 active auctions
+                if not matched:
+                    matched = [a for a in auctions.values() if a.get("is_active")][:5]
+
+            if matched:
+                lines = ["Live auction data (up to 5):"]
+                for a in matched:
+                    lines.append(f"- ID: {a['id']} | Title: {a['title']} | Current: {a['current_price']} | Highest: {a.get('highest_bidder') or 'None'} | Active: {a['is_active']}")
+                auction_context = "\n".join(lines)
+            else:
+                auction_context = "Live auction data: no active auctions found."
+
+        # Build final prompt, injecting auction_context when present
+        if auction_context:
+            full_prompt = f"{SYSTEM_PROMPT}\n\n{auction_context}\n\nUser Question: {user_text}\n\nAssistant:"
+        else:
+            full_prompt = f"{SYSTEM_PROMPT}\n\nUser Question: {user_text}\n\nAssistant:"
 
         print(f"Sending request to Gemini...")
-        
+
         # Use gemini-2.5-flash - this model works!
         response = client.models.generate_content(
             model="gemini-2.5-flash",
@@ -107,7 +157,7 @@ async def chat_message(request: MessageRequest):
         )
 
         print(f"Response received successfully!")
-        
+
         reply_text = response.text if response.text else "I apologize, but I couldn't generate a response."
 
         return MessageResponse(reply=reply_text)
@@ -127,6 +177,93 @@ async def get_auction_status():
         "message": "Auctions are running normally",
         "status": "online"
     }
+
+
+# --- Simple in-memory auction management (for sprint/demo) ---
+auctions_lock = threading.Lock()
+auctions = {}
+
+class AuctionCreate(BaseModel):
+    title: str
+    description: Optional[str] = ""
+    starting_bid: float
+    ends_at: Optional[datetime] = None
+    seller: Optional[str] = "anonymous"
+
+class Auction(BaseModel):
+    id: str
+    title: str
+    description: Optional[str]
+    starting_bid: float
+    current_price: float
+    highest_bidder: Optional[str]
+    ends_at: Optional[datetime]
+    is_active: bool
+    bids: List[dict]
+
+class BidRequest(BaseModel):
+    bidder: str
+    amount: float
+
+@app.post("/api/auctions", response_model=Auction)
+def create_auction(a: AuctionCreate):
+    with auctions_lock:
+        aid = str(uuid.uuid4())
+        auction = {
+            "id": aid,
+            "title": a.title,
+            "description": a.description,
+            "starting_bid": a.starting_bid,
+            "current_price": a.starting_bid,
+            "highest_bidder": None,
+            "ends_at": a.ends_at,
+            "is_active": True,
+            "bids": [],
+        }
+        auctions[aid] = auction
+    return auction
+
+@app.get("/api/auctions", response_model=List[Auction])
+def list_auctions():
+    with auctions_lock:
+        return list(auctions.values())
+
+@app.get("/api/auctions/{auction_id}", response_model=Auction)
+def get_auction(auction_id: str):
+    with auctions_lock:
+        auc = auctions.get(auction_id)
+        if not auc:
+            raise HTTPException(status_code=404, detail="Auction not found")
+        return auc
+
+@app.post("/api/auctions/{auction_id}/bid")
+def place_bid(auction_id: str, bid: BidRequest):
+    with auctions_lock:
+        auc = auctions.get(auction_id)
+        if not auc:
+            raise HTTPException(status_code=404, detail="Auction not found")
+        if not auc["is_active"]:
+            raise HTTPException(status_code=400, detail="Auction is closed")
+        if bid.amount <= auc["current_price"]:
+            raise HTTPException(status_code=400, detail=f"Bid must be greater than current price ({auc['current_price']})")
+
+        # record bid
+        bid_entry = {"bidder": bid.bidder, "amount": bid.amount, "timestamp": datetime.utcnow().isoformat()}
+        auc["bids"].append(bid_entry)
+        auc["current_price"] = bid.amount
+        auc["highest_bidder"] = bid.bidder
+
+    return {"status": "ok", "auction_id": auction_id, "current_price": auc["current_price"], "highest_bidder": auc["highest_bidder"]}
+
+@app.post("/api/auctions/{auction_id}/close")
+def close_auction(auction_id: str):
+    with auctions_lock:
+        auc = auctions.get(auction_id)
+        if not auc:
+            raise HTTPException(status_code=404, detail="Auction not found")
+        auc["is_active"] = False
+    return {"status": "closed", "auction_id": auction_id}
+
 
 @app.get("/health")
 async def health_check():
