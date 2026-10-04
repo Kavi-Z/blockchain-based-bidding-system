@@ -640,6 +640,19 @@ const BidderDashboard = () => {
       
       console.log("✅ Bid confirmed in block:", receipt.blockNumber, "Tx hash:", receipt.transactionHash);
 
+      let blockchainEndTime = null;
+      for (const log of receipt.logs ?? []) {
+        try {
+          const parsedLog = contract.interface.parseLog(log);
+          if (parsedLog?.name === "AuctionExtended") {
+            blockchainEndTime = Number(parsedLog.args.newEndTime);
+            break;
+          }
+        } catch {
+          continue;
+        }
+      }
+
       // Save bid to backend with confirmed blockchain data
       const bidData = {
         auctionId: selectedAuctionId,
@@ -647,6 +660,7 @@ const BidderDashboard = () => {
         bidAmount: parseFloat(bidAmount),
         transactionHash: receipt.transactionHash,
         blockNumber: receipt.blockNumber,
+        blockchainEndTime,
       };
 
       console.log("Saving bid to backend:", bidData);

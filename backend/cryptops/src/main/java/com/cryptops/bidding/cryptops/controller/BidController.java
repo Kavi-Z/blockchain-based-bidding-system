@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -124,8 +126,15 @@ public class BidController {
             auction.setCurrentHighestBid(request.getBidAmount());
             auction.setHighestBidderId(userId);
             auction.setHighestBidderUsername(bidderUsername);
+
+            if (request.getBlockchainEndTime() != null) {
+                auction.setEndTime(LocalDateTime.ofInstant(
+                        Instant.ofEpochSecond(request.getBlockchainEndTime()),
+                        ZoneId.systemDefault()
+                ));
+            }
              
-            if (auction.getExtensionTime() > 0) {
+            if (request.getBlockchainEndTime() == null && auction.getExtensionTime() > 0) {
                 long msUntilEnd = auction.getEndTime().atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli() - System.currentTimeMillis();
                 long extensionMs = auction.getExtensionTime() * 60 * 1000L;
                 

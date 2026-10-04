@@ -6,6 +6,7 @@ public class BidRequest {
     private Double bidAmount;
     private String transactionHash;
     private Long blockNumber;
+    private Long blockchainEndTime;
 
     public BidRequest() {}
 
@@ -55,5 +56,13 @@ public class BidRequest {
 
     public void setBlockNumber(Long blockNumber) {
         this.blockNumber = blockNumber;
+    }
+
+    public Long getBlockchainEndTime() {
+        return blockchainEndTime;
+    }
+
+    public void setBlockchainEndTime(Long blockchainEndTime) {
+        this.blockchainEndTime = blockchainEndTime;
     }
 }
