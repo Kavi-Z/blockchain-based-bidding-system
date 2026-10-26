@@ -1,4 +1,5 @@
 import os
+import traceback
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -44,5 +45,10 @@ def ask_question(query: Query):
     """
     Receive user question and return chatbot answer
     """
-    answer = qa_chain.run(query.message)
+    try:
+        answer = qa_chain.run(query.message)
+    except Exception as e:
+        # Returning normally keeps the CORS headers, so the browser shows this instead of a CORS error
+        traceback.print_exc()
+        return {"answer": f"Sorry, the AI service failed: {type(e).__name__}: {str(e)[:300]}"}
     return {"answer": answer}

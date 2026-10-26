@@ -5,7 +5,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 
-from .config import VECTOR_DB_PATH, GEMINI_API_KEY
+from .config import VECTOR_DB_PATH, GEMINI_API_KEY, GEMINI_CHAT_MODEL
 
 
 class ChainWrapper:
@@ -30,7 +30,7 @@ def get_chain():
     retriever = vectordb.as_retriever(search_kwargs={"k": 3})
 
     llm = ChatGoogleGenerativeAI(
-        model="models/gemini-2.5-flash",
+        model=GEMINI_CHAT_MODEL,
         temperature=0,
         api_key=GEMINI_API_KEY
     )
