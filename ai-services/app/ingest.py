@@ -29,6 +29,15 @@ def split_text(documents):
     )
     return splitter.split_documents(documents)
 
+def vector_store_exists():
+    """True only if the store holds documents; a failed ingest can leave an empty one behind."""
+    if not os.path.exists(os.path.join(VECTOR_DB_PATH, "chroma.sqlite3")):
+        return False
+    try:
+        return Chroma(persist_directory=VECTOR_DB_PATH)._collection.count() > 0
+    except Exception:
+        return False
+
 def main():
     print("Loading documents...")
     documents = load_documents()

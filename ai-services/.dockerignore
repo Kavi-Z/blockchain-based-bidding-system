@@ -1,0 +1,10 @@
+venv/
+.env
+__pycache__/
+*.pyc
+
+# Rebuilt inside the container on first start
+vector_store/
+
+# pip log accidentally committed
+2.0

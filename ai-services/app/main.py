@@ -2,6 +2,12 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from .rag_chain import get_chain
+from . import ingest
+
+# The vector store is not committed, so build it on first start (e.g. a fresh Railway deploy)
+if not ingest.vector_store_exists():
+    print("Vector store not found; running ingestion...")
+    ingest.main()
 
 app = FastAPI()
 
