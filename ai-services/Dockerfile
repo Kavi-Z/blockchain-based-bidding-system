@@ -9,8 +9,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application code
 COPY . .
 
-# Expose the port the app runs on
+# Default port for local runs; Railway overrides PORT at runtime
+ENV PORT=8000
 EXPOSE 8000
 
-# Command to run the application
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Command to run the application (shell form so ${PORT} is expanded)
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT}
